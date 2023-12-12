@@ -15,7 +15,7 @@ class ConfigService {
     public function __construct(
     ) {
         $this->serializerService = new SerializerService();
-        $this->filesystem = new Filesystem();
+//        $this->filesystem = new Filesystem();
     }
 
     public function createConfig(
