@@ -1,0 +1,12 @@
+{
+    "alias": "marathon",
+    "chmod": "0777",
+    "directories": [
+        "./config",
+        "./src",
+        "./vendor"
+    ],
+    "files": [".env"],
+    "main": "bin/marathon",
+    "output": "marathon"
+  }
