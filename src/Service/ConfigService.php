@@ -18,7 +18,7 @@ class ConfigService {
         private TimerService $timerService,
     ) {
         $this->serializerService = new SerializerService();
-//        $this->filesystem = new Filesystem();
+        $this->filesystem = new Filesystem();
     }
 
     /**
