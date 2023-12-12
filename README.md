@@ -44,10 +44,10 @@ To contribute to the project, you can follow these instructions:
 - Clone the marathon GitHub repository
 - Create a branch for your contribution
 - Make your changes
-- Test your changes
-- Build your bin
+- Test your changes with `bin/phpunit`
+- Build your bin with `box compile`
 - Submit a pull request
-- 
+
 ### Build a bin with Box
 #### Box install
 [Box2](https://github.com/box-project/box) used for binary generation from php project. **PHP >=8.1 is required.**
