@@ -23,16 +23,3 @@ jobs:
 
             - name: Run PHPUnit
               run: ./bin/phpunit
-
-            - name: Set build status
-              if: always() # Cette étape est exécutée même en cas d'échec des tests
-              uses: octokit/request-action@v2.x
-              with:
-                  route: POST /repos/:owner/:repo/statuses/:sha
-                  sha: ${{ github.sha }}
-                  state: ${{ job.status }}
-                  target_url: ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}
-                  description: 'PHPUnit Tests'
-                  context: phpunit
-env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
