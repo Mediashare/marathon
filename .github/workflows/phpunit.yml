@@ -34,3 +34,5 @@ jobs:
                   target_url: ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}
                   description: 'PHPUnit Tests'
                   context: phpunit
+env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
