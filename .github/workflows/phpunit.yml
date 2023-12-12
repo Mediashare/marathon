@@ -21,5 +21,8 @@ jobs:
             - name: Install dependencies
               run: composer install
 
+            - name: PHPUnit permissions
+              run: chmod +x ./bin/phpunit
+
             - name: Run PHPUnit
               run: ./bin/phpunit
