@@ -59,7 +59,7 @@ class OutputService {
             ->setRows(
                 ($this->getTimer() instanceof Timer)
                     ? [$this->getTimer()->toRender($this->getConfig()->getDateTimeFormat())]
-                    : $this->getTimer()->map(fn (Timer $timer) => $timer->toRender($this->getConfig()->getDateTimeFormat()))
+                    : $this->getTimer()->map(static fn (Timer $timer) => $timer->toRender($this->getConfig()->getDateTimeFormat()))
                     ->toArray()
             )
             ->render()
@@ -77,7 +77,7 @@ class OutputService {
                 $this->getTimer()
                     ->getCommits()
                     ->map(
-                        fn (Commit $commit)
+                        static fn (Commit $commit)
                             => $commit
                                 ->toRender(
                                     $this->getTimer()->getCommits()->getKey($commit) + 1,
@@ -85,7 +85,7 @@ class OutputService {
                                         $this->getTimer()
                                             ->getCommits()
                                             ->allPrevious($commit)
-                                            ->map(fn (Commit $previousCommit) => $previousCommit->getSeconds())
+                                            ->map(static fn (Commit $previousCommit) => $previousCommit->getSeconds())
                                             ->toArray(),
                                     ),
                                     $this->getConfig()->getDateTimeFormat()

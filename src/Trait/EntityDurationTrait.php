@@ -32,12 +32,12 @@ trait EntityDurationTrait {
                             ? $this
                                 ->getCommits()
                                 ->map(
-                                    fn (Commit $commit) => $commit->getSeconds()
+                                    static fn (Commit $commit) => $commit->getSeconds()
                                 )->toArray()
                             : [],
                         $this
                             ->getSteps()
-                            ->map(fn (Step $step) => $step->getSeconds())
+                            ->map(static fn (Step $step) => $step->getSeconds())
                             ->toArray(),
                     )
                 );
@@ -46,7 +46,7 @@ trait EntityDurationTrait {
                 $seconds = array_sum(
                     $this
                         ->getSteps()
-                        ->map(fn (Step $step) => $step->getSeconds())
+                        ->map(static fn (Step $step) => $step->getSeconds())
                         ->toArray()
                 );
                 break;

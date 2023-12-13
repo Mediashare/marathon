@@ -86,7 +86,7 @@ class CommitService {
         if (($commit = $timer
                 ->getCommits()
                 ->findOneBy(
-                    fn (Commit $commit) => $commit->getId() === $id
+                    static fn (Commit $commit) => $commit->getId() === $id
                 )) === null
         ) {
             throw new CommitNotFoundException();
@@ -129,7 +129,8 @@ class CommitService {
         string $id,
     ): self {
         $timer = $this->getTimer();
-        if (($commit = $timer->getCommits()->findOneBy(fn(Commit $commit) => $commit->getId() === $id)) === null):
+        if (($commit = $timer->getCommits()->findOneBy(static fn (Commit $commit) => $commit->getId() === $id)) ===
+            null):
             throw new CommitNotFoundException();
         endif;
 

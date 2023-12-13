@@ -29,11 +29,11 @@ class CommitCollection extends AbstractCollection
         return new CommitCollection(
             array_filter(
                 array_map(
-                    fn (Commit $commit, int $key) => $key < $currentKey ? $commit : null,
+                    static fn (Commit $commit, int $key) => $key < $currentKey ? $commit : null,
                     $this->data,
                     array_keys($this->data),
                 ),
-                fn (Commit|null $commit) => $commit instanceof Commit,
+                static fn (Commit|null $commit) => $commit instanceof Commit,
             )
         );
     }

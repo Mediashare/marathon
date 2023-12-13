@@ -101,7 +101,7 @@ class Timer {
 
     public function removeCommits(CommitCollection $commits): self {
         $commits
-            ->map(fn (Commit $commit) => $this->removeCommit($commit));
+            ->map(static fn (Commit $commit) => $this->removeCommit($commit));
 
         return $this;
     }
