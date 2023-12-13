@@ -2,7 +2,7 @@
 namespace Mediashare\Marathon\Service;
 
 use Mediashare\Marathon\Entity\Config;
-use Mediashare\Marathon\Entity\Timer;
+use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
 use Mediashare\Marathon\Trait\ArrayToEntityTrait;
@@ -33,29 +33,29 @@ class SerializerService {
      * @throws FileNotFoundException
      * @throws JsonDecodeException
      */
-    public function read(string $filepath, string $className): Timer|Config {
+    public function read(string $filepath, string $className): Task|Config {
         if (!$this->filesystem->exists($filepath)):
             throw new FileNotFoundException($filepath);
         endif;
 
         $content = file_get_contents($filepath);
 
-        if (!($timerArray = json_decode($content, true)) || json_last_error() !== JSON_ERROR_NONE):
+        if (!($taskArray = json_decode($content, true)) || json_last_error() !== JSON_ERROR_NONE):
             throw new JsonDecodeException($filepath);
         endif;
 
-        return $this->arrayToEntity($timerArray, $className);
+        return $this->arrayToEntity($taskArray, $className);
     }
 
     /**
-     * Write timer file
+     * Write task file
      */
-    public function writeTimer(string $filepath, Timer $timer): self {
+    public function writeTask(string $filepath, Task $task): self {
         $this
             ->filesystem
             ->dumpFile(
                 $filepath,
-                $this->serializer->serialize($timer, 'json')
+                $this->serializer->serialize($task, 'json')
             )
         ;
 

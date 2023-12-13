@@ -4,7 +4,7 @@ namespace Mediashare\Marathon\Trait;
 
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Step;
-use Mediashare\Marathon\Entity\Timer;
+use Mediashare\Marathon\Entity\Task;
 
 trait EntityDurationTrait {
     /**
@@ -12,7 +12,7 @@ trait EntityDurationTrait {
      */
     public function getDuration(bool|null $onlyNotCommited = false, int $totalSeconds = 0): string {
         $seconds = $this->getSeconds($onlyNotCommited) + $totalSeconds;
-        return $this->duration = trim(
+        return trim(
             sprintf(
                 '%s %02d:%02d:%02d',
                 ((($seconds/86400%60) !== 0) ? ($seconds/86400%60) . 'd' : ''),
@@ -25,7 +25,7 @@ trait EntityDurationTrait {
 
     public function getSeconds(bool|null $onlyNotCommited = false): int {
         switch (self::class) {
-            case Timer::class:
+            case Task::class:
                 $seconds = array_sum(
                     array_merge(
                         !$onlyNotCommited
@@ -53,6 +53,7 @@ trait EntityDurationTrait {
             case Step::class:
                 $seconds = ($this->getEndDate() ?? (new \DateTime())->getTimestamp()) - $this->getStartDate();
                 break;
+            default: $seconds = 0;
         }
 
         return $seconds;

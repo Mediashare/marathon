@@ -4,12 +4,12 @@ namespace Mediashare\Marathon\Trait;
 
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Step;
-use Mediashare\Marathon\Entity\Timer;
+use Mediashare\Marathon\Entity\Task;
 
 trait EntityDateTimeTrait {
     public function getStartDate(): int|null {
         switch (self::class) {
-            case Timer::class:
+            case Task::class:
                 $startDate =
                     $this->getCommits()?->first()?->getStartDate()
                     ?? $this->getSteps()?->first()?->getStartDate()
@@ -35,7 +35,7 @@ trait EntityDateTimeTrait {
 
     public function getEndDate(): int|null {
         switch (self::class) {
-            case Timer::class:
+            case Task::class:
                 $endDate =
                     $this->getCommits()?->first()?->getEndDate()
                     ?? $this->getSteps()?->first()?->getEndDate()

@@ -17,11 +17,11 @@ $app = new Symfony\Component\Console\Application(
 
 $handlerService = new \Mediashare\Marathon\Service\HandlerService(
     new \Mediashare\Marathon\Service\ConfigService(
-            $timerService = new \Mediashare\Marathon\Service\TimerService(
+            $taskService = new \Mediashare\Marathon\Service\TaskService(
                     $stepService = new \Mediashare\Marathon\Service\StepService(),
             )
     ),
-    $timerService,
+    $taskService,
     new \Mediashare\Marathon\Service\CommitService($stepService),
     new \Mediashare\Marathon\Service\SerializerService(),
 );
@@ -29,38 +29,38 @@ $handlerService = new \Mediashare\Marathon\Service\HandlerService(
 $outputService = new \Mediashare\Marathon\Service\OutputService();
 
 $commandsLoader = new \Symfony\Component\Console\CommandLoader\FactoryCommandLoader([
-    'task:list' => function () use ($handlerService, $outputService, ) {
-            return new Mediashare\Marathon\Command\TimerListCommand($handlerService, $outputService);
+    'task:list' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskListCommand($handlerService, $outputService);
         },
-    'task:start' => function () use ($handlerService, $outputService, ) {
-            return new Mediashare\Marathon\Command\TimerStartCommand($handlerService, $outputService);
+    'task:start' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskStartCommand($handlerService, $outputService);
         },
-    'task:stop' => function () use ($handlerService, $outputService, ) {
-            return new Mediashare\Marathon\Command\TimerStopCommand($handlerService, $outputService);
+    'task:stop' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskStopCommand($handlerService, $outputService);
         },
-    'task:status' => function () use ($handlerService, $outputService, ) {
-            return new Mediashare\Marathon\Command\TimerStatusCommand($handlerService, $outputService);
+    'task:status' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskStatusCommand($handlerService, $outputService);
         },
-    'task:archive' => function () use ($handlerService, $outputService, ) {
-            return new Mediashare\Marathon\Command\TimerArchiveCommand($handlerService, $outputService);
+    'task:archive' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskArchiveCommand($handlerService, $outputService);
         },
-    'task:delete' => function () use ($handlerService, $outputService, ) {
-            return new Mediashare\Marathon\Command\TimerDeleteCommand($handlerService, $outputService);
+    'task:delete' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskDeleteCommand($handlerService, $outputService);
         },
-    'task:commit' => function () use ($handlerService, $outputService, ) {
+    'commit' => function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\CommitCommand($handlerService, $outputService);
         },
-    'task:commit:edit' => function () use ($handlerService, $outputService,) {
+    'commit:edit' => function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\CommitEditCommand($handlerService, $outputService);
         },
-    'task:commit:delete' => function () use ($handlerService, $outputService,) {
+    'commit:delete' => function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\CommitDeleteCommand($handlerService, $outputService);
         },
     'marathon:gitignore' => function () {
-            return new Mediashare\Marathon\Command\GitignoreCommand();
+            return new Mediashare\Marathon\Command\MarathonGitignoreCommand();
         },
     'marathon:upgrade' => function () {
-            return new Mediashare\Marathon\Command\UpgradeCommand();
+            return new Mediashare\Marathon\Command\MarathonUpgradeCommand();
         },
 ]);
 $app->setCommandLoader($commandsLoader);

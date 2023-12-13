@@ -7,7 +7,7 @@ use Mediashare\Marathon\Trait\EntityDateTimeTrait;
 use Mediashare\Marathon\Trait\EntityDurationTrait;
 use Mediashare\Marathon\Trait\EntityUnserializerTrait;
 
-class Timer {
+class Task {
     use EntityDateTimeTrait;
     use EntityDurationTrait;
     use EntityUnserializerTrait;
@@ -99,13 +99,6 @@ class Timer {
         return $this;
     }
 
-    public function removeCommits(CommitCollection $commits): self {
-        $commits
-            ->map(static fn (Commit $commit) => $this->removeCommit($commit));
-
-        return $this;
-    }
-
     /**
      * @param StepCollection<Step> $steps
      * @return $this
@@ -138,7 +131,7 @@ class Timer {
             'running' => \ucfirst($this->getStatus()),
             'commits' => $this->getCommits()->count(),
             'duration' => $this->getDuration(),
-            'current_timer' => $this->getDuration(onlyNotCommited: true),
+            'current_task' => $this->getDuration(onlyNotCommited: true),
             'startDate' => $this->getStartDateFormated($dateTimeFormat),
             'endDate' => $this->getEndDateFormated($dateTimeFormat),
         ];

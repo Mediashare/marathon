@@ -7,7 +7,7 @@ use Mediashare\Marathon\Collection\StepCollection;
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Step;
-use Mediashare\Marathon\Entity\Timer;
+use Mediashare\Marathon\Entity\Task;
 
 trait EntityUnserializerTrait {
     use ArrayToEntityTrait;
@@ -21,9 +21,9 @@ trait EntityUnserializerTrait {
                     endif;
                 endforeach;
                 break;
-            case Timer::class:
+            case Task::class:
                 foreach ($data as $key => $value):
-                    if (!is_array($value) && method_exists(Timer::class, $method = 'set' . $key)):
+                    if (!is_array($value) && method_exists(Task::class, $method = 'set' . $key)):
                         $this->{$method}($value);
                     endif;
                 endforeach;
