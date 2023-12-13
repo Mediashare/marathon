@@ -2,10 +2,8 @@
 namespace Mediashare\Marathon\Command;
 
 use Mediashare\Marathon\Entity\Config;
-use Mediashare\Marathon\Service\ConfigService;
 use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\OutputService;
-use Mediashare\Marathon\Service\TimerService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
