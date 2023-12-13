@@ -41,7 +41,7 @@ class StepServiceTest extends AbstractTestCase {
 
     public function testCreateWithCustomDuration(): void {
         $customDuration = '+5 minutes';
-        $step = $this->stepService->createStepWithCustomDuration($customDuration);
+        $step = $this->stepService->createWithCustomDuration($customDuration);
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
@@ -53,7 +53,7 @@ class StepServiceTest extends AbstractTestCase {
     public function testCreateWithCustomDurationAndStartDate(): void {
         $customDuration = '+2 hours';
         $customStartDate = strtotime('2023-03-01');
-        $step = $this->stepService->createStepWithCustomDuration($customDuration, $customStartDate);
+        $step = $this->stepService->createWithCustomDuration($customDuration, $customStartDate);
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertEquals($customStartDate, $step->getStartDate());

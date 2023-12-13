@@ -20,7 +20,7 @@ class StepService {
      * @param string $duration (exemple: '+5minutes', '+2hours', '+1days')
      * @param int|null $startDate Timestamp of startDate
      */
-    public function createStepWithCustomDuration(string $duration, int|null $startDate = null): Step {
+    public function createWithCustomDuration(string $duration, int|null $startDate = null): Step {
         $startDate = $startDate ?? (new \DateTime())->getTimestamp();
         $endDate = strtotime($duration, $startDate);
 

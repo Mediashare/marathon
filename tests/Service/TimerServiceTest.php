@@ -5,30 +5,42 @@ namespace Mediashare\Marathon\Tests\Service;
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Step;
 use Mediashare\Marathon\Entity\Timer;
+use Mediashare\Marathon\Exception\FileNotFoundException;
+use Mediashare\Marathon\Exception\JsonDecodeException;
 use Mediashare\Marathon\Exception\TimerNotFoundException;
+use Mediashare\Marathon\Service\StepService;
 use Mediashare\Marathon\Service\TimerService;
 use Mediashare\Marathon\Tests\AbstractTestCase;
 
 class TimerServiceTest extends AbstractTestCase {
     private TimerService $timerService;
-    private Config $config;
 
     protected function setUp(): void
     {
-        $this->config = new Config(
+        $config = new Config(
             timerDirectory: sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'marathon' . DIRECTORY_SEPARATOR . 'timers',
             timerId: (new \DateTime())->format('YmdHis')
         );
-        $this->timerService = new TimerService($this->config);
+        $this->timerService = (new TimerService(new StepService()))->setConfig($config);
     }
 
-    public function testCreateTimer(): void {
-        $timer = $this->timerService->createTimer(['id' => 'test_id']);
+    /**
+     * @throws JsonDecodeException
+     * @throws TimerNotFoundException
+     * @throws FileNotFoundException
+     */
+    public function testCreate(): void {
+        $timer = $this->timerService->create(['id' => 'test_id'])->getTimer();
 
         $this->assertInstanceOf(Timer::class, $timer);
         $this->assertEquals('test_id', $timer->getId());
     }
 
+    /**
+     * @throws JsonDecodeException
+     * @throws TimerNotFoundException
+     * @throws FileNotFoundException
+     */
     public function testGetTimer(): void {
         $timer = $this->timerService->getTimer();
 
@@ -36,8 +48,13 @@ class TimerServiceTest extends AbstractTestCase {
         $this->assertTrue($timer->isRun());
     }
 
-    public function testStartTimer(): void {
-        $timer = $this->timerService->start('Test Timer', '+1 hour');
+    /**
+     * @throws JsonDecodeException
+     * @throws TimerNotFoundException
+     * @throws FileNotFoundException
+     */
+    public function testStart(): void {
+        $timer = $this->timerService->start('Test Timer', '+1 hour')->getTimer();
 
         $this->assertTrue($timer->isRun());
         $this->assertEquals('Test Timer', $timer->getName());
@@ -53,9 +70,14 @@ class TimerServiceTest extends AbstractTestCase {
         $this->assertNull($step->getEndDate());
     }
 
-    public function testStopTimer(): void {
+    /**
+     * @throws JsonDecodeException
+     * @throws TimerNotFoundException
+     * @throws FileNotFoundException
+     */
+    public function testStop(): void {
         $this->timerService->start('Test Timer', '+1 hour');
-        $timer = $this->timerService->stop();
+        $timer = $this->timerService->stop()->getTimer();
 
         $this->assertFalse($timer->isRun());
         $this->assertCount(2, $timer->getSteps());
@@ -69,15 +91,25 @@ class TimerServiceTest extends AbstractTestCase {
         $this->assertSame($step->getEndDate(), $step->getStartDate());
     }
 
-    public function testArchiveTimer(): void {
+    /**
+     * @throws JsonDecodeException
+     * @throws TimerNotFoundException
+     * @throws FileNotFoundException
+     */
+    public function testArchive(): void {
         $this->timerService->start('Test Timer', '+1 hour');
-        $timer = $this->timerService->archive();
+        $timer = $this->timerService->archive()->getTimer();
 
         $this->assertTrue($timer->isArchived());
     }
 
-    public function testRemoveTimer(): void {
-        $timer = $this->timerService->start('Test Timer', '+1 hour');
+    /**
+     * @throws FileNotFoundException
+     * @throws JsonDecodeException
+     * @throws TimerNotFoundException
+     */
+    public function testDelete(): void {
+        $this->timerService->start('Test Timer', '+1 hour');
         $this->timerService->delete();
 
         $this->expectException(TimerNotFoundException::class);

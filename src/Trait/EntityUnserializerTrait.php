@@ -30,12 +30,12 @@ trait EntityUnserializerTrait {
 
                 $this
                     ->setCommits(new CommitCollection(array_map(
-                            static fn (array $commit) => $this->arrayToEntity($commit, Commit::class),
+                            fn (array $commit) => $this->arrayToEntity($commit, Commit::class),
                             $data['commits'] ?? [],
                         ))
                     )
                     ->setSteps(new StepCollection(array_map(
-                            static fn (array $step) => $this->arrayToEntity($step, Step::class),
+                            fn (array $step) => $this->arrayToEntity($step, Step::class),
                             $data['steps'] ?? [],
                         ))
                     );
@@ -47,7 +47,7 @@ trait EntityUnserializerTrait {
                     endif;
                 endforeach;
                 $this->setSteps(new StepCollection(array_map(
-                        static fn (array $step) => $this->arrayToEntity($step, Step::class),
+                        fn (array $step) => $this->arrayToEntity($step, Step::class),
                         $data['steps'] ?? [],
                     ))
                 );

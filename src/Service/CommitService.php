@@ -36,7 +36,7 @@ class CommitService {
 
         if ($duration):
             $commit->addStep(
-                $this->stepService->createStepWithCustomDuration(
+                $this->stepService->createWithCustomDuration(
                     $duration,
                     ($lastStep = $timer->getSteps()?->last())?->getEndDate()
                         ? $lastStep->getStartDate()
@@ -111,7 +111,7 @@ class CommitService {
                         ->addStep(
                             $this
                                 ->stepService
-                                ->createStepWithCustomDuration(
+                                ->createWithCustomDuration(
                                     $duration,
                                     $startDate,
                                 )

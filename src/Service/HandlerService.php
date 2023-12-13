@@ -3,7 +3,6 @@
 namespace Mediashare\Marathon\Service;
 
 use Mediashare\Marathon\Collection\TimerCollection;
-use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Timer;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
