@@ -51,14 +51,14 @@ class TimerService {
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
-    public function getTimer(bool $createItIfNotExist = true): Timer {
+    public function getTimer(bool $createItIfNotExist = true): Timer|null {
         if ($this->timer instanceof Timer):
             return $this->timer;
         endif;
 
         $timerExist = $this->filesystem->exists($filepath = $this->getTimerFilepath());
         if (!$timerExist && $createItIfNotExist):
-            return $this->setTimer($this->createTimer())->getTimer();
+            return $this->create()->getTimer();
         elseif (!$timerExist):
             throw new TimerNotFoundException();
         endif;
@@ -68,13 +68,13 @@ class TimerService {
             ->getTimer();
     }
 
-    public function setTimer(Timer $timer): self {
+    public function setTimer(Timer|null $timer = null): self {
         $this->timer = $timer;
 
         return $this;
     }
 
-    public function createTimer(array $data = []): Timer {
+    public function create(array $data = []): self {
         /** @var Timer $timer */
         $timer = $this->serializerService->arrayToEntity($data, Timer::class);
 
@@ -83,21 +83,26 @@ class TimerService {
         endif;
 
         if ($timer->isRun() && !$timer->getSteps()?->last()?->getEndDate()):
-            $timer->addStep($this->stepService->createStep());
+            $timer->addStep($this->stepService->create());
         endif;
 
         $this->serializerService->writeTimer($this->getTimerFilepath(), $timer);
 
-        return $timer;
+        return $this->setTimer($timer);
     }
 
+    /**
+     * @throws FileNotFoundException
+     * @throws TimerNotFoundException
+     * @throws JsonDecodeException
+     */
     public function start(
         string|false $name = false,
         string|false $duration = false,
     ): self {
         $timer = $this->getTimer()
-            ->setRun(true)
-            ->setName($name !== false ? $name : $this->getTimer()->getName());
+            ?->setRun(true)
+            ->setName($name !== false ? $name : $this->getTimer()?->getName());
 
         if ($duration):
             $firstStep = $timer->getSteps()->first();
@@ -114,17 +119,22 @@ class TimerService {
         if (!$timer->getStartDate() || !($lastStep = $timer->getSteps()?->last()) || $lastStep->getEndDate()):
             $timer
                 ->addStep(
-                    $this->stepService->createStep()
+                    $this->stepService->create()
                 );
         endif;
 
         return $this->setTimer($timer);
     }
 
-    public function stop(): self {
+    /**
+     * @throws TimerNotFoundException
+     * @throws JsonDecodeException
+     * @throws FileNotFoundException
+     */
+    public function stop(bool $createItIfNotExist = true): self {
         $timer = $this
-            ->getTimer(createItIfNotExist: false)
-            ->setRun(false);
+            ->getTimer($createItIfNotExist)
+            ?->setRun(false);
 
         if (($lastStep = $timer->getSteps()?->last()) && !$lastStep->getEndDate()):
             $timer
@@ -138,21 +148,29 @@ class TimerService {
         return $this->setTimer($timer);
     }
 
+    /**
+     * @throws FileNotFoundException
+     * @throws JsonDecodeException
+     * @throws TimerNotFoundException
+     */
     public function archive(): self {
         $this
-            ->stop()
-            ->getTimer(createItIfNotExist: false)
-            ->setArchived(true);
+            ->stop(createItIfNotExist: false)
+            ->getTimer()
+            ?->setArchived(true);
 
         return $this;
     }
 
+    /**
+     * @throws TimerNotFoundException
+     */
     public function delete(): self {
         $this->filesystem
             ->remove($this->getTimerFilepath())
         ;
 
-        return $this;
+        return $this->setTimer(null);
     }
 
     /**

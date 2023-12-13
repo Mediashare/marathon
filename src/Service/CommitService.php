@@ -66,7 +66,7 @@ class CommitService {
             $this
                 ->getTimer()
                 ->addStep(
-                    $this->stepService->createStep()
+                    $this->stepService->create()
                 );
         endif;
 

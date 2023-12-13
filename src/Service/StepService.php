@@ -4,7 +4,7 @@ namespace Mediashare\Marathon\Service;
 use Mediashare\Marathon\Entity\Step;
 
 class StepService {
-    public function createStep(
+    public function create(
         string|null $startDate = null,
         string|null $endDate = null,
     ): Step {
