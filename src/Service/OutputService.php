@@ -1,10 +1,10 @@
 <?php
 namespace Mediashare\Marathon\Service;
 
-use Mediashare\Marathon\Collection\TimerCollection;
+use Mediashare\Marathon\Collection\TaskCollection;
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Config;
-use Mediashare\Marathon\Entity\Timer;
+use Mediashare\Marathon\Entity\Task;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,7 +14,7 @@ class OutputService {
     private Table $table;
 
     private Config $config;
-    private TimerCollection|Timer $timer;
+    private TaskCollection|Task $task;
 
     public function setOutput(OutputInterface $output): self {
         $this->output = $output;
@@ -41,25 +41,25 @@ class OutputService {
         return $this->config;
     }
 
-    public function setTimer(TimerCollection|Timer $timer): self {
-        $this->timer = $timer;
+    public function setTask(TaskCollection|Task $task): self {
+        $this->task = $task;
 
         return $this;
     }
 
-    private function getTimer(): TimerCollection|Timer {
-        return $this->timer;
+    private function getTask(): TaskCollection|Task {
+        return $this->task;
     }
 
-    public function renderTimers(): self {
+    public function renderTasks(): self {
         $this->getTable()->setHeaders([
-                [new TableCell(($this->getTimer() instanceof Timer) ? 'Timer' : 'Timers', ['colspan' => 7])],
+                [new TableCell(($this->getTask() instanceof Task) ? 'Task' : 'Tasks', ['colspan' => 7])],
                 ['ID', 'Name', 'Status', 'Commits', 'Duration', 'Current step', 'Start date', 'End date']
             ])
             ->setRows(
-                ($this->getTimer() instanceof Timer)
-                    ? [$this->getTimer()->toRender($this->getConfig()->getDateTimeFormat())]
-                    : $this->getTimer()->map(static fn (Timer $timer) => $timer->toRender($this->getConfig()->getDateTimeFormat()))
+                ($this->getTask() instanceof Task)
+                    ? [$this->getTask()->toRender($this->getConfig()->getDateTimeFormat())]
+                    : $this->getTask()->map(fn (Task $task) => $task->toRender($this->getConfig()->getDateTimeFormat()))
                     ->toArray()
             )
             ->render()
@@ -74,15 +74,15 @@ class OutputService {
                 ['N°', 'ID', 'Message', 'Duration', 'Total', 'Start date', 'End date']
             ])
             ->setRows(
-                $this->getTimer()
+                $this->getTask()
                     ->getCommits()
                     ->map(
-                        static fn (Commit $commit)
+                        fn (Commit $commit)
                             => $commit
                                 ->toRender(
-                                    $this->getTimer()->getCommits()->getKey($commit) + 1,
+                                    $this->getTask()->getCommits()->getKey($commit) + 1,
                                     array_sum(
-                                        $this->getTimer()
+                                        $this->getTask()
                                             ->getCommits()
                                             ->allPrevious($commit)
                                             ->map(static fn (Commit $previousCommit) => $previousCommit->getSeconds())

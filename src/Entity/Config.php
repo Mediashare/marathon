@@ -4,24 +4,24 @@ namespace Mediashare\Marathon\Entity;
 
 class Config {
     public const CONFIG_PATH = '.'.DIRECTORY_SEPARATOR.'.marathon'.DIRECTORY_SEPARATOR.'config.json';
-    public const TIMER_DIRECTORY = '.'.DIRECTORY_SEPARATOR.'.marathon'.DIRECTORY_SEPARATOR.'timers';
+    public const TASKS_DIRECTORY = '.'.DIRECTORY_SEPARATOR.'.marathon'.DIRECTORY_SEPARATOR.'tasks';
 
     public const DATETIME_FORMAT = 'd/m/Y H:i:s';
 
     public function __construct(
         private string|null $dateTimeFormat = self::DATETIME_FORMAT,
-        private string|null $timerDirectory = null,
-        private string|null $timerId = null,
+        private string|null $taskDirectory = null,
+        private string|null $taskId = null,
     ) { }
 
-    public function setTimerDirectory(string $timerDirectory): self {
-        $this->timerDirectory = $timerDirectory;
+    public function setTaskDirectory(string $taskDirectory): self {
+        $this->taskDirectory = $taskDirectory;
 
         return $this;
     }
 
-    public function getTimerDirectory(): string|null {
-        return $this->timerDirectory ?? self::TIMER_DIRECTORY;
+    public function getTaskDirectory(): string|null {
+        return $this->taskDirectory ?? self::TASKS_DIRECTORY;
     }
 
     public function setDateTimeFormat(string $dateTimeFormat): self {
@@ -34,21 +34,21 @@ class Config {
         return $this->dateTimeFormat;
     }
 
-    public function setTimerId(string $timerId): self {
-        $this->timerId = $timerId;
+    public function setTaskId(string $taskId): self {
+        $this->taskId = $taskId;
 
         return $this;
     }
 
-    public function getTimerId(): string|null {
-        return $this->timerId;
+    public function getTaskId(): string|null {
+        return $this->taskId;
     }
 
     public function toArray(): array {
         return [
-            'timerDirectory' => $this->getTimerDirectory(),
+            'taskDirectory' => $this->getTaskDirectory(),
             'dateTimeFormat' => $this->getDateTimeFormat(),
-            'timerId' => $this->getTimerId(),
+            'taskId' => $this->getTaskId(),
         ];
     }
 }

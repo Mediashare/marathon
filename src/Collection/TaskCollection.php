@@ -3,20 +3,20 @@
 namespace Mediashare\Marathon\Collection;
 
 use Ramsey\Collection\AbstractCollection;
-use Mediashare\Marathon\Entity\Timer;
+use Mediashare\Marathon\Entity\Task;
 
-class TimerCollection extends AbstractCollection
+class TaskCollection extends AbstractCollection
 {
     public function getType(): string
     {
-        return Timer::class;
+        return Task::class;
     }
 
-    public function last(): Timer|null {
+    public function last(): Task|null {
         return $this->data[array_key_last($this->data)] ?? null;
     }
 
-    public function first(): Timer|null {
+    public function first(): Task|null {
         return $this->data[array_key_first($this->data)] ?? null;
     }
 }

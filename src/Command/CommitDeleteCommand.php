@@ -11,19 +11,19 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CommitDeleteCommand extends Command {
-    protected static $defaultName = 'task:commit:delete';
+    protected static $defaultName = 'commit:delete';
 
     protected function configure() {
         $this
-            ->setName('task:commit:delete')
-            ->setDescription('<comment>Deleting</comment> the commit from timer selected')
+            ->setName('commit:delete')
+            ->setDescription('<comment>Deleting</comment> the commit from task selected')
             ->addArgument('id', InputArgument::REQUIRED, 'Commit <comment>ID</comment> selected (if not specified then retrieve last commit)')
 
             // Config
-            ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Config path to json file')
+            ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Config <comment>path</comment> to json file')
             ->addOption('config-datetime-format', 'cdf', InputOption::VALUE_REQUIRED, 'Set DateTime format (ex: <comment>"d/m/Y H:i:s"</comment>, <comment>"m/d/Y H:i:s"</comment>)', Config::DATETIME_FORMAT)
-            ->addOption('config-timer-dir', 'ctd', InputOption::VALUE_REQUIRED, 'Set directory path containing the timer files')
-            ->addOption('config-timer-id', 'cti', InputOption::VALUE_REQUIRED, 'Timer <comment>ID</comment> selected in config')
+            ->addOption('config-task-dir', 'ctd', InputOption::VALUE_REQUIRED, 'Set directory path containing a tasks files')
+            ->addOption('config-task-id', 'cti', InputOption::VALUE_REQUIRED, 'Task <comment>ID</comment> selected in config')
         ;
     }
 
@@ -39,8 +39,8 @@ class CommitDeleteCommand extends Command {
             $this->handlerService->setConfig(
                 $input->getOption('config-path'),
                 $input->getOption('config-datetime-format'),
-                $input->getOption('config-timer-dir'),
-                $input->getOption('config-timer-id'),
+                $input->getOption('config-task-dir'),
+                $input->getOption('config-task-id'),
             )->commit(
                 $input->getArgument('id'),
                 isDelete: true,
@@ -50,9 +50,9 @@ class CommitDeleteCommand extends Command {
             $this->outputService
                 ->setOutput($output)
                 ->setConfig($this->handlerService->getConfig())
-                ->setTimer($this->handlerService->getTimer())
+                ->setTask($this->handlerService->getTask())
                 ->renderCommits()
-                ->renderTimers();
+                ->renderTasks();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

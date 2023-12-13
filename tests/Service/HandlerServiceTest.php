@@ -8,7 +8,7 @@ use Mediashare\Marathon\Service\ConfigService;
 use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\SerializerService;
 use Mediashare\Marathon\Service\StepService;
-use Mediashare\Marathon\Service\TimerService;
+use Mediashare\Marathon\Service\TaskService;
 use Mediashare\Marathon\Tests\AbstractTestCase;
 
 class HandlerServiceTest extends AbstractTestCase {
@@ -16,16 +16,16 @@ class HandlerServiceTest extends AbstractTestCase {
 
     protected function setUp(): void {
         $config = new Config(
-            timerDirectory: sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'marathon' . DIRECTORY_SEPARATOR . 'timers',
-            timerId: (new \DateTime())->format('YmdHis')
+            taskDirectory: sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'marathon' . DIRECTORY_SEPARATOR . 'tasks',
+            taskId: (new \DateTime())->format('YmdHis')
         );
 
         $this->handlerService = new HandlerService(
             new ConfigService(
-                $timerService = (new TimerService(
+                $taskService = (new TaskService(
                     $stepService = new StepService()
                 ))->setConfig($config)),
-            $timerService,
+            $taskService,
             new CommitService($stepService),
             new SerializerService(),
         );
@@ -39,11 +39,11 @@ class HandlerServiceTest extends AbstractTestCase {
         $this->assertTrue(true);
     }
 
-    public function testGetTimer(): void {
+    public function testGetTask(): void {
         $this->assertTrue(true);
     }
 
-    public function testGetTimers(): void {
+    public function testGetTasks(): void {
         $this->assertTrue(true);
     }
 

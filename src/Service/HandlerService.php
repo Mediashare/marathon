@@ -2,21 +2,21 @@
 
 namespace Mediashare\Marathon\Service;
 
-use Mediashare\Marathon\Collection\TimerCollection;
+use Mediashare\Marathon\Collection\TaskCollection;
 use Mediashare\Marathon\Entity\Config;
-use Mediashare\Marathon\Entity\Timer;
+use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
-use Mediashare\Marathon\Exception\TimerNotFoundException;
+use Mediashare\Marathon\Exception\TaskNotFoundException;
 
 class HandlerService {
     private Config $config;
-    private Timer $timer;
+    private Task $task;
 
     public function __construct(
         private ConfigService $configService,
-        private TimerService $timerService,
+        private TaskService $taskService,
         private CommitService $commitService,
         private SerializerService $serializerService,
     ) {}
@@ -24,15 +24,15 @@ class HandlerService {
     public function setConfig(
         string|null $configPath = null,
         string|null $dateTimeFormat = null,
-        string|null $timerDirectory = null,
-        string|null $timerId = null,
+        string|null $taskDirectory = null,
+        string|null $taskId = null,
     ): self {
         $this->config = $this->configService->write(
             $configPath,
             $dateTimeFormat,
-            $timerDirectory,
-            $timerId,
-        );
+            $taskDirectory,
+            $taskId,
+        )->getConfig();
 
         return $this;
     }
@@ -41,48 +41,51 @@ class HandlerService {
         return $this->config;
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function updateCurrentTrackingId(): self {
-        $lastTimerId = $this->configService->getLastTimerId(
-            $this->config->getTimerDirectory(),
+        $lastTaskId = $this->configService->getLastTaskId(
+            $this->config->getTaskDirectory(),
         );
 
         $this->configService->write(
-            timerId: $this->getConfig()->getTimerId() === $lastTimerId
+            taskId: $this->getConfig()->getTaskId() === $lastTaskId
                 ? (new \DateTime())->format('YmdHis')
-                : $lastTimerId
+                : $lastTaskId
             ,
         );
 
         return $this;
     }
 
-    private function setTimer(Timer $timer): self {
-        $this->timer = $timer;
+    private function setTask(Task $task): self {
+        $this->task = $task;
 
         return $this;
     }
 
     /**
-     * @throws TimerNotFoundException
+     * @throws TaskNotFoundException
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
-    public function getTimer(): Timer {
-        return $this->timer
-            ?? $this->timerService
+    public function getTask(): Task {
+        return $this->task
+            ?? $this->taskService
                 ->setConfig($this->getConfig())
-                ->getTimer()
+                ->getTask()
             ;
     }
 
-    public function getTimers(): TimerCollection {
-        return $this->timerService
+    public function getTasks(): TaskCollection {
+        return $this->taskService
             ->setConfig($this->getConfig())
-            ->getTimers();
+            ->getTasks();
     }
 
     /**
-     * @throws TimerNotFoundException
+     * @throws TaskNotFoundException
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
@@ -90,53 +93,53 @@ class HandlerService {
         string|false $name = false,
         string|false $duration = false,
     ): self {
-        return $this->setTimer(
-            $this->timerService
+        return $this->setTask(
+            $this->taskService
                 ->setConfig($this->getConfig())
                 ->start($name, $duration)
-                ->getTimer()
+                ->getTask()
         );
     }
 
     /**
-     * @throws TimerNotFoundException
+     * @throws TaskNotFoundException
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
     public function stop(): self {
-        return $this->setTimer(
-            $this->timerService
+        return $this->setTask(
+            $this->taskService
                 ->setConfig($this->getConfig())
                 ->stop()
-                ->getTimer()
+                ->getTask()
         );
     }
 
     /**
-     * @throws TimerNotFoundException
+     * @throws TaskNotFoundException
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
     public function archive(): self {
-        return $this->setTimer(
-            $this->timerService
+        return $this->setTask(
+            $this->taskService
                 ->setConfig($this->getConfig())
                 ->archive()
-                ->getTimer()
+                ->getTask()
         );
     }
 
     /**
-     * @throws TimerNotFoundException
+     * @throws TaskNotFoundException
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
     public function delete(): self {
-        $timerService = $this->timerService->setConfig($this->getConfig());
+        $taskService = $this->taskService->setConfig($this->getConfig());
 
-        $this->setTimer($timerService->getTimer(createItIfNotExist: false));
+        $this->setTask($taskService->getTask(createItIfNotExist: false));
 
-        $timerService->delete();
+        $taskService->delete();
 
         return $this;
     }
@@ -144,7 +147,7 @@ class HandlerService {
     /**
      * @throws CommitNotFoundException
      * @throws FileNotFoundException
-     * @throws TimerNotFoundException
+     * @throws TaskNotFoundException
      * @throws JsonDecodeException
      */
     public function commit(
@@ -155,18 +158,18 @@ class HandlerService {
     ): self {
         if ($id === false):
             $this->commitService
-                ->setTimer($this->getTimer())
+                ->setTask($this->getTask())
                 ->create(
                     $message,
                     $duration
                 );
         elseif ($isDelete === true):
             $this->commitService
-                ->setTimer($this->getTimer())
+                ->setTask($this->getTask())
                 ->delete($id);
         else:
             $this->commitService
-                ->setTimer($this->getTimer())
+                ->setTask($this->getTask())
                 ->edit(
                     $id,
                     $message,
@@ -174,19 +177,19 @@ class HandlerService {
                 );
         endif;
 
-        return $this->setTimer($this->commitService->getTimer());
+        return $this->setTask($this->commitService->getTask());
     }
 
     /**
-     * @throws TimerNotFoundException
+     * @throws TaskNotFoundException
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
     public function write(): self {
         $this->serializerService
-            ->writeTimer(
-                $this->timerService->getTimerFilepath(),
-                $this->getTimer()
+            ->writeTask(
+                $this->taskService->getTaskFilepath(),
+                $this->getTask()
             );
 
         return $this;

@@ -11,21 +11,21 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CommitEditCommand extends Command {
-    protected static $defaultName = 'task:commit:edit';
+    protected static $defaultName = 'commit:edit';
 
     protected function configure() {
         $this
-            ->setName('task:commit:edit')
-            ->setDescription('<comment>Editing</comment> the commit from timer selected')
+            ->setName('commit:edit')
+            ->setDescription('<comment>Editing</comment> the commit from task')
             ->addArgument('id', InputArgument::REQUIRED, 'Commit <comment>ID</comment> selected (if not specified then retrieve last commit)')
             ->addOption('message', 'm', InputOption::VALUE_OPTIONAL, 'Update a commit <comment>message</comment>', false)
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Update the <comment>duration</comment> of the selected commit (ex: "<comment>+1minutes</comment>", "<comment>+10min</comment>", "<comment>+1hours</comment>", "<comment>+1days</comment>", "<comment>-1hour</comment>")', false)
 
             // Config
-            ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Config path to json file')
+            ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Config <comment>path</comment> to json file')
             ->addOption('config-datetime-format', 'cdf', InputOption::VALUE_REQUIRED, 'Set DateTime format (ex: <comment>"d/m/Y H:i:s"</comment>, <comment>"m/d/Y H:i:s"</comment>)', Config::DATETIME_FORMAT)
-            ->addOption('config-timer-dir', 'ctd', InputOption::VALUE_REQUIRED, 'Set directory path containing the timer files')
-            ->addOption('config-timer-id', 'cti', InputOption::VALUE_REQUIRED, 'Timer <comment>ID</comment> selected in config')
+            ->addOption('config-task-dir', 'ctd', InputOption::VALUE_REQUIRED, 'Set directory path containing a tasks files')
+            ->addOption('config-task-id', 'cti', InputOption::VALUE_REQUIRED, 'Task <comment>ID</comment> selected in config')
         ;
     }
 
@@ -42,8 +42,8 @@ class CommitEditCommand extends Command {
             $this->handlerService->setConfig(
                 $input->getOption('config-path'),
                 $input->getOption('config-datetime-format'),
-                $input->getOption('config-timer-dir'),
-                $input->getOption('config-timer-id'),
+                $input->getOption('config-task-dir'),
+                $input->getOption('config-task-id'),
             )->commit(
                 $input->getArgument('id'),
                 $input->getOption('message'),
@@ -54,9 +54,9 @@ class CommitEditCommand extends Command {
             $this->outputService
                 ->setOutput($output)
                 ->setConfig($this->handlerService->getConfig())
-                ->setTimer($this->handlerService->getTimer())
+                ->setTask($this->handlerService->getTask())
                 ->renderCommits()
-                ->renderTimers();
+                ->renderTasks();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

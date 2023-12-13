@@ -10,21 +10,21 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TimerStopCommand extends Command {
-    protected static $defaultName = 'task:stop';
+class TaskArchiveCommand extends Command {
+    protected static $defaultName = 'task:archive';
     
     protected function configure() {
         $this
-            ->setName('task:stop')
-            ->setDescription('<comment>Stoping</comment> timer step selected')
-            ->addArgument('id', InputArgument::OPTIONAL, 'Stoping timer by <comment>ID</comment> selected')
-            ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Update the <comment>duration</comment> of the selected commit (ex: "<comment>+1minutes</comment>", "<comment>+10min</comment>", "<comment>+1hours</comment>", "<comment>+1days</comment>", "<comment>-1hour</comment>")', false)
+            ->setName('task:archive')
+            ->setDescription('<comment>Archiving</comment> the task selected')
+            ->addArgument('id', InputArgument::OPTIONAL, 'Task <comment>ID</comment> selected')
+            ->addOption('stop', 's', InputOption::VALUE_NONE, '<comment>Stop</comment> current step of task')
 
             // Config
-            ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Config path to json file')
+            ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Config <comment>path</comment> to json file')
             ->addOption('config-datetime-format', 'cdf', InputOption::VALUE_REQUIRED, 'Set DateTime format (ex: <comment>"d/m/Y H:i:s"</comment>, <comment>"m/d/Y H:i:s"</comment>)', Config::DATETIME_FORMAT)
-            ->addOption('config-timer-dir', 'ctd', InputOption::VALUE_REQUIRED, 'Set directory path containing the timer files')
-            ->addOption('config-timer-id', 'cti', InputOption::VALUE_REQUIRED, 'Timer <comment>ID</comment> selected in config')
+            ->addOption('config-task-dir', 'ctd', InputOption::VALUE_REQUIRED, 'Set directory path containing a tasks files')
+            ->addOption('config-task-id', 'cti', InputOption::VALUE_REQUIRED, 'Task <comment>ID</comment> selected in config')
         ;
     }
 
@@ -41,17 +41,20 @@ class TimerStopCommand extends Command {
             $this->handlerService->setConfig(
                 $input->getOption('config-path'),
                 $input->getOption('config-datetime-format'),
-                $input->getOption('config-timer-dir'),
-                $input->getArgument('id') ?? $input->getOption('config-timer-id'),
-            )->stop()->write();
+                $input->getOption('config-task-dir'),
+                $input->getArgument('id') ?? $input->getOption('config-task-id'),
+            )->archive()->write();
 
             // Output render into terminal
             $this->outputService
                 ->setOutput($output)
                 ->setConfig($this->handlerService->getConfig())
-                ->setTimer($this->handlerService->getTimer())
+                ->setTask($this->handlerService->getTask())
                 ->renderCommits()
-                ->renderTimers();
+                ->renderTasks();
+
+            // Update config
+            $this->handlerService->updateCurrentTrackingId();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {
