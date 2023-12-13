@@ -6,8 +6,6 @@ use Mediashare\Marathon\Collection\CommitCollection;
 use Mediashare\Marathon\Collection\StepCollection;
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Step;
-use Mediashare\Marathon\Service\StepService;
-use Mediashare\Marathon\Service\TimerService;
 use Mediashare\Marathon\Tests\AbstractTestCase;
 use Mediashare\Marathon\Service\CommitService;
 use Mediashare\Marathon\Entity\Config;
@@ -17,18 +15,18 @@ use Mediashare\Marathon\Exception\CommitNotFoundException;
 class CommitServiceTest extends AbstractTestCase {
     private CommitService $commitService;
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         $config = new Config(
             timerDirectory: sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'marathon' . DIRECTORY_SEPARATOR . 'timers',
             timerId: (new \DateTime())->format('YmdHis')
         );
 
-        $this->commitService = (new CommitService($stepService = new StepService()))
-            ->setTimer((new TimerService($stepService))->setConfig($config)->getTimer());
+        $this->commitService = new CommitService($config);
     }
 
-    public function testCreate(): void {
-        $timer = $this->commitService->create('Test Commit', '+2 hours')->getTimer();
+    public function testCreateCommit(): void {
+        $timer = $this->commitService->create('Test Commit', '+2 hours');
 
         $this->assertInstanceOf(Timer::class, $timer);
         $this->assertCount(1, $commits = $timer->getCommits());
@@ -45,14 +43,11 @@ class CommitServiceTest extends AbstractTestCase {
         $this->assertInstanceOf(Step::class, $steps->first());
     }
 
-    /**
-     * @throws CommitNotFoundException
-     */
-    public function testEdit(): void {
-        $timer = $this->commitService->create('Original Commit', '+1 hour')->getTimer();
+    public function testEditCommit(): void {
+        $timer = $this->commitService->create('Original Commit', '+1 hour');
         $originalCommitId = $timer->getCommits()->first()->getId();
 
-        $timer = $this->commitService->edit($originalCommitId, 'Updated Commit', '+30 minutes')->getTimer();
+        $timer = $this->commitService->edit($originalCommitId, 'Updated Commit', '+30 minutes');
 
         $this->assertInstanceOf(Timer::class, $timer);
         $this->assertCount(1, $timer->getCommits());
@@ -62,21 +57,18 @@ class CommitServiceTest extends AbstractTestCase {
         $this->assertEquals('Updated Commit', $editedCommit->getMessage());
     }
 
-    /**
-     * @throws CommitNotFoundException
-     */
-    public function testDelete(): void {
-        $timer = $this->commitService->create('To Be Removed Commit', '+3 hours')->getTimer();
+    public function testRemoveCommit(): void {
+        $timer = $this->commitService->create('To Be Removed Commit', '+3 hours');
         $toBeRemovedCommitId = $timer->getCommits()->first()->getId();
 
-        $timer = $this->commitService->delete($toBeRemovedCommitId)->getTimer();
+        $timer = $this->commitService->delete($toBeRemovedCommitId);
 
         $this->assertInstanceOf(Timer::class, $timer);
         $this->assertCount(0, $timer->getCommits());
         $this->assertCount(1, $timer->getSteps());
     }
 
-    public function testDeleteNonexistent(): void {
+    public function testRemoveNonexistentCommit(): void {
         $this->expectException(CommitNotFoundException::class);
 
         $this->commitService->delete('NonexistentCommitId');

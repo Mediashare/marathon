@@ -33,7 +33,7 @@ class HandlerService {
             $dateTimeFormat,
             $timerDirectory,
             $timerId,
-        )->getConfig();
+        );
 
         return $this;
     }
@@ -42,11 +42,6 @@ class HandlerService {
         return $this->config;
     }
 
-    /**
-     * @throws JsonDecodeException
-     * @throws FileNotFoundException
-     * @throws \JsonException
-     */
     public function updateCurrentTrackingId(): self {
         $lastTimerId = $this->configService->getLastTimerId(
             $this->config->getTimerDirectory(),
@@ -81,10 +76,6 @@ class HandlerService {
             ;
     }
 
-    /**
-     * @throws JsonDecodeException
-     * @throws FileNotFoundException
-     */
     public function getTimers(): TimerCollection {
         return $this->timerService
             ->setConfig($this->getConfig())

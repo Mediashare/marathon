@@ -2,8 +2,6 @@
 
 namespace Mediashare\Marathon\Service;
 
-use Mediashare\Marathon\Exception\FileNotFoundException;
-use Mediashare\Marathon\Exception\JsonDecodeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Mediashare\Marathon\Entity\Config;
 
@@ -21,18 +19,15 @@ class ConfigService {
         $this->filesystem = new Filesystem();
     }
 
-    /**
-     * @throws \JsonException
-     */
     public function write(
         string|null $configPath = null,
         string|null $dateTimeFormat = null,
         string|null $timerDirectory = null,
         string|null $timerId = null,
-    ): self {
-        $configPath ? $this->setConfigPath($configPath) : null;
+    ): Config {
+        $configPath ? $this->configPath = $configPath : null;
 
-        $config = new Config(
+        $this->config = new Config(
             $dateTimeFormat ?? $this->getLastDateTimeFormat(),
             $timerDirectory = $timerDirectory ?? $this->getLastTimerDirectory(),
             $timerId
@@ -41,12 +36,8 @@ class ConfigService {
             ,
         );
 
-        $this->filesystem->dumpFile($this->getConfigPath(), json_encode($config->toArray(), JSON_THROW_ON_ERROR));
+        $this->createConfigFile();
 
-        return $this->setConfig($config);
-    }
-
-    public function getConfig(): Config {
         return $this->config;
     }
 
@@ -62,40 +53,33 @@ class ConfigService {
         return $this->getLastConfig()->getTimerDirectory();
     }
 
-    /**
-     * @throws JsonDecodeException
-     * @throws FileNotFoundException
-     */
     public function getLastTimerId(string $timerDirectory): string|null {
-        if ($lastTimerIdByConfig = $this->getLastConfig()->getTimerId()):
-            return $lastTimerIdByConfig;
-        endif;
+        try {
+            if ($lastTimerIdByConfig = $this->getLastConfig()->getTimerId()):
+                return $lastTimerIdByConfig;
+            endif;
 
-        return $this->timerService
-            ->setConfig(new Config(timerDirectory: $timerDirectory))
-            ->getTimers()?->last()?->getId();
-    }
+            return $this->timerService
+                ->setConfig(new Config(timerDirectory: $timerDirectory))
+                ->getTimers()?->last()?->getId();
 
-    private function setConfigPath(string $configPath): self {
-        $this->configPath = $configPath;
+        } catch (\Exception $exception) {
 
-        return $this;
-    }
+        }
 
-    private function getConfigPath(): string {
-        return $this->configPath;
-    }
-
-    private function setConfig(Config $config): self {
-        $this->config = $config;
-
-        return $this;
+        return null;
     }
 
     private function getLastConfig(): Config {
-        return $this->filesystem->exists($this->getConfigPath())
-            ? $this->serializerService->read($this->getConfigPath(), Config::class)
+        return $this->filesystem->exists($this->configPath)
+            ? $this->serializerService->read($this->configPath, Config::class)
             : new Config()
         ;
+    }
+
+    private function createConfigFile(): self {
+        $this->filesystem->dumpFile($this->configPath, json_encode($this->config->toArray(), JSON_THROW_ON_ERROR));
+
+        return $this;
     }
 }
