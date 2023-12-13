@@ -7,11 +7,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 Class UpgradeCommand extends Command {
-    protected static $defaultName = 'timer:upgrade';
+    protected static $defaultName = 'marathon:upgrade';
 
     protected function configure() {
         $this
-            ->setName('timer:upgrade')
+            ->setName('marathon:upgrade')
             ->setDescription('<comment>Upgrading</comment> to latest version of Marathon');
     }
 

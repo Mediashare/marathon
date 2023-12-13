@@ -13,12 +13,13 @@ class ConfigService {
     private Config $config;
 
     public function __construct(
+        private TimerService $timerService,
     ) {
         $this->serializerService = new SerializerService();
         $this->filesystem = new Filesystem();
     }
 
-    public function createConfig(
+    public function write(
         string|null $configPath = null,
         string|null $dateTimeFormat = null,
         string|null $timerDirectory = null,
@@ -27,7 +28,7 @@ class ConfigService {
         $configPath ? $this->configPath = $configPath : null;
 
         $this->config = new Config(
-            $dateTimeFormat = $dateTimeFormat ?? $this->getLastDateTimeFormat(),
+            $dateTimeFormat ?? $this->getLastDateTimeFormat(),
             $timerDirectory = $timerDirectory ?? $this->getLastTimerDirectory(),
             $timerId
                 ?? $this->getLastTimerId($timerDirectory)
@@ -58,7 +59,8 @@ class ConfigService {
                 return $lastTimerIdByConfig;
             endif;
 
-            return (new TimerService(new Config(timerDirectory: $timerDirectory)))
+            return $this->timerService
+                ->setConfig(new Config(timerDirectory: $timerDirectory))
                 ->getTimers()?->last()?->getId();
 
         } catch (\Exception $exception) {

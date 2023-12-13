@@ -37,7 +37,7 @@ class TimerServiceTest extends AbstractTestCase {
     }
 
     public function testStartTimer(): void {
-        $timer = $this->timerService->startTimer('Test Timer', '+1 hour');
+        $timer = $this->timerService->start('Test Timer', '+1 hour');
 
         $this->assertTrue($timer->isRun());
         $this->assertEquals('Test Timer', $timer->getName());
@@ -54,8 +54,8 @@ class TimerServiceTest extends AbstractTestCase {
     }
 
     public function testStopTimer(): void {
-        $this->timerService->startTimer('Test Timer', '+1 hour');
-        $timer = $this->timerService->stopTimer();
+        $this->timerService->start('Test Timer', '+1 hour');
+        $timer = $this->timerService->stop();
 
         $this->assertFalse($timer->isRun());
         $this->assertCount(2, $timer->getSteps());
@@ -70,15 +70,15 @@ class TimerServiceTest extends AbstractTestCase {
     }
 
     public function testArchiveTimer(): void {
-        $this->timerService->startTimer('Test Timer', '+1 hour');
-        $timer = $this->timerService->archiveTimer();
+        $this->timerService->start('Test Timer', '+1 hour');
+        $timer = $this->timerService->archive();
 
         $this->assertTrue($timer->isArchived());
     }
 
     public function testRemoveTimer(): void {
-        $timer = $this->timerService->startTimer('Test Timer', '+1 hour');
-        $this->timerService->removeTimer();
+        $timer = $this->timerService->start('Test Timer', '+1 hour');
+        $this->timerService->delete();
 
         $this->expectException(TimerNotFoundException::class);
         $this->timerService->getTimer(createItIfNotExist: false);

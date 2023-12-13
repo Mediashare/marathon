@@ -26,7 +26,7 @@ class CommitServiceTest extends AbstractTestCase {
     }
 
     public function testCreateCommit(): void {
-        $timer = $this->commitService->createCommit('Test Commit', '+2 hours');
+        $timer = $this->commitService->create('Test Commit', '+2 hours');
 
         $this->assertInstanceOf(Timer::class, $timer);
         $this->assertCount(1, $commits = $timer->getCommits());
@@ -44,10 +44,10 @@ class CommitServiceTest extends AbstractTestCase {
     }
 
     public function testEditCommit(): void {
-        $timer = $this->commitService->createCommit('Original Commit', '+1 hour');
+        $timer = $this->commitService->create('Original Commit', '+1 hour');
         $originalCommitId = $timer->getCommits()->first()->getId();
 
-        $timer = $this->commitService->editCommit($originalCommitId, 'Updated Commit', '+30 minutes');
+        $timer = $this->commitService->edit($originalCommitId, 'Updated Commit', '+30 minutes');
 
         $this->assertInstanceOf(Timer::class, $timer);
         $this->assertCount(1, $timer->getCommits());
@@ -58,10 +58,10 @@ class CommitServiceTest extends AbstractTestCase {
     }
 
     public function testRemoveCommit(): void {
-        $timer = $this->commitService->createCommit('To Be Removed Commit', '+3 hours');
+        $timer = $this->commitService->create('To Be Removed Commit', '+3 hours');
         $toBeRemovedCommitId = $timer->getCommits()->first()->getId();
 
-        $timer = $this->commitService->removeCommit($toBeRemovedCommitId);
+        $timer = $this->commitService->delete($toBeRemovedCommitId);
 
         $this->assertInstanceOf(Timer::class, $timer);
         $this->assertCount(0, $timer->getCommits());
@@ -71,6 +71,6 @@ class CommitServiceTest extends AbstractTestCase {
     public function testRemoveNonexistentCommit(): void {
         $this->expectException(CommitNotFoundException::class);
 
-        $this->commitService->removeCommit('NonexistentCommitId');
+        $this->commitService->delete('NonexistentCommitId');
     }
 }

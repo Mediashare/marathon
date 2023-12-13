@@ -4,6 +4,7 @@ namespace Mediashare\Marathon\Command;
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Service\CommitService;
 use Mediashare\Marathon\Service\ConfigService;
+use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\OutputService;
 use Mediashare\Marathon\Service\SerializerService;
 use Mediashare\Marathon\Service\TimerService;
@@ -14,11 +15,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CommitEditCommand extends Command {
-    protected static $defaultName = 'timer:commit:edit';
+    protected static $defaultName = 'task:commit:edit';
 
     protected function configure() {
         $this
-            ->setName('timer:commit:edit')
+            ->setName('task:commit:edit')
             ->setDescription('<comment>Editing</comment> the commit from timer selected')
             ->addArgument('id', InputArgument::REQUIRED, 'Commit <comment>ID</comment> selected (if not specified then retrieve last commit)')
             ->addOption('message', 'm', InputOption::VALUE_OPTIONAL, 'Update a commit <comment>message</comment>', false)
@@ -32,36 +33,34 @@ class CommitEditCommand extends Command {
         ;
     }
 
+    public function __construct(
+        private HandlerService $handlerService,
+        private OutputService $outputService,
+    ) {
+        parent::__construct();
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output) {
         try {
-            // Config
-            $configService = new ConfigService();
-            $config = $configService->createConfig(
+            // Handler
+            $this->handlerService->setConfig(
                 $input->getOption('config-path'),
                 $input->getOption('config-datetime-format'),
                 $input->getOption('config-timer-dir'),
                 $input->getOption('config-timer-id'),
-            );
-
-            // Commit
-            $commitService = new CommitService($config);
-            $timer = $commitService->editCommit(
+            )->commit(
                 $input->getArgument('id'),
                 $input->getOption('message'),
                 $input->getOption('duration'),
-            );
-
-            // Output terminal
-            $output->writeln('<info>[Timer:<comment>'.$timer->getId().'</comment>] Editing commit</info>');
-
-            // Update timer data file
-            $serializerService = new SerializerService();
-            $serializerService->writeTimer((new TimerService($config))->getTimerFilepath(), $timer);
+            )->write();
 
             // Output render into terminal
-            $outputService = new OutputService($output, $config);
-            $outputService->renderCommits($timer);
-            $outputService->renderTimers($timer);
+            $this->outputService
+                ->setOutput($output)
+                ->setConfig($this->handlerService->getConfig())
+                ->setTimer($this->handlerService->getTimer())
+                ->renderCommits()
+                ->renderTimers();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

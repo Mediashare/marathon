@@ -10,24 +10,57 @@ use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class OutputService {
+    private OutputInterface $output;
     private Table $table;
 
-    public function __construct(
-        private OutputInterface $output,
-        private Config $config,
-    ) {
+    private Config $config;
+    private TimerCollection|Timer $timer;
+
+    public function setOutput(OutputInterface $output): self {
+        $this->output = $output;
         $this->table = new Table($this->output);
+
+        return $this;
     }
 
-    public function renderTimers(TimerCollection|Timer $timers): self {
-        $this->table->setHeaders([
-                [new TableCell(($timers instanceof Timer) ? 'Timer' : 'Timers', ['colspan' => 7])],
+    private function getOutput(): OutputInterface {
+        return $this->output;
+    }
+
+    private function getTable(): Table {
+        return $this->table;
+    }
+
+    public function setConfig(Config $config): self {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    private function getConfig(): Config {
+        return $this->config;
+    }
+
+    public function setTimer(TimerCollection|Timer $timer): self {
+        $this->timer = $timer;
+
+        return $this;
+    }
+
+    private function getTimer(): TimerCollection|Timer {
+        return $this->timer;
+    }
+
+    public function renderTimers(): self {
+        $this->getTable()->setHeaders([
+                [new TableCell(($this->getTimer() instanceof Timer) ? 'Timer' : 'Timers', ['colspan' => 7])],
                 ['ID', 'Name', 'Status', 'Commits', 'Duration', 'Current step', 'Start date', 'End date']
             ])
             ->setRows(
-                ($timers instanceof Timer)
-                    ? [$timers->toRender($this->config->getDateTimeFormat())]
-                    : $timers->map(fn (Timer $timer) => $timer->toRender($this->config->getDateTimeFormat()))->toArray()
+                ($this->getTimer() instanceof Timer)
+                    ? [$this->getTimer()->toRender($this->getConfig()->getDateTimeFormat())]
+                    : $this->getTimer()->map(fn (Timer $timer) => $timer->toRender($this->getConfig()->getDateTimeFormat()))
+                    ->toArray()
             )
             ->render()
         ;
@@ -35,27 +68,27 @@ class OutputService {
         return $this;
     }
 
-    public function renderCommits(Timer $timer): self {
-        $this->table->setHeaders([
+    public function renderCommits(): self {
+        $this->getTable()->setHeaders([
                 [new TableCell('Commits', ['colspan' => 5])],
                 ['N°', 'ID', 'Message', 'Duration', 'Total', 'Start date', 'End date']
             ])
             ->setRows(
-                $timer
+                $this->getTimer()
                     ->getCommits()
                     ->map(
                         fn (Commit $commit)
                             => $commit
                                 ->toRender(
-                                    $timer->getCommits()->getKey($commit) + 1,
+                                    $this->getTimer()->getCommits()->getKey($commit) + 1,
                                     array_sum(
-                                        $timer
+                                        $this->getTimer()
                                             ->getCommits()
                                             ->allPrevious($commit)
                                             ->map(fn (Commit $previousCommit) => $previousCommit->getSeconds())
                                             ->toArray(),
                                     ),
-                                    $this->config->getDateTimeFormat()
+                                    $this->getConfig()->getDateTimeFormat()
                                 )
                     )
                     ->toArray(),

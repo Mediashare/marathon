@@ -28,11 +28,11 @@ Here are some examples of how to use Marathon:
   marathon timer:stop                        Stoping timer step selected
   marathon timer:status                      Displaying status of timer selected
   marathon timer:archive                     Archiving the timer selected
-  marathon timer:remove                      Removing the timer selected
+  marathon timer:delete                      Removing the timer selected
 
   marathon timer:commit <?COMMIT_MESSAGE>    Creating new commit into timer selected
   marathon timer:commit:edit <?COMMIT_ID>    Editing the commit from timer selected
-  marathon timer:commit:remove <?COMMIT_ID>  Remove commit
+  marathon timer:commit:delete <?COMMIT_ID>  Remove commit
   
   marathon timer:gitignore                   Adding .marathon rule into .gitgnore
   marathon timer:upgrade                     Upgrading to latest version of Marathon

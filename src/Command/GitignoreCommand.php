@@ -7,11 +7,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class GitignoreCommand extends Command {
-    protected static $defaultName = 'timer:gitignore';
+    protected static $defaultName = 'marathon:gitignore';
 
     protected function configure() {
         $this
-            ->setName('timer:gitignore')
+            ->setName('marathon:gitignore')
             ->setDescription('Adding <comment>.marathon</comment> rule into <comment>.gitgnore</comment>')
         ;
     }

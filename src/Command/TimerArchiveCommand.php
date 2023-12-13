@@ -3,6 +3,7 @@ namespace Mediashare\Marathon\Command;
 
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Service\ConfigService;
+use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\OutputService;
 use Mediashare\Marathon\Service\SerializerService;
 use Mediashare\Marathon\Service\TimerService;
@@ -13,11 +14,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TimerArchiveCommand extends Command {
-    protected static $defaultName = 'timer:archive';
+    protected static $defaultName = 'task:archive';
     
     protected function configure() {
         $this
-            ->setName('timer:archive')
+            ->setName('task:archive')
             ->setDescription('<comment>Archiving</comment> the timer selected')
             ->addArgument('id', InputArgument::OPTIONAL, 'Timer <comment>ID</comment> selected')
             ->addOption('stop', 's', InputOption::VALUE_NONE, '<comment>Stop</comment> current step of timer')
@@ -29,47 +30,34 @@ class TimerArchiveCommand extends Command {
             ->addOption('config-timer-id', 'cti', InputOption::VALUE_REQUIRED, 'Timer <comment>ID</comment> selected in config')
         ;
     }
+
+    public function __construct(
+        private HandlerService $handlerService,
+        private OutputService $outputService,
+    ) {
+        parent::__construct();
+    }
     
     protected function execute(InputInterface $input, OutputInterface $output) {
         try {
-            // Config
-            $configService = new ConfigService();
-            $config = $configService->createConfig(
+            // Handler
+            $this->handlerService->setConfig(
                 $input->getOption('config-path'),
                 $input->getOption('config-datetime-format'),
                 $input->getOption('config-timer-dir'),
                 $input->getArgument('id') ?? $input->getOption('config-timer-id'),
-            );
-
-            // Timer
-            $timerService = new TimerService($config, createItIfNotExist: !$input->getOption('stop'));
-            $timer = $timerService->archiveTimer();
-
-            // Update timer data file
-            $serializerService = new SerializerService();
-            $serializerService->writeTimer($timerService->getTimerFilepath(), $timer);
+            )->archive()->write();
 
             // Output render into terminal
-            $output->writeln('<info>[Timer:<comment>'.$timer->getId().'</comment>] Archiving</info>');
-            $outputService = new OutputService($output, $config);
-            $outputService->renderCommits($timer);
-            $outputService->renderTimers($timer);
+            $this->outputService
+                ->setOutput($output)
+                ->setConfig($this->handlerService->getConfig())
+                ->setTimer($this->handlerService->getTimer())
+                ->renderCommits()
+                ->renderTimers();
 
             // Update config
-            $lastTimerId = $configService->getLastTimerId(
-                $lastTimerDirectory = $input->getOption('config-timer-dir')
-                    ?? $configService->getLastTimerDirectory(),
-            );
-
-            $configService->createConfig(
-                $input->getOption('config-path'),
-                $input->getOption('config-datetime-format'),
-                $lastTimerDirectory,
-                $config->getTimerId() === $lastTimerId
-                    ? (new \DateTime())->format('YmdHis')
-                    : $lastTimerId
-                ,
-            );
+            $this->handlerService->updateCurrentTrackingId();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

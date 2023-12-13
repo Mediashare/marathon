@@ -12,19 +12,25 @@ use Symfony\Component\Filesystem\Filesystem;
 class TimerService {
     private SerializerService $serializerService;
     private Filesystem $filesystem;
-    private StepService $stepService;
-    private Timer $timer;
+
+    private Config $config;
+    private Timer|null $timer = null;
 
     public function __construct(
-        private Config $config,
-        bool $createItIfNotExist = true
+        private StepService $stepService,
     ) {
         $this->serializerService = new SerializerService();
         $this->filesystem = new Filesystem();
+    }
 
-        $this->stepService = new StepService();
+    public function setConfig(Config $config): self {
+        $this->config = $config;
 
-        $this->timer = $this->getTimer($createItIfNotExist);
+        return $this;
+    }
+
+    public function getConfig(): Config {
+        return $this->config;
     }
 
     /**
@@ -46,14 +52,26 @@ class TimerService {
      * @throws FileNotFoundException
      */
     public function getTimer(bool $createItIfNotExist = true): Timer {
+        if ($this->timer instanceof Timer):
+            return $this->timer;
+        endif;
+
         $timerExist = $this->filesystem->exists($filepath = $this->getTimerFilepath());
         if (!$timerExist && $createItIfNotExist):
-            return $this->timer = $this->createTimer();
+            return $this->setTimer($this->createTimer())->getTimer();
         elseif (!$timerExist):
             throw new TimerNotFoundException();
         endif;
 
-        return $this->timer = $this->serializerService->read($filepath, Timer::class);
+        return $this
+            ->setTimer($this->serializerService->read($filepath, Timer::class))
+            ->getTimer();
+    }
+
+    public function setTimer(Timer $timer): self {
+        $this->timer = $timer;
+
+        return $this;
     }
 
     public function createTimer(array $data = []): Timer {
@@ -73,12 +91,13 @@ class TimerService {
         return $timer;
     }
 
-    public function startTimer(
+    public function start(
         string|false $name = false,
         string|false $duration = false,
-    ): Timer {
-        $timer = $this->timer->setRun(true);
-        $timer->setName($name !== false ? $name : $timer->getName());
+    ): self {
+        $timer = $this->getTimer()
+            ->setRun(true)
+            ->setName($name !== false ? $name : $this->getTimer()->getName());
 
         if ($duration):
             $firstStep = $timer->getSteps()->first();
@@ -99,11 +118,12 @@ class TimerService {
                 );
         endif;
 
-        return $timer;
+        return $this->setTimer($timer);
     }
 
-    public function stopTimer(): Timer {
-        $timer = $this->timer
+    public function stop(): self {
+        $timer = $this
+            ->getTimer(createItIfNotExist: false)
             ->setRun(false);
 
         if (($lastStep = $timer->getSteps()?->last()) && !$lastStep->getEndDate()):
@@ -115,16 +135,19 @@ class TimerService {
                 );
         endif;
 
-        return $timer;
+        return $this->setTimer($timer);
     }
 
-    public function archiveTimer(): Timer {
-        return $this
-            ->stopTimer()
+    public function archive(): self {
+        $this
+            ->stop()
+            ->getTimer(createItIfNotExist: false)
             ->setArchived(true);
+
+        return $this;
     }
 
-    public function removeTimer(): self {
+    public function delete(): self {
         $this->filesystem
             ->remove($this->getTimerFilepath())
         ;
@@ -136,10 +159,10 @@ class TimerService {
      * @throws TimerNotFoundException
      */
     public function getTimerFilepath(): string {
-        if (!$this->config->getTimerId()):
+        if (!$this->getConfig()->getTimerId()):
             throw new TimerNotFoundException();
         endif;
 
-        return $this->config->getTimerDirectory().DIRECTORY_SEPARATOR. $this->config->getTimerId().'.json';
+        return $this->getConfig()->getTimerDirectory().DIRECTORY_SEPARATOR. $this->getConfig()->getTimerId().'.json';
     }
 }

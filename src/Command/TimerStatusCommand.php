@@ -3,6 +3,7 @@ namespace Mediashare\Marathon\Command;
 
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Service\ConfigService;
+use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\OutputService;
 use Mediashare\Marathon\Service\TimerService;
 use Symfony\Component\Console\Command\Command;
@@ -12,11 +13,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TimerStatusCommand extends Command {
-    protected static $defaultName = 'timer:status';
+    protected static $defaultName = 'task:status';
     
     protected function configure() {
         $this
-            ->setName('timer:status')
+            ->setName('task:status')
             ->setDescription('<comment>Displaying</comment> status of timer selected')
             ->addArgument('id', InputArgument::OPTIONAL, 'Displaying timer status by <comment>ID</comment> selected')
 
@@ -28,26 +29,30 @@ class TimerStatusCommand extends Command {
         ;
     }
 
+    public function __construct(
+        private HandlerService $handlerService,
+        private OutputService $outputService,
+    ) {
+        parent::__construct();
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output) {
         try {
-            // Config
-            $configService = new ConfigService();
-            $config = $configService->createConfig(
+            // Handler
+            $this->handlerService->setConfig(
                 $input->getOption('config-path'),
                 $input->getOption('config-datetime-format'),
                 $input->getOption('config-timer-dir'),
                 $input->getArgument('id') ?? $input->getOption('config-timer-id'),
             );
 
-            // Timer
-            $timerService = new TimerService($config);
-            $timer = $timerService->getTimer();
-
             // Output render into terminal
-            $output->writeln('<info>[Timer:<comment>'.$timer->getId().'</comment>] Display status timer</info>');
-            $outputService = new OutputService($output, $config);
-            $outputService->renderCommits($timer);
-            $outputService->renderTimers($timer);
+            $this->outputService
+                ->setOutput($output)
+                ->setConfig($this->handlerService->getConfig())
+                ->setTimer($this->handlerService->getTimer())
+                ->renderCommits()
+                ->renderTimers();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

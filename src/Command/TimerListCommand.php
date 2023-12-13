@@ -3,6 +3,7 @@ namespace Mediashare\Marathon\Command;
 
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Service\ConfigService;
+use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\OutputService;
 use Mediashare\Marathon\Service\TimerService;
 use Symfony\Component\Console\Command\Command;
@@ -11,11 +12,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TimerListCommand extends Command {
-    protected static $defaultName = 'timer:list';
+    protected static $defaultName = 'task:list';
     
     protected function configure() {
         $this
-            ->setName('timer:list')
+            ->setName('task:list')
             ->setDescription('<comment>Displaying</comment> the timer list')
 
             // Config
@@ -26,23 +27,29 @@ class TimerListCommand extends Command {
         ;
     }
 
+    public function __construct(
+        private HandlerService $handlerService,
+        private OutputService $outputService,
+    ) {
+        parent::__construct();
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output) {
         try {
-            // Config
-            $configService = new ConfigService();
-            $config = $configService->createConfig(
+            // Handler
+            $this->handlerService->setConfig(
                 $input->getOption('config-path'),
                 $input->getOption('config-datetime-format'),
                 $input->getOption('config-timer-dir'),
                 $input->getOption('config-timer-id'),
             );
 
-            // Timer
-            $timerService = new TimerService($config);
-            $timers = $timerService->getTimers();
-
-            $outputService = new OutputService($output, $config);
-            $outputService->renderTimers($timers);
+            // Output render into terminal
+            $this->outputService
+                ->setOutput($output)
+                ->setConfig($this->handlerService->getConfig())
+                ->setTimer($this->handlerService->getTimers())
+                ->renderTimers();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

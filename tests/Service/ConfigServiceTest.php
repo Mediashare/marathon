@@ -18,7 +18,7 @@ class ConfigServiceTest extends AbstractTestCase {
 
     public function testCreateConfig()
     {
-        $config = $this->configService->createConfig($this->tempConfigPath);
+        $config = $this->configService->write($this->tempConfigPath);
 
         $this->assertFileExists($this->tempConfigPath);
         $this->assertInstanceOf(Config::class, $config);
@@ -28,7 +28,7 @@ class ConfigServiceTest extends AbstractTestCase {
     public function testGetLastDateTimeFormat()
     {
         // Create a config file with a specific datetime format
-        $config = $this->configService->createConfig($this->tempConfigPath, 'Y-m-d H:i:s');
+        $config = $this->configService->write($this->tempConfigPath, 'Y-m-d H:i:s');
         $lastDateTimeFormat = $this->configService->getLastDateTimeFormat();
 
         $this->assertEquals('Y-m-d H:i:s', $lastDateTimeFormat);
@@ -37,7 +37,7 @@ class ConfigServiceTest extends AbstractTestCase {
     public function testGetLastTimerDirectory()
     {
         // Create a config file with a specific timer directory
-        $config = $this->configService->createConfig($this->tempConfigPath, null, '/path/to/timer');
+        $config = $this->configService->write($this->tempConfigPath, null, '/path/to/timer');
         $lastTimerDirectory = $this->configService->getLastTimerDirectory();
 
         $this->assertEquals('/path/to/timer', $lastTimerDirectory);
@@ -46,7 +46,7 @@ class ConfigServiceTest extends AbstractTestCase {
     public function testGetLastTimerId()
     {
         // Create a config file with a specific timer directory and ID
-        $config = $this->configService->createConfig($this->tempConfigPath, null, '/path/to/timer', '12345');
+        $config = $this->configService->write($this->tempConfigPath, null, '/path/to/timer', '12345');
         $lastTimerId = $this->configService->getLastTimerId('/path/to/timer');
 
         $this->assertEquals('12345', $lastTimerId);

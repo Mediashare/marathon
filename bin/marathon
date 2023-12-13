@@ -14,18 +14,54 @@ $app = new Symfony\Component\Console\Application(
         'Marathon',
         !empty($_ENV['APP_VERSION']) ? $_ENV['APP_VERSION'] : 'test'
 );
+
+$handlerService = new \Mediashare\Marathon\Service\HandlerService(
+    new \Mediashare\Marathon\Service\ConfigService(
+            $timerService = new \Mediashare\Marathon\Service\TimerService(
+                    $stepService = new \Mediashare\Marathon\Service\StepService(),
+            )
+    ),
+    $timerService,
+    new \Mediashare\Marathon\Service\CommitService($stepService),
+    new \Mediashare\Marathon\Service\SerializerService(),
+);
+
+$outputService = new \Mediashare\Marathon\Service\OutputService();
+
 $commandsLoader = new \Symfony\Component\Console\CommandLoader\FactoryCommandLoader([
-    'timer:list' => function () { return new Mediashare\Marathon\Command\TimerListCommand(); },
-    'timer:start' => function () { return new Mediashare\Marathon\Command\TimerStartCommand(); },
-    'timer:stop' => function () { return new Mediashare\Marathon\Command\TimerStopCommand(); },
-    'timer:status' => function () { return new Mediashare\Marathon\Command\TimerStatusCommand(); },
-    'timer:archive' => function () { return new Mediashare\Marathon\Command\TimerArchiveCommand(); },
-    'timer:remove' => function () { return new Mediashare\Marathon\Command\TimerRemoveCommand(); },
-    'timer:commit' => function () { return new Mediashare\Marathon\Command\CommitCommand();},
-    'timer:commit:edit' => function () { return new Mediashare\Marathon\Command\CommitEditCommand();},
-    'timer:commit:remove' => function () { return new Mediashare\Marathon\Command\CommitRemoveCommand(); },
-    'timer:gitignore' => function () { return new Mediashare\Marathon\Command\GitignoreCommand(); },
-    'timer:upgrade' => function () { return new Mediashare\Marathon\Command\UpgradeCommand(); },
+    'task:list' => function () use ($handlerService, $outputService, ) {
+            return new Mediashare\Marathon\Command\TimerListCommand($handlerService, $outputService);
+        },
+    'task:start' => function () use ($handlerService, $outputService, ) {
+            return new Mediashare\Marathon\Command\TimerStartCommand($handlerService, $outputService);
+        },
+    'task:stop' => function () use ($handlerService, $outputService, ) {
+            return new Mediashare\Marathon\Command\TimerStopCommand($handlerService, $outputService);
+        },
+    'task:status' => function () use ($handlerService, $outputService, ) {
+            return new Mediashare\Marathon\Command\TimerStatusCommand($handlerService, $outputService);
+        },
+    'task:archive' => function () use ($handlerService, $outputService, ) {
+            return new Mediashare\Marathon\Command\TimerArchiveCommand($handlerService, $outputService);
+        },
+    'task:delete' => function () use ($handlerService, $outputService, ) {
+            return new Mediashare\Marathon\Command\TimerDeleteCommand($handlerService, $outputService);
+        },
+    'task:commit' => function () use ($handlerService, $outputService, ) {
+            return new Mediashare\Marathon\Command\CommitCommand($handlerService, $outputService);
+        },
+    'task:commit:edit' => function () use ($handlerService, $outputService,) {
+            return new Mediashare\Marathon\Command\CommitEditCommand($handlerService, $outputService);
+        },
+    'task:commit:delete' => function () use ($handlerService, $outputService,) {
+            return new Mediashare\Marathon\Command\CommitDeleteCommand($handlerService, $outputService);
+        },
+    'marathon:gitignore' => function () {
+            return new Mediashare\Marathon\Command\GitignoreCommand();
+        },
+    'marathon:upgrade' => function () {
+            return new Mediashare\Marathon\Command\UpgradeCommand();
+        },
 ]);
 $app->setCommandLoader($commandsLoader);
 $app->run();

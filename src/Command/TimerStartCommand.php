@@ -3,6 +3,7 @@ namespace Mediashare\Marathon\Command;
 
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Service\ConfigService;
+use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\OutputService;
 use Mediashare\Marathon\Service\SerializerService;
 use Mediashare\Marathon\Service\TimerService;
@@ -13,11 +14,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TimerStartCommand extends Command {
-    protected static $defaultName = 'timer:start';
+    protected static $defaultName = 'task:start';
     
     protected function configure() {
         $this
-            ->setName('timer:start')
+            ->setName('task:start')
             ->setDescription('<comment>Starting</comment> timer step selected')
             ->addArgument('name', InputArgument::OPTIONAL, 'Set the <comment>name</comment> of timer selected', false)
             ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Starting timer by <comment>ID</comment> selected')
@@ -32,46 +33,35 @@ class TimerStartCommand extends Command {
         ;
     }
 
+    public function __construct(
+        private HandlerService $handlerService,
+        private OutputService $outputService,
+    ) {
+        parent::__construct();
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output) {
         try {
-            // Config
-            $configService = new ConfigService();
-            if ($input->getOption('new')):
-                $config = $configService->createConfig(
-                    $input->getOption('config-path'),
-                    $input->getOption('config-datetime-format'),
-                    $input->getOption('config-timer-dir'),
-                    $input->getOption('id')
-                        ?? $input->getOption('config-timer-id')
-                        ?? (new \DateTime())->format(
-                            $input->getOption('config-datetime-format') ?? $configService->getLastDateTimeFormat()
-                        ),
-                );
-            else:
-                $config = $configService->createConfig(
-                    $input->getOption('config-path'),
-                    $input->getOption('config-datetime-format'),
-                    $input->getOption('config-timer-dir'),
-                    $input->getOption('id') ?? $input->getOption('config-timer-id'),
-                );
-            endif;
-
-            // Timer
-            $timerService = new TimerService($config);
-            $timer = $timerService->startTimer(
+            // Handler
+            $this->handlerService->setConfig(
+                $input->getOption('config-path'),
+                $input->getOption('config-datetime-format'),
+                $input->getOption('config-timer-dir'),
+                $input->getOption('new')
+                    ? $input->getOption('id') ?? $input->getOption('config-timer-id') ?? (new \DateTime())->format('YmdHis')
+                    : $input->getOption('id') ?? $input->getOption('config-timer-id'),
+            )->start(
                 $input->getArgument('name'),
                 $input->getOption('duration'),
-            );
-
-            // Update timer data file
-            $serializerService = new SerializerService();
-            $serializerService->writeTimer($timerService->getTimerFilepath(), $timer);
+            )->write();
 
             // Output render into terminal
-            $output->writeln('<info>[Timer:<comment>'.$timer->getId().'</comment>] Starting timer</info>');
-            $outputService = new OutputService($output, $config);
-            $outputService->renderCommits($timer);
-            $outputService->renderTimers($timer);
+            $this->outputService
+                ->setOutput($output)
+                ->setConfig($this->handlerService->getConfig())
+                ->setTimer($this->handlerService->getTimer())
+                ->renderCommits()
+                ->renderTimers();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

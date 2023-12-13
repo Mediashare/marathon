@@ -3,6 +3,7 @@ namespace Mediashare\Marathon\Command;
 
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Service\ConfigService;
+use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\OutputService;
 use Mediashare\Marathon\Service\SerializerService;
 use Mediashare\Marathon\Service\TimerService;
@@ -13,11 +14,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TimerStopCommand extends Command {
-    protected static $defaultName = 'timer:stop';
+    protected static $defaultName = 'task:stop';
     
     protected function configure() {
         $this
-            ->setName('timer:stop')
+            ->setName('task:stop')
             ->setDescription('<comment>Stoping</comment> timer step selected')
             ->addArgument('id', InputArgument::OPTIONAL, 'Stoping timer by <comment>ID</comment> selected')
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Update the <comment>duration</comment> of the selected commit (ex: "<comment>+1minutes</comment>", "<comment>+10min</comment>", "<comment>+1hours</comment>", "<comment>+1days</comment>", "<comment>-1hour</comment>")', false)
@@ -29,31 +30,31 @@ class TimerStopCommand extends Command {
             ->addOption('config-timer-id', 'cti', InputOption::VALUE_REQUIRED, 'Timer <comment>ID</comment> selected in config')
         ;
     }
+
+    public function __construct(
+        private HandlerService $handlerService,
+        private OutputService $outputService,
+    ) {
+        parent::__construct();
+    }
     
     protected function execute(InputInterface $input, OutputInterface $output) {
         try {
-            // Config
-            $configService = new ConfigService();
-            $config = $configService->createConfig(
+            // Handler
+            $this->handlerService->setConfig(
                 $input->getOption('config-path'),
                 $input->getOption('config-datetime-format'),
                 $input->getOption('config-timer-dir'),
                 $input->getArgument('id') ?? $input->getOption('config-timer-id'),
-            );
-
-            // Timer
-            $timerService = new TimerService($config);
-            $timer = $timerService->stopTimer();
-
-            // Update timer data file
-            $serializerService = new SerializerService();
-            $serializerService->writeTimer($timerService->getTimerFilepath(), $timer);
+            )->stop()->write();
 
             // Output render into terminal
-            $output->writeln('<info>[Timer:<comment>'.$timer->getId().'</comment>] Stoping timer</info>');
-            $outputService = new OutputService($output, $config);
-            $outputService->renderCommits($timer);
-            $outputService->renderTimers($timer);
+            $this->outputService
+                ->setOutput($output)
+                ->setConfig($this->handlerService->getConfig())
+                ->setTimer($this->handlerService->getTimer())
+                ->renderCommits()
+                ->renderTimers();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {
