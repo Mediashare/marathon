@@ -1,11 +1,11 @@
 <?php
 namespace Mediashare\Marathon\Service;
 
-use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Step;
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
+use Mediashare\Marathon\Exception\StrToTimeException;
 
 class CommitService {
     private Task $task;
@@ -24,6 +24,9 @@ class CommitService {
         return $this->task;
     }
 
+    /**
+     * @throws StrToTimeException
+     */
     public function create(
         ?string $message = null,
         ?string $duration = null
@@ -75,6 +78,7 @@ class CommitService {
 
     /**
      * @throws CommitNotFoundException
+     * @throws StrToTimeException
      */
     public function edit(
         string $id,

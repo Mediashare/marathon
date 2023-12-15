@@ -2,15 +2,14 @@
 
 namespace Mediashare\Marathon\Exception;
 
-class JsonDecodeException extends \Exception {
+class StrToTimeException extends \Exception {
     public function __construct(
-        string $filepath,
-        string $message = "Json format was corrupted",
+        string $message = "Duration format was incorrect",
         int $code = 404,
         \Throwable|null $previous = null,
     ) {
         parent::__construct(
-            '['.$filepath.'] ' . $message,
+            $message,
             $code,
             $previous
         );
