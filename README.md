@@ -1,6 +1,7 @@
 # Marathon
 ## Introduction
-Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently **manage tasks for your projects**. It provides a comprehensive solution for maintaining a track record of project-related activities through commit history.
+Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently **manage tasks for your projects**. 
+It provides a comprehensive solution for maintaining a project-related activities through commit history.
 ### Features
 - **Commit:** Easily associate time entries with project commits to maintain a detailed history of actions taken during the development process.
 - **Efficient Time Management:** Streamline your workflow by seamlessly integrating time into your version control system. Focus on development while keeping an accurate record of time spent on each task.
