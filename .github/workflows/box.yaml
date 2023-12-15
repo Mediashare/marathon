@@ -26,3 +26,6 @@ jobs:
 
             - name: Run the build
               run: box compile
+
+            - name: Test marathon binary
+              run: php marathon list
