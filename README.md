@@ -1,41 +1,50 @@
 # Marathon
 ## Introduction
-Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently **manage time for your projects**. It provides a comprehensive solution for maintaining a track record of project-related activities through commit history.
+Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently **manage tasks for your projects**. 
+It provides a comprehensive solution for maintaining a project-related activities through commit history.
 ### Features
 - **Commit:** Easily associate time entries with project commits to maintain a detailed history of actions taken during the development process.
 - **Efficient Time Management:** Streamline your workflow by seamlessly integrating time into your version control system. Focus on development while keeping an accurate record of time spent on each task.
 - **Symfony Framework:** Built on the robust Symfony framework, ensuring reliability, scalability, and ease of maintenance for your time management needs.
 ## Installation
 ### Composer
+#### Basic
+```bash
+composer require mediashre/marathon
+bin/marathon list
+```
+#### Global
 ```bash
 composer global require mediashre/marathon
+marathon list
 ```
 ### Binary
 ```bash
 curl --output marathon https://github.com/Mediashare/marathon/raw/master/marathon
 chmod 755 marathon
 sudo cp marathon /usr/local/bin/marathon
+marathon list
 ```
 ## Usage
 Here are some examples of how to use Marathon:
-- To track the time you spend on a project, you can create a task for each phase of the project.
-- To track the time you spend on a recurring task, you can create a task with a start date and an end date.
-- To track the time you spend on a task with a client or vendor, you can add this information to the task.
+- To check the time you spend on a project, you can create a task for each phase of the project.
+- To check the time you spend on a recurring task, you can create a task with a start date and an end date.
+- To check the time you spend on a task with a client or vendor, you can add this information to the task.
 
 ```bash
-  marathon timer:list                        Displaying the timer list
-  marathon timer:start                       Starting timer step selected
-  marathon timer:stop                        Stoping timer step selected
-  marathon timer:status                      Displaying status of timer selected
-  marathon timer:archive                     Archiving the timer selected
-  marathon timer:remove                      Removing the timer selected
+  marathon task:list                        Displaying the tasks list
+  marathon task:start                       Starting step of task selected
+  marathon task:stop                        Stoping step of task selected
+  marathon task:status                      Displaying status of task selected
+  marathon task:archive                     Archiving the task selected
+  marathon task:delete                      Deleting the task selected
 
-  marathon timer:commit <?COMMIT_MESSAGE>    Creating new commit into timer selected
-  marathon timer:commit:edit <?COMMIT_ID>    Editing the commit from timer selected
-  marathon timer:commit:remove <?COMMIT_ID>  Remove commit
+  marathon commit <?COMMIT_MESSAGE>         Creating new commit into task selected
+  marathon commit:edit <?COMMIT_ID>         Editing the commit from task
+  marathon commit:delete <?COMMIT_ID>       Deleting the commit from task selected
   
-  marathon timer:gitignore                   Adding .marathon rule into .gitgnore
-  marathon timer:upgrade                     Upgrading to latest version of Marathon
+  marathon marathon:gitignore               Adding .marathon rule into .gitgnore
+  marathon marathon:upgrade                 Upgrading to latest version of Marathon
 ```
 ## Contributing
 Marathon is an open-source project. You can contribute to the project by submitting bug fixes, improvements, or new features.

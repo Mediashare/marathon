@@ -1,18 +1,20 @@
 {
     "name": "mediashare/marathon",
-    "description": "Marathon is a free and open-source command-line time tracker. It allows you to track the time you spend on tasks or projects.",
+    "description": "Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently manage tasks for your projects.",
     "type": "library",
     "keywords": [
         "marathon",
+        "task",
+        "time",
+        "timer",
         "time tracking",
         "time management",
+        "task management",
         "productivity",
         "command line",
-        "taks",
         "projects",
         "version control",
         "commit history",
-        "time management",
         "workflow",
         "developer tools"
     ],

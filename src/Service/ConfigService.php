@@ -13,30 +13,35 @@ class ConfigService {
     private Config $config;
 
     public function __construct(
+        private TaskService $taskService,
     ) {
         $this->serializerService = new SerializerService();
         $this->filesystem = new Filesystem();
     }
 
-    public function createConfig(
+    public function write(
         string|null $configPath = null,
         string|null $dateTimeFormat = null,
-        string|null $timerDirectory = null,
-        string|null $timerId = null,
-    ): Config {
-        $configPath ? $this->configPath = $configPath : null;
+        string|null $taskDirectory = null,
+        string|null $taskId = null,
+    ): self {
+        $configPath ? $this->setConfigPath($configPath) : null;
 
         $this->config = new Config(
-            $dateTimeFormat = $dateTimeFormat ?? $this->getLastDateTimeFormat(),
-            $timerDirectory = $timerDirectory ?? $this->getLastTimerDirectory(),
-            $timerId
-                ?? $this->getLastTimerId($timerDirectory)
+            $dateTimeFormat ?? $this->getLastDateTimeFormat(),
+            $taskDirectory = $taskDirectory ?? $this->getLastTaskDirectory(),
+            $taskId
+                ?? $this->getLastTaskId($taskDirectory)
                 ?? (new \DateTime())->format('YmdHis')
             ,
         );
 
-        $this->createConfigFile();
+        $this->filesystem->dumpFile($this->getConfigPath(), json_encode($this->getConfig()->toArray(), JSON_THROW_ON_ERROR));
 
+        return $this;
+    }
+
+    public function getConfig(): Config {
         return $this->config;
     }
 
@@ -48,18 +53,19 @@ class ConfigService {
         return $this->getLastConfig()->getDateTimeFormat();
     }
 
-    public function getLastTimerDirectory(): string {
-        return $this->getLastConfig()->getTimerDirectory();
+    public function getLastTaskDirectory(): string {
+        return $this->getLastConfig()->getTaskDirectory();
     }
 
-    public function getLastTimerId(string $timerDirectory): string|null {
+    public function getLastTaskId(string $taskDirectory): string|null {
         try {
-            if ($lastTimerIdByConfig = $this->getLastConfig()->getTimerId()):
-                return $lastTimerIdByConfig;
+            if ($lastTaskIdByConfig = $this->getLastConfig()->getTaskId()):
+                return $lastTaskIdByConfig;
             endif;
 
-            return (new TimerService(new Config(timerDirectory: $timerDirectory)))
-                ->getTimers()?->last()?->getId();
+            return $this->taskService
+                ->setConfig(new Config(taskDirectory: $taskDirectory))
+                ->getTasks()?->last()?->getId();
 
         } catch (\Exception $exception) {
 
@@ -68,16 +74,20 @@ class ConfigService {
         return null;
     }
 
-    private function getLastConfig(): Config {
-        return $this->filesystem->exists($this->configPath)
-            ? $this->serializerService->read($this->configPath, Config::class)
-            : new Config()
-        ;
-    }
-
-    private function createConfigFile(): self {
-        $this->filesystem->dumpFile($this->configPath, json_encode($this->config->toArray(), JSON_THROW_ON_ERROR));
+    private function setConfigPath(string $configPath): self {
+        $this->configPath = $configPath;
 
         return $this;
+    }
+
+    private function getConfigPath(): string|null {
+        return $this->configPath;
+    }
+
+    private function getLastConfig(): Config {
+        return $this->filesystem->exists($this->getConfigPath())
+            ? $this->serializerService->read($this->getConfigPath(), Config::class)
+            : new Config()
+        ;
     }
 }

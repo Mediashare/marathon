@@ -13,35 +13,35 @@ class StepServiceTest extends AbstractTestCase {
         $this->stepService = new StepService();
     }
 
-    public function testCreateStepWithNoDates(): void {
-        $step = $this->stepService->createStep();
+    public function testCreateWithNoDates(): void {
+        $step = $this->stepService->create();
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
         $this->assertNull($step->getEndDate());
     }
 
-    public function testCreateStepWithCustomStartDate(): void {
+    public function testCreateWithCustomStartDate(): void {
         $customStartDate = strtotime('2023-01-01');
-        $step = $this->stepService->createStep($customStartDate);
+        $step = $this->stepService->create($customStartDate);
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertEquals($customStartDate, $step->getStartDate());
         $this->assertNull($step->getEndDate());
     }
 
-    public function testCreateStepWithEndDate(): void {
+    public function testCreateWithEndDate(): void {
         $endDate = strtotime('2023-02-01');
-        $step = $this->stepService->createStep(null, $endDate);
+        $step = $this->stepService->create(null, $endDate);
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
         $this->assertEquals($endDate, $step->getEndDate());
     }
 
-    public function testCreateStepWithCustomDuration(): void {
+    public function testCreateWithCustomDuration(): void {
         $customDuration = '+5 minutes';
-        $step = $this->stepService->createStepWithCustomDuration($customDuration);
+        $step = $this->stepService->createWithCustomDuration($customDuration);
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
@@ -50,10 +50,10 @@ class StepServiceTest extends AbstractTestCase {
         $this->assertEquals('00:05:00', $step->getDuration());
     }
 
-    public function testCreateStepWithCustomDurationAndStartDate(): void {
+    public function testCreateWithCustomDurationAndStartDate(): void {
         $customDuration = '+2 hours';
         $customStartDate = strtotime('2023-03-01');
-        $step = $this->stepService->createStepWithCustomDuration($customDuration, $customStartDate);
+        $step = $this->stepService->createWithCustomDuration($customDuration, $customStartDate);
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertEquals($customStartDate, $step->getStartDate());

@@ -4,36 +4,46 @@ namespace Mediashare\Marathon\Service;
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Step;
 use Mediashare\Marathon\Entity\Commit;
-use Mediashare\Marathon\Entity\Timer;
+use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
 
 class CommitService {
-    private Timer $timer;
-    private StepService $stepService;
+    private Task $task;
 
     public function __construct(
-        private Config $config,
-    ) {
-        $timerService = new TimerService($this->config);
-        $this->timer = $timerService->getTimer();
-        $this->stepService = new StepService();
+        private StepService $stepService,
+    ) { }
+
+    public function setTask(Task $task): self {
+        $this->task = $task;
+
+        return $this;
     }
 
-    public function createCommit(?string $message = null, ?string $duration = null): Timer {
+    public function getTask(): Task {
+        return $this->task;
+    }
+
+    public function create(
+        ?string $message = null,
+        ?string $duration = null
+    ): self {
+        $task = $this->getTask();
+
         $commit = (new Commit())
             ->setId((new \DateTime())->format('YmdHis'))
             ->setMessage($message);
 
         if ($duration):
             $commit->addStep(
-                $this->stepService->createStepWithCustomDuration(
+                $this->stepService->createWithCustomDuration(
                     $duration,
-                    ($lastStep = $this->timer->getSteps()?->last())?->getEndDate()
+                    ($lastStep = $task->getSteps()?->last())?->getEndDate()
                         ? $lastStep->getStartDate()
                         : null
                 )
             );
-        elseif (($steps = $this->timer->getSteps())->count() > 0):
+        elseif (($steps = $task->getSteps())->count() > 0):
             /** @var Step $step */
             foreach ($steps as $step):
                 if (!$step->getEndDate()):
@@ -48,44 +58,44 @@ class CommitService {
                 ->setEndDate($dateTime));
         endif;
 
-        $this->timer
+        $task
             ->addCommit($commit)
             ->getSteps()->clear();
 
-        if ($this->timer->isRun()):
+        if ($task->isRun()):
             $this
-                ->timer
+                ->getTask()
                 ->addStep(
-                    $this->stepService->createStep()
+                    $this->stepService->create()
                 );
         endif;
 
-        return $this->timer;
+        return $this->setTask($task);
     }
 
     /**
      * @throws CommitNotFoundException
      */
-    public function editCommit(
+    public function edit(
         string $id,
         string|false $message = false,
         string|false $duration = false,
-    ): Timer {
-        if (($commit = $this
-                ->timer
+    ): self {
+        $task = $this->getTask();
+
+        if (($commit = $task
                 ->getCommits()
                 ->findOneBy(
-                    fn (Commit $commit) => $commit->getId() === $id
+                    static fn (Commit $commit) => $commit->getId() === $id
                 )) === null
         ) {
             throw new CommitNotFoundException();
         }
 
-        $key = $this->timer->getCommits()->getKey($commit);
+        $key = $task->getCommits()->getKey($commit);
 
         if ($message !== false):
-            $this
-                ->timer
+            $task
                 ->getCommits()
                 ->offsetSet($key, $commit->setMessage($message));
         endif;
@@ -93,8 +103,7 @@ class CommitService {
         if ($duration !== false):
             $startDate = $commit->getStartDate() ?? (new \DateTime())->getTimestamp();
             $commit->getSteps()->clear();
-            $this
-                ->timer
+            $task
                 ->getCommits()
                 ->offsetSet(
                     $key,
@@ -102,7 +111,7 @@ class CommitService {
                         ->addStep(
                             $this
                                 ->stepService
-                                ->createStepWithCustomDuration(
+                                ->createWithCustomDuration(
                                     $duration,
                                     $startDate,
                                 )
@@ -110,21 +119,23 @@ class CommitService {
                 );
         endif;
 
-        return $this->timer;
+        return $this->setTask($task);
     }
 
     /**
      * @throws CommitNotFoundException
      */
-    public function removeCommit(
+    public function delete(
         string $id,
-    ): Timer {
-        if (($commit = $this->timer->getCommits()->findOneBy(fn(Commit $commit) => $commit->getId() === $id)) === null):
+    ): self {
+        $task = $this->getTask();
+        if (($commit = $task->getCommits()->findOneBy(static fn (Commit $commit) => $commit->getId() === $id)) ===
+            null):
             throw new CommitNotFoundException();
         endif;
 
-        $this->timer->getCommits()->remove($commit);
+        $task->getCommits()->remove($commit);
 
-        return $this->timer;
+        return $this->setTask($task);
     }
 }
