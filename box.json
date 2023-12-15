@@ -6,7 +6,7 @@
         "./src",
         "./vendor"
     ],
-    "files": [".env", ".env.local.php"],
+    "files": [".env"],
     "main": "bin/marathon",
     "output": "marathon"
   }
