@@ -2,7 +2,11 @@
 
 namespace Mediashare\Marathon\Entity;
 
+use Mediashare\Marathon\Trait\EntityUnserializerTrait;
+
 class Config {
+    use EntityUnserializerTrait;
+
     public const CONFIG_PATH = '.'.DIRECTORY_SEPARATOR.'.marathon'.DIRECTORY_SEPARATOR.'config.json';
     public const TASKS_DIRECTORY = '.'.DIRECTORY_SEPARATOR.'.marathon'.DIRECTORY_SEPARATOR.'tasks';
 

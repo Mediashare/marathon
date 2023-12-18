@@ -10,7 +10,7 @@ class FileNotFoundException extends \Exception {
         \Throwable|null $previous = null,
     ) {
         parent::__construct(
-            '[<comment>'.$filepath.'</comment>] ' . $message,
+            '['.$filepath.'] ' . $message,
             $code,
             $previous
         );

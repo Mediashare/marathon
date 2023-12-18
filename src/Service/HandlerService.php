@@ -8,11 +8,12 @@ use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
+use Mediashare\Marathon\Exception\StrToTimeException;
 use Mediashare\Marathon\Exception\TaskNotFoundException;
 
 class HandlerService {
     private Config $config;
-    private Task $task;
+    private Task|null $task;
 
     public function __construct(
         private ConfigService $configService,
@@ -44,14 +45,12 @@ class HandlerService {
     /**
      * @throws \JsonException
      */
-    public function updateCurrentTrackingId(): self {
-        $lastTaskId = $this->configService->getLastTaskId(
-            $this->config->getTaskDirectory(),
-        );
+    public function updateConfigCurrentTaskId(): self {
+        $lastTaskId = $this->configService->getLastTaskId();
 
         $this->configService->write(
             taskId: $this->getConfig()->getTaskId() === $lastTaskId
-                ? (new \DateTime())->format('YmdHis')
+                ? null
                 : $lastTaskId
             ,
         );
@@ -59,7 +58,7 @@ class HandlerService {
         return $this;
     }
 
-    private function setTask(Task $task): self {
+    private function setTask(Task|null $task): self {
         $this->task = $task;
 
         return $this;
@@ -70,11 +69,11 @@ class HandlerService {
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
-    public function getTask(): Task {
+    public function getTask(bool $createItIfNotExist = false): Task {
         return $this->task
             ?? $this->taskService
                 ->setConfig($this->getConfig())
-                ->getTask()
+                ->getTask($createItIfNotExist)
             ;
     }
 
@@ -137,11 +136,11 @@ class HandlerService {
     public function delete(): self {
         $taskService = $this->taskService->setConfig($this->getConfig());
 
-        $this->setTask($taskService->getTask(createItIfNotExist: false));
+        $this->setTask($taskService->getTask());
 
         $taskService->delete();
 
-        return $this;
+        return $this->setTask(null);
     }
 
     /**
@@ -149,6 +148,7 @@ class HandlerService {
      * @throws FileNotFoundException
      * @throws TaskNotFoundException
      * @throws JsonDecodeException
+     * @throws StrToTimeException
      */
     public function commit(
         string|false $id = false,
@@ -158,7 +158,7 @@ class HandlerService {
     ): self {
         if ($id === false):
             $this->commitService
-                ->setTask($this->getTask())
+                ->setTask($this->getTask(createItIfNotExist: true))
                 ->create(
                     $message,
                     $duration

@@ -34,7 +34,7 @@ class TaskDeleteCommand extends Command {
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         try {
             // Handler
             $this->handlerService->setConfig(
@@ -53,7 +53,7 @@ class TaskDeleteCommand extends Command {
                 ->renderTasks();
 
             // Update config
-            $this->handlerService->updateCurrentTrackingId();
+            $this->handlerService->updateConfigCurrentTaskId();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

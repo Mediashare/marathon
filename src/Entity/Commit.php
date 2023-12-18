@@ -11,8 +11,8 @@ class Commit {
     use EntityDurationTrait;
     use EntityUnserializerTrait;
 
-    private string|null $id = null;
-    private string $message = '';
+    private string $id;
+    private string|null $message = null;
 
     private StepCollection $steps;
 
@@ -32,7 +32,7 @@ class Commit {
         return $this->id;
     }
 
-    public function setMessage(string $message): self {
+    public function setMessage(string|null $message): self {
         $this->message = $message;
 
         return $this;
@@ -60,11 +60,15 @@ class Commit {
         return $this;
     }
 
-    public function toRender(int $index = 0, int $totalSeconds = 0, string $dateTimeFormat = Config::DATETIME_FORMAT) {
+    public function toRender(
+        int $index = 0,
+        int $totalSeconds = 0,
+        string $dateTimeFormat = Config::DATETIME_FORMAT,
+    ) {
         return [
             'index' => $index,
             'id' => $this->id,
-            'message' => $this->message,
+            'message' => $this->getMessage(),
             'duration' => $this->getDuration(),
             'duration_total' => $this->getDuration(totalSeconds: $totalSeconds),
             'startDate' => $this->getStartDateFormated($dateTimeFormat),

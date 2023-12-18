@@ -16,7 +16,7 @@ class MarathonGitignoreCommand extends Command {
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         if (file_exists($filepath = './.gitignore')):
             $currentContent = file_get_contents($filepath);
             if (str_contains($currentContent, '.marathon')):

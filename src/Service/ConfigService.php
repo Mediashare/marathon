@@ -2,6 +2,8 @@
 
 namespace Mediashare\Marathon\Service;
 
+use Mediashare\Marathon\Exception\FileNotFoundException;
+use Mediashare\Marathon\Exception\JsonDecodeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Mediashare\Marathon\Entity\Config;
 
@@ -19,6 +21,11 @@ class ConfigService {
         $this->filesystem = new Filesystem();
     }
 
+    /**
+     * @throws FileNotFoundException
+     * @throws JsonDecodeException
+     * @throws \JsonException
+     */
     public function write(
         string|null $configPath = null,
         string|null $dateTimeFormat = null,
@@ -46,30 +53,44 @@ class ConfigService {
     }
 
     public function isDebug(): bool {
-        return (empty($_ENV['APP_ENV']) || strtolower($_ENV['APP_ENV']) !== 'prod');
+        return ($this->isTest() ||empty($_ENV['APP_ENV']) || strtolower($_ENV['APP_ENV']) !== 'prod');
     }
 
+    public function isTest(): bool {
+        return (!empty($_ENV['APP_ENV']) && strtolower($_ENV['APP_ENV']) === 'test');
+    }
+
+    /**
+     * @throws JsonDecodeException
+     * @throws FileNotFoundException
+     */
     public function getLastDateTimeFormat(): string {
         return $this->getLastConfig()->getDateTimeFormat();
     }
 
+    /**
+     * @throws JsonDecodeException
+     * @throws FileNotFoundException
+     */
     public function getLastTaskDirectory(): string {
         return $this->getLastConfig()->getTaskDirectory();
     }
 
-    public function getLastTaskId(string $taskDirectory): string|null {
+    public function getLastTaskId(string|null $taskDirectory = null): string|null {
         try {
-            if ($lastTaskIdByConfig = $this->getLastConfig()->getTaskId()):
-                return $lastTaskIdByConfig;
+            $lastTaskId = $this->taskService
+                ->setConfig(new Config(taskDirectory: $taskDirectory ?? $this->getLastTaskDirectory()))
+                ->getTasks()?->last()?->getId()
+            ;
+
+            if ($lastTaskId):
+                return $lastTaskId;
             endif;
 
-            return $this->taskService
-                ->setConfig(new Config(taskDirectory: $taskDirectory))
-                ->getTasks()?->last()?->getId();
-
-        } catch (\Exception $exception) {
-
-        }
+            if ($lastTaskIdByLastConfig = $this->getLastConfig()->getTaskId()):
+                return $lastTaskIdByLastConfig;
+            endif;
+        } catch (\Exception $exception) {}
 
         return null;
     }
@@ -84,10 +105,17 @@ class ConfigService {
         return $this->configPath;
     }
 
+    /**
+     * @throws JsonDecodeException
+     * @throws FileNotFoundException
+     */
     private function getLastConfig(): Config {
-        return $this->filesystem->exists($this->getConfigPath())
-            ? $this->serializerService->read($this->getConfigPath(), Config::class)
-            : new Config()
-        ;
+        if (!$this->isTest() && $this->filesystem->exists($this->getConfigPath())):
+            return $this->serializerService->read($this->getConfigPath(), Config::class);
+        elseif (!$this->isTest() && $this->filesystem->exists(Config::CONFIG_PATH)):
+            return $this->serializerService->read(Config::CONFIG_PATH, Config::class);
+        endif;
+
+        return new Config();
     }
 }

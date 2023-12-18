@@ -20,7 +20,7 @@ class TaskStartCommand extends Command {
             ->addArgument('name', InputArgument::OPTIONAL, 'Set the <comment>name</comment> of task selected', false)
             ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Starting task by <comment>ID</comment> selected')
             ->addOption('new', null, InputOption::VALUE_NONE, 'Starting <comment>new</comment> task')
-            ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>+1minutes</comment>", "<comment>+10min</comment>", "<comment>+1hours</comment>", "<comment>+1days</comment>", "<comment>-1hour</comment>")', false)
+            ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
 
             // Config
             ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Config <comment>path</comment> to json file')
@@ -37,7 +37,7 @@ class TaskStartCommand extends Command {
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         try {
             // Handler
             $this->handlerService->setConfig(

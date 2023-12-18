@@ -21,7 +21,7 @@ class CommitCollection extends AbstractCollection
     }
 
     public function getKey(Commit $commit): mixed {
-        return array_search($commit, $this->data);
+        return array_search($commit, $this->data, true);
     }
 
     public function allPrevious(Commit $commit): CommitCollection {

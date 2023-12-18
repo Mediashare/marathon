@@ -39,7 +39,7 @@ class TaskService {
      */
     public function getTasks(): TaskCollection {
         $taskCollection = new TaskCollection();
-        foreach (glob($this->config->getTaskDirectory() . '/*') as $filepath):
+        foreach (glob($this->config->getTaskDirectory() . DIRECTORY_SEPARATOR . '*') as $filepath):
             $taskCollection->add($this->serializerService->read($filepath, Task::class));
         endforeach;
 
@@ -51,21 +51,23 @@ class TaskService {
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
-    public function getTask(bool $createItIfNotExist = true): Task {
+    public function getTask(bool $createItIfNotExist = false): Task|self {
         if ($this->task instanceof Task):
             return $this->task;
         endif;
 
-        $taskExist = $this->filesystem->exists($filepath = $this->getTaskFilepath());
-        if (!$taskExist && $createItIfNotExist):
+        $taskFileExist = $this->filesystem->exists($filepath = $this->getTaskFilepath());
+        if ($taskFileExist):
+            return $this
+                ->setTask($this->serializerService->read($filepath, Task::class))
+                ->getTask();
+        elseif (!$taskFileExist && $createItIfNotExist):
             return $this->create()->getTask();
-        elseif (!$taskExist):
+        elseif (!$taskFileExist):
             throw new TaskNotFoundException();
         endif;
 
-        return $this
-            ->setTask($this->serializerService->read($filepath, Task::class))
-            ->getTask();
+        return $this;
     }
 
     public function setTask(Task|null $task = null): self {
@@ -83,9 +85,12 @@ class TaskService {
 
         if (!$task->getId()):
             $task->setId($this->config->getTaskId() ?? (new \DateTime())->format('YmdHis'));
+            $this->setConfig($this->getConfig()->setTaskId($task->getId()));
+        else:
+            $this->setConfig($this->getConfig()->setTaskId($task->getId()));
         endif;
 
-        if ($task->isRun() && !$task->getSteps()?->last()?->getEndDate()):
+        if ($task->isRun()):
             $task->addStep($this->stepService->create());
         endif;
 
@@ -103,7 +108,7 @@ class TaskService {
         string|false $name = false,
         string|false $duration = false,
     ): self {
-        $task = $this->getTask()
+        $task = $this->getTask(createItIfNotExist: true)
             ->setRun(true)
             ->setName($name !== false ? $name : $this->getTask()->getName());
 
@@ -136,7 +141,7 @@ class TaskService {
      */
     public function stop(): self {
         $task = $this
-            ->getTask(createItIfNotExist: false)
+            ->getTask(createItIfNotExist: true)
             ->setRun(false);
 
         if (($lastStep = $task->getSteps()?->last()) && !$lastStep->getEndDate()):
@@ -159,7 +164,7 @@ class TaskService {
     public function archive(): self {
         $this
             ->stop()
-            ->getTask(createItIfNotExist: false)
+            ->getTask()
             ->setArchived(true);
 
         return $this;
