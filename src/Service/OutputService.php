@@ -52,7 +52,10 @@ class OutputService {
     }
 
     public function renderTasks(): self {
-        $this->getTable()->setHeaders([
+        $this
+            ->getTable()
+            ->setColumnMaxWidth(1, $this->getMaxWidthOfColumn())
+            ->setHeaders([
                 [new TableCell(($this->getTask() instanceof Task) ? 'Task' : 'Tasks', ['colspan' => 7])],
                 ['ID', 'Name', 'Status', 'Commits', 'Duration', 'Current step', 'Start date', 'End date']
             ])
@@ -69,7 +72,10 @@ class OutputService {
     }
 
     public function renderCommits(): self {
-        $this->getTable()->setHeaders([
+        $this
+            ->getTable()
+            ->setColumnMaxWidth(2, $this->getMaxWidthOfColumn())
+            ->setHeaders([
                 [new TableCell('Commits', ['colspan' => 5])],
                 ['N°', 'ID', 'Message', 'Duration', 'Total', 'Start date', 'End date']
             ])
@@ -88,7 +94,7 @@ class OutputService {
                                             ->map(static fn (Commit $previousCommit) => $previousCommit->getSeconds())
                                             ->toArray(),
                                     ),
-                                    $this->getConfig()->getDateTimeFormat()
+                                    $this->getConfig()->getDateTimeFormat(),
                                 )
                     )
                     ->toArray(),
@@ -96,5 +102,14 @@ class OutputService {
             ->render();
 
         return $this;
+    }
+
+    private function getMaxWidthOfColumn(): int {
+        stripos(PHP_OS, 'WIN') === 0
+            ? $terminalWidth = (int) shell_exec('powershell -Command "&{(Get-Host).UI.RawUI.WindowSize.Width}"')
+            : $terminalWidth = (int) shell_exec('tput cols')
+        ;
+
+        return $terminalWidth - ($terminalWidth / 1.33);
     }
 }
