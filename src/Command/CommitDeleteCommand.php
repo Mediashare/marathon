@@ -34,7 +34,7 @@ class CommitDeleteCommand extends Command {
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         try {
             $this->handlerService->setConfig(
                 $input->getOption('config-path'),

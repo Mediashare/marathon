@@ -2,12 +2,8 @@
 namespace Mediashare\Marathon\Command;
 
 use Mediashare\Marathon\Entity\Config;
-use Mediashare\Marathon\Service\CommitService;
-use Mediashare\Marathon\Service\ConfigService;
 use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\OutputService;
-use Mediashare\Marathon\Service\SerializerService;
-use Mediashare\Marathon\Service\TimerService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,7 +18,7 @@ class CommitCommand extends Command {
             ->setName('commit')
             ->setDescription('<comment>Creating</comment> new commit into task selected')
             ->addArgument('message', InputArgument::OPTIONAL, 'Define a commit <comment>message</comment>', '')
-            ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the new commit (ex: "<comment>+1minutes</comment>", "<comment>+10min</comment>", "<comment>+1hours</comment>", "<comment>+1days</comment>", "<comment>-1hour</comment>")', false)
+            ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the new commit (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
 
             // Config
             ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Config <comment>path</comment> to json file')
@@ -39,7 +35,7 @@ class CommitCommand extends Command {
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         try {
             // Handler
             $this->handlerService->setConfig(

@@ -13,7 +13,7 @@ class Task {
     use EntityUnserializerTrait;
 
     private string|null $id = null;
-    private string $name = '';
+    private string|null $name = null;
     private bool $run = true;
     private bool $archived = false;
 
@@ -39,13 +39,13 @@ class Task {
         return $this->id;
     }
 
-    public function setName(string $name): self {
+    public function setName(string|null $name): self {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getName(): string {
+    public function getName(): string|null {
         return $this->name;
     }
 
@@ -70,7 +70,7 @@ class Task {
     }
 
     public function getStatus(): string {
-        if ($this->isArchived()): return 'archived'; elseif ($this->run): return 'run'; else: return 'pause'; endif;
+        if ($this->isArchived()): return 'archived'; elseif ($this->run): return 'run'; else: return 'pending'; endif;
     }
 
     public function setCommits(CommitCollection $commits): self {

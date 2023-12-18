@@ -11,8 +11,8 @@ class Commit {
     use EntityDurationTrait;
     use EntityUnserializerTrait;
 
-    private string|null $id = null;
-    private string $message = '';
+    private string $id;
+    private string|null $message = null;
 
     private StepCollection $steps;
 
@@ -32,7 +32,7 @@ class Commit {
         return $this->id;
     }
 
-    public function setMessage(string $message): self {
+    public function setMessage(string|null $message): self {
         $this->message = $message;
 
         return $this;

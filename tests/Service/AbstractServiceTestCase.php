@@ -1,12 +1,25 @@
 <?php
 
-namespace Mediashare\Marathon\Tests;
+namespace Mediashare\Marathon\Tests\Service;
 
 use PHPUnit\Framework\TestCase;
 
-class AbstractTestCase extends TestCase {
+class AbstractServiceTestCase extends TestCase {
+    public string $marathonDirectory;
+    public string $configPath;
+    public string $taskDirectory;
+
+    public function setUp(): void {
+        $this->marathonDirectory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'marathon';
+        $this->configPath = $this->marathonDirectory . DIRECTORY_SEPARATOR . 'config.json';
+        $this->taskDirectory = $this->marathonDirectory . DIRECTORY_SEPARATOR . 'tasks';
+
+        @mkdir($this->marathonDirectory, recursive: true);
+        @mkdir($this->taskDirectory, recursive: true);
+    }
+
     public function tearDown(): void {
-        $this->rmdir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'marathon');
+        $this->rmdir($this->marathonDirectory);
     }
 
     private function rmdir(string $directory): void {

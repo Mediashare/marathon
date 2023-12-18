@@ -21,6 +21,6 @@ class StepCollection extends AbstractCollection
     }
 
     public function getKey(Step $step): mixed {
-        return array_search($step, $this->data);
+        return array_search($step, $this->data, true);
     }
 }

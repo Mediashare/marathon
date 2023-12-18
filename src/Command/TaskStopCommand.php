@@ -18,7 +18,7 @@ class TaskStopCommand extends Command {
             ->setName('task:stop')
             ->setDescription('<comment>Stoping</comment> task step selected')
             ->addArgument('id', InputArgument::OPTIONAL, 'Stoping task by <comment>ID</comment> selected')
-            ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Update the <comment>duration</comment> of the selected commit (ex: "<comment>+1minutes</comment>", "<comment>+10min</comment>", "<comment>+1hours</comment>", "<comment>+1days</comment>", "<comment>-1hour</comment>")', false)
+            ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Update the <comment>duration</comment> of the selected commit (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
 
             // Config
             ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Config <comment>path</comment> to json file')
@@ -35,7 +35,7 @@ class TaskStopCommand extends Command {
         parent::__construct();
     }
     
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         try {
             // Handler
             $this->handlerService->setConfig(

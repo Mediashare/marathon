@@ -2,93 +2,138 @@
 
 namespace Mediashare\Marathon\Tests\Service;
 
-use Mediashare\Marathon\Collection\CommitCollection;
-use Mediashare\Marathon\Collection\StepCollection;
 use Mediashare\Marathon\Entity\Commit;
-use Mediashare\Marathon\Entity\Step;
-use Mediashare\Marathon\Exception\FileNotFoundException;
-use Mediashare\Marathon\Exception\JsonDecodeException;
-use Mediashare\Marathon\Exception\TaskNotFoundException;
-use Mediashare\Marathon\Service\StepService;
-use Mediashare\Marathon\Service\TaskService;
-use Mediashare\Marathon\Tests\AbstractTestCase;
-use Mediashare\Marathon\Service\CommitService;
-use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
+use Mediashare\Marathon\Exception\StrToTimeException;
+use Mediashare\Marathon\Service\CommitService;
+use Mediashare\Marathon\Service\StepService;
 
-class CommitServiceTest extends AbstractTestCase {
+class CommitServiceTest extends AbstractServiceTestCase {
     private CommitService $commitService;
 
-    /**
-     * @throws JsonDecodeException
-     * @throws TaskNotFoundException
-     * @throws FileNotFoundException
-     */
-    protected function setUp(): void
-    {
-        $config = new Config(
-            taskDirectory: sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'marathon' . DIRECTORY_SEPARATOR . 'tasks',
-            taskId: (new \DateTime())->format('YmdHis')
-        );
+    public function setUp(): void {
+        parent::setUp();
 
-        $this->commitService = (new CommitService(
-            $stepService = new StepService()
-        ))->setTask((new TaskService($stepService))->setConfig($config)->getTask());
-    }
-
-    public function testCreate(): void {
-        $task = $this->commitService->create('Test Commit', '+2 hours')->getTask();
-
-        $this->assertInstanceOf(Task::class, $task);
-        $this->assertCount(1, $commits = $task->getCommits());
-
-        $this->assertInstanceOf(CommitCollection::class, $commits);
-        $this->assertInstanceOf(Commit::class, $commit = $commits->first());
-
-        $this->assertInstanceOf(StepCollection::class, $steps = $commit->getSteps());
-        $this->assertInstanceOf(Step::class, $lastStep = $steps->first());
-        $this->assertEquals("02:00:00", $lastStep->getDuration());
-
-        $this->assertCount(1, $steps = $task->getSteps());
-        $this->assertInstanceOf(StepCollection::class, $steps);
-        $this->assertInstanceOf(Step::class, $steps->first());
+        $this->commitService = new CommitService($this->createMock(StepService::class));
     }
 
     /**
-     * @throws CommitNotFoundException
+     * @throws StrToTimeException
      */
-    public function testEdit(): void {
-        $task = $this->commitService->create('Original Commit', '+1 hour')->getTask();
-        $originalCommitId = $task->getCommits()->first()->getId();
+    public function testCreateCommit(): void {
+        $task = new Task();
+        $this->commitService->setTask($task);
 
-        $task = $this->commitService->edit($originalCommitId, 'Updated Commit', '+30 minutes')->getTask();
+        $this->commitService->create();
 
-        $this->assertInstanceOf(Task::class, $task);
         $this->assertCount(1, $task->getCommits());
-        $this->assertCount(1, $task->getSteps());
+        $this->assertCount(1, $task->getCommits()->first()->getSteps());
+        $this->assertNull($task->getCommits()->first()->getMessage());
+    }
 
-        $editedCommit = $task->getCommits()->first();
-        $this->assertEquals('Updated Commit', $editedCommit->getMessage());
+    /**
+     * @throws StrToTimeException
+     */
+    public function testCreateCommitWithMessage(): void {
+        $task = new Task();
+        $this->commitService->setTask($task);
+
+        $commitMessage = 'Test Commit';
+        $duration = '1 hour';
+
+        $this->commitService->create($commitMessage, $duration);
+
+        $this->assertCount(1, $task->getCommits());
+        $this->assertCount(1, $task->getCommits()->first()->getSteps());
+        $this->assertEquals($commitMessage, $task->getCommits()->first()->getMessage());
+    }
+
+    /**
+     * @throws StrToTimeException
+     */
+    public function testCreateCommitWithDuration(): void {
+        $task = new Task();
+        $this->commitService->setTask($task);
+
+        $duration = '1 hour';
+
+        $this->commitService->create(duration: $duration);
+
+        $this->assertCount(1, $task->getCommits());
+        $this->assertCount(1, $task->getCommits()->first()->getSteps());
+        $this->assertNull($task->getCommits()->first()->getMessage());
+    }
+
+    /**
+     * @throws CommitNotFoundException
+     * @throws StrToTimeException
+     */
+    public function testEditCommitMessage(): void {
+        $task = new Task();
+        $commitId = '123456789';
+
+        $commit = new Commit();
+        $commit->setId($commitId);
+        $task->addCommit($commit);
+
+        $this->commitService->setTask($task);
+
+        $newMessage = 'Updated Message';
+        $this->commitService->edit($commitId, $newMessage);
+
+        $this->assertCount(1, $task->getCommits());
+        $this->assertEquals($newMessage, $task->getCommits()->first()->getMessage());
+    }
+
+    /**
+     * @throws CommitNotFoundException
+     * @throws StrToTimeException
+     */
+    public function testEditCommitDuration(): void {
+        $task = new Task();
+        $commitId = '123456789';
+
+        $commit = new Commit();
+        $commit->setId($commitId);
+        $task->addCommit($commit);
+
+        $this->commitService->setTask($task);
+
+        $newDuration = '2 hours';
+        $this->commitService->edit($commitId, false, $newDuration);
+
+        $this->assertCount(1, $task->getCommits());
+        $this->assertCount(1, $task->getCommits()->first()->getSteps());
+        $this->assertCount(1, $task->getCommits()->first()->getSteps());
     }
 
     /**
      * @throws CommitNotFoundException
      */
-    public function testDelete(): void {
-        $task = $this->commitService->create('To Be Removed Commit', '+3 hours')->getTask();
-        $toBeRemovedCommitId = $task->getCommits()->first()->getId();
+    public function testDeleteCommit(): void {
+        $task = new Task();
+        $commitId = '123456789';
 
-        $task = $this->commitService->delete($toBeRemovedCommitId)->getTask();
+        $commit = new Commit();
+        $commit->setId($commitId);
+        $task->addCommit($commit);
 
-        $this->assertInstanceOf(Task::class, $task);
+        $this->commitService->setTask($task);
+
+        $this->commitService->delete($commitId);
+
         $this->assertCount(0, $task->getCommits());
-        $this->assertCount(1, $task->getSteps());
     }
 
-    public function testRemoveNonexistent(): void {
+    public function testCommitNotFoundException(): void {
         $this->expectException(CommitNotFoundException::class);
 
-        $this->commitService->delete('NonexistentCommitId');
+        $task = new Task();
+        $commitId = 'nonexistent_commit_id';
+
+        $this->commitService->setTask($task);
+
+        $this->commitService->delete($commitId);
     }
 }

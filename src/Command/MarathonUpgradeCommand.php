@@ -15,7 +15,7 @@ Class MarathonUpgradeCommand extends Command {
             ->setDescription('<comment>Upgrading</comment> to latest version of Marathon');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         if (!\Phar::running()):
             $output->writeln("<info>Use <comment>git pull</comment> for upgrade Marathon</info>");
             return Command::INVALID;

@@ -3,72 +3,117 @@
 namespace Mediashare\Marathon\Tests\Service;
 
 use Mediashare\Marathon\Entity\Config;
+use Mediashare\Marathon\Entity\Task;
+use Mediashare\Marathon\Exception\FileNotFoundException;
+use Mediashare\Marathon\Exception\JsonDecodeException;
+use Mediashare\Marathon\Exception\TaskNotFoundException;
 use Mediashare\Marathon\Service\CommitService;
 use Mediashare\Marathon\Service\ConfigService;
 use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\SerializerService;
-use Mediashare\Marathon\Service\StepService;
 use Mediashare\Marathon\Service\TaskService;
-use Mediashare\Marathon\Tests\AbstractTestCase;
 
-class HandlerServiceTest extends AbstractTestCase {
+class HandlerServiceTest extends AbstractServiceTestCase {
     private HandlerService $handlerService;
+    private TaskService $taskService;
 
-    protected function setUp(): void {
-        $config = new Config(
-            taskDirectory: sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'marathon' . DIRECTORY_SEPARATOR . 'tasks',
-            taskId: (new \DateTime())->format('YmdHis')
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->handlerService = (new HandlerService(
+            $configService = $this->createMock(ConfigService::class),
+            $this->taskService = $this->createMock(TaskService::class),
+            $this->createMock(CommitService::class),
+            $this->createMock(SerializerService::class),
+        ))->setConfig(
+            configPath: $this->configPath,
+            taskDirectory: $this->taskDirectory,
         );
 
-        $this->handlerService = new HandlerService(
-            new ConfigService(
-                $taskService = (new TaskService(
-                    $stepService = new StepService()
-                ))->setConfig($config)),
-            $taskService,
-            new CommitService($stepService),
-            new SerializerService(),
-        );
+        $configService->method('write')->willReturnSelf();
+        $configService->method('getConfig')->willReturn($this->handlerService->getConfig());
     }
 
-    public function testSetConfig(): void {
-        $this->assertTrue(true);
+    public function testSetAndGetConfig(): void {
+        $this->handlerService->setConfig(null, null, null, null);
+
+        $this->assertInstanceOf(Config::class, $this->handlerService->getConfig());
     }
 
-    public function testUpdateCurrentTrackingId(): void {
-        $this->assertTrue(true);
+    /**
+     * @throws TaskNotFoundException
+     * @throws FileNotFoundException
+     * @throws JsonDecodeException
+     */
+    public function testStartTask(): void {
+        $task = new Task();
+        $this->taskService->method('setConfig')->willReturnSelf();
+        $this->taskService->method('start')->willReturnSelf();
+        $this->taskService->method('getTask')->willReturn($task);
+
+        $task = $this->handlerService->start()->getTask();
+
+        $this->assertTrue($task->isRun());
+        $this->assertInstanceOf(Task::class, $task);
+
     }
 
-    public function testGetTask(): void {
-        $this->assertTrue(true);
+    /**
+     * @throws TaskNotFoundException
+     * @throws FileNotFoundException
+     * @throws JsonDecodeException
+     */
+    public function testStopTask(): void {
+        $task = (new Task())->setRun(false);
+        $this->taskService->method('setConfig')->willReturnSelf();
+        $this->taskService->method('stop')->willReturnSelf();
+        $this->taskService->method('getTask')->willReturn($task);
+
+        $task = $this->handlerService->stop()->getTask();
+
+        $this->assertFalse($task->isRun());
+        $this->assertInstanceOf(Task::class, $task);
     }
 
-    public function testGetTasks(): void {
-        $this->assertTrue(true);
+    /**
+     * @throws TaskNotFoundException
+     * @throws FileNotFoundException
+     * @throws JsonDecodeException
+     */
+    public function testArchiveTask(): void {
+        $task = (new Task())->setArchived(true);
+        $this->taskService->method('setConfig')->willReturnSelf();
+        $this->taskService->method('archive')->willReturnSelf();
+        $this->taskService->method('getTask')->willReturn($task);
+
+        $task = $this->handlerService->archive()->getTask();
+
+        $this->assertTrue($task->isArchived());
+        $this->assertInstanceOf(Task::class, $task);
     }
 
-    public function testStart(): void {
-        $this->assertTrue(true);
-    }
+    /**
+     * @throws TaskNotFoundException
+     * @throws FileNotFoundException
+     * @throws JsonDecodeException
+     */
+    public function testDeleteTask(): void {
+        $task = new Task();
 
-    public function testStop(): void {
-        $this->assertTrue(true);
-    }
+        $this->taskService->method('setConfig')->willReturnSelf();
+        $this->taskService->method('start')->willReturnSelf();
+        $this->taskService->method('getTask')->willReturn($task);
 
-    public function testArchive(): void {
-        $this->assertTrue(true);
-    }
+        $this->handlerService->start();
 
-    public function testDelete(): void {
-        $this->assertTrue(true);
-    }
+        $this->taskService->method('delete')->willReturnSelf();
 
-    public function testCommit(): void {
-        $this->assertTrue(true);
-    }
+        $this->handlerService->delete();
 
-    public function testWrite(): void {
-        $this->assertTrue(true);
-    }
+        $this->taskService->method('getTask')->willThrowException(new TaskNotFoundException());
 
+        $this->expectException(TaskNotFoundException::class);
+
+        $this->handlerService->getTask();
+    }
 }
