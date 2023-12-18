@@ -86,9 +86,9 @@ class TaskService {
         if (!$task->getId()):
             $task->setId($this->config->getTaskId() ?? (new \DateTime())->format('YmdHis'));
             $this->setConfig($this->getConfig()->setTaskId($task->getId()));
-        else:
-            $this->setConfig($this->getConfig()->setTaskId($task->getId()));
         endif;
+
+        $this->setConfig($this->getConfig()->setTaskId($task->getId()));
 
         if ($task->isRun()):
             $task->addStep($this->stepService->create());
