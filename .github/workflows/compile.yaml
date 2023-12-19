@@ -33,6 +33,20 @@ jobs:
         run: php marathon list
 
       - name: Check infinite loop
+        id: skip-check
+        run: echo "SKIP_CHECK=$(if [ "${{ github.actor }}" == "GitHub Action" ]; then echo "true"; else echo "false"; fi)" >> $GITHUB_ENV
+
+      - name: Afficher SKIP_CHECK
+        run: echo "SKIP_CHECK is $SKIP_CHECK"
+
+      - name: Check if Pull Request
+        id: pr-check
+        run: echo "IS_PR=$(if [ "${{ github.event_name }}" == "pull_request" ]; then echo "true"; else echo "false"; fi)" >> $GITHUB_ENV
+
+      - name: Afficher IS_PR
+        run: echo "IS_PR is $IS_PR"
+
+      - name: Check infinite loop
         id: skip-infinite-loop-check
         run: echo "SKIP_INFINITE_LOOP_CHECK=$(if [ "${{ github.actor }}" == "GitHub Action" ]; then echo "true"; else echo "false"; fi)" >> $GITHUB_ENV
 
