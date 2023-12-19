@@ -40,13 +40,13 @@ jobs:
         run: echo "PUSH_IT is $CONDITION"
 
       - name: Configure Git
-        if: steps.push-it.outputs.CONDITION == true
+        if: steps.push-it.outputs.CONDITION == 'true'
         run: |
           git config user.name "$(git log -n 1 --pretty=format:%an)"
           git config user.email "$(git log -n 1 --pretty=format:%ae)"
 
       - name: Commit and Push Binary
-        if: steps.push-it.outputs.CONDITION == true
+        if: steps.push-it.outputs.CONDITION == 'true'
         run: |
           branch_name=$(echo "${GITHUB_REF#refs/heads/}")
           git add ./marathon
