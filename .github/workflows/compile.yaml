@@ -38,6 +38,9 @@ jobs:
 
       - name: Afficher PUSH_IT
         run: echo "PUSH_IT is $CONDITION"
+      
+      - name: Afficher CONDITION
+        run: echo "CONDITION is ${{ steps.push-it.outputs.CONDITION }}"
 
       - name: Configure Git
         if: steps.push-it.outputs.CONDITION == 'true'
