@@ -60,5 +60,5 @@ jobs:
             git commit -m "$branch_name/compilation"
             git push "https://${{ secrets.CUSTOM_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:$branch_name
 
-      env:
-        CUSTOM_GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+    env:
+      CUSTOM_GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
