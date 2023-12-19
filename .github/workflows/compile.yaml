@@ -1,63 +1,62 @@
 name: Compile marathon binary
 
 on:
-    pull_request:
-        branches:
-            - '*'
-    push:
-        branches:
-            - '*'
-
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - '*'
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-            uses: actions/checkout@v2
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-            - name: Set up PHP
-            uses: shivammathur/setup-php@v2
-            with:
-                php-version: '8.1'
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
 
-            - name: Install dependencies
-            run: composer install
+      - name: Install dependencies
+        run: composer install
 
-            - name: Install Box builder
-            run: composer global require humbug/box
+      - name: Install Box builder
+        run: composer global require humbug/box
 
-            - name: Run the build ($branch_name)
-            run: box compile
+      - name: Run the build ($branch_name)
+        run: box compile
 
-            - name: Test marathon binary
-            run: php marathon list
+      - name: Test marathon binary
+        run: php marathon list
 
-            - name: Check infinite loop
-            id: skip-check
-            run: echo ::set-output name=skip::$(if [ "${{ github.actor }}" == "GitHub Action" ]; then echo "true"; else echo "false"; fi)
+      - name: Check infinite loop
+        id: skip-check
+        run: echo ::set-output name=skip::$(if [ "${{ github.actor }}" == "GitHub Action" ]; then echo "true"; else echo "false"; fi)
 
-            - name: Check if Pull Request
-            id: pr-check
-            run: echo ::set-output name=is_pr::$(if [ "${{ github.event_name }}" == "pull_request" ]; then echo "true"; else echo "false"; fi)
+      - name: Check if Pull Request
+        id: pr-check
+        run: echo ::set-output name=is_pr::$(if [ "${{ github.event_name }}" == "pull_request" ]; then echo "true"; else echo "false"; fi)
 
-            - name: Get User Email
-            id: get-user-email
-            uses: octokit/request-action@v2.x
-            with:
-                route: GET /repos/:owner/:repo/commits/${{ github.sha }}
-                headers:
-                Authorization: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get User Email
+        id: get-user-email
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/:owner/:repo/commits/${{ github.sha }}
+          headers:
+            Authorization: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Configure Git
-            if: steps.pr-check.outputs.is_pr == 'true' && steps.skip-check.outputs.skip != 'true'
-            run: |
-                git config --local user.email "${{ steps.get-user-email.outputs.data.committer.email }}"
-                git config --local user.name "${{ steps.get-user-email.outputs.data.committer.name }}"
+      - name: Configure Git
+        if: steps.pr-check.outputs.is_pr == 'true' && steps.skip-check.outputs.skip != 'true'
+        run: |
+          git config --local user.email "${{ steps.get-user-email.outputs.data.committer.email }}"
+          git config --local user.name "${{ steps.get-user-email.outputs.data.committer.name }}"
 
-            - name: Commit and Push Binary
-            if: steps.pr-check.outputs.is_pr == 'true' && steps.skip-check.outputs.skip != 'true'
-            run: |
-                git add ./marathon
-                git commit -m "$branch_name/compilation"
-                git push origin HEAD:$branch_name
+      - name: Commit and Push Binary
+        if: steps.pr-check.outputs.is_pr == 'true' && steps.skip-check.outputs.skip != 'true'
+        run: |
+          git add ./marathon
+          git commit -m "$branch_name/compilation"
+          git push origin HEAD:$branch_name
