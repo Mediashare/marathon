@@ -54,21 +54,10 @@ jobs:
             git config user.name "$(git log -n 1 --pretty=format:%an)"
             git config user.email "$(git log -n 1 --pretty=format:%ae)"
 
-    #   - name: Commit and Push Binary
-    #     if: ${{ env.CONDITION == 'true' }}
-    #     run: |
-    #         branch_name=$(echo "${GITHUB_REF#refs/heads/}")
-    #         git add ./marathon
-    #         git commit -m "$branch_name/compilation"
-    #         git push "https://${{ secrets.CUSTOM_GITHUB_TOKEN }}@github.com/Mediashare/marathon.git" HEAD:$branch_name
-      
-      - name: Auto-commit 
+      - name: Commit new marathon binary
         if: ${{ env.CONDITION == 'true' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
             commit_message: ${GITHUB_REF#refs/heads/}
             commit_user_name: $(git log -n 1 --pretty=format:%an)
             commit_user_email: $(git log -n 1 --pretty=format:%ae)
-
-    # env:
-    #   CUSTOM_GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
