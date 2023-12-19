@@ -47,15 +47,15 @@ jobs:
             CONDITION: ${{ env.CONDITION }}
 
       - name: Configure Git
-        if: steps.push-it.outputs.CONDITION == 'true'
+        if: ${{ env.CONDITION == 'true' }}
         run: |
-          git config user.name "$(git log -n 1 --pretty=format:%an)"
-          git config user.email "$(git log -n 1 --pretty=format:%ae)"
+            git config user.name "$(git log -n 1 --pretty=format:%an)"
+            git config user.email "$(git log -n 1 --pretty=format:%ae)"
 
       - name: Commit and Push Binary
-        if: steps.push-it.outputs.CONDITION == 'true'
+        if: ${{ env.CONDITION == 'true' }}
         run: |
-          branch_name=$(echo "${GITHUB_REF#refs/heads/}")
-          git add ./marathon
-          git commit -m "$branch_name/compilation"
-          git push origin HEAD:$branch_name
+            branch_name=$(echo "${GITHUB_REF#refs/heads/}")
+            git add ./marathon
+            git commit -m "$branch_name/compilation"
+            git push origin HEAD:$branch_name
