@@ -23,7 +23,7 @@ Class MarathonUpgradeCommand extends Command {
 
         $file = \Phar::running();
         $file = str_replace('phar://', '', $file);
-        $url = 'https://github.com/Mediashare/marathon/raw/master/marathon';
+        $url = 'https://raw.githubusercontent.com/Mediashare/marathon/main/marathon';
         $tmp = tempnam(sys_get_temp_dir(), 'marathon');
         if (!is_writable(\pathinfo($tmp, PATHINFO_DIRNAME))):
             $text = "<error>You have not permission for write <comment>".$tmp."</comment> file</error>";
