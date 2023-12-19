@@ -1,11 +1,6 @@
 name: Compile marathon binary
 
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - '*'
   push:
     branches:
       - '*'
@@ -48,37 +43,25 @@ jobs:
             echo "INFINITE_LOOP=$INFINITE_LOOP" >> $GITHUB_ENV
 
       - name: Get branch name
-        if: |
-          ${{ env.INFINITE_LOOP == 'false' }} &&
-          (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged) ||
-          (github.event_name == 'push' && github.event_name != 'pull_request')
+        if: ${{ env.INFINITE_LOOP == 'false' }}
         run: |
             BRANCH=${GITHUB_REF#refs/heads/}
             echo "BRANCH=$BRANCH" >> $GITHUB_ENV
       
       - name: Get username
-        if: |
-          ${{ env.INFINITE_LOOP == 'false' }} &&
-          (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged) ||
-          (github.event_name == 'push' && github.event_name != 'pull_request')
+        if: ${{ env.INFINITE_LOOP == 'false' }}
         run: |
             USERNAME="$(git log -n 1 --pretty=format:%an)"
             echo "USERNAME=$USERNAME" >> $GITHUB_ENV
       
       - name: Get email
-        if: |
-          ${{ env.INFINITE_LOOP == 'false' }} &&
-          (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged) ||
-          (github.event_name == 'push' && github.event_name != 'pull_request')
+        if: ${{ env.INFINITE_LOOP == 'false' }}
         run: |
             EMAIL=$(git log -n 1 --pretty=format:%ae)
             echo "EMAIL=$EMAIL" >> $GITHUB_ENV
 
       - name: Commit new marathon binary
-        if: |
-          ${{ env.INFINITE_LOOP == 'false' }} &&
-          (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged) ||
-          (github.event_name == 'push' && github.event_name != 'pull_request')
+        if: ${{ env.INFINITE_LOOP == 'false' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
             commit_message: ${{ env.BRANCH }}/compilation
