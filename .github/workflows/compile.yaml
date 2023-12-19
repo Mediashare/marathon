@@ -33,21 +33,21 @@ jobs:
         run: php marathon list
 
       - name: Check infinite loop
-        id: skip-check
-        run: echo ::set-output name=skip::$(if [ "${{ github.actor }}" == "GitHub Action" ]; then echo "true"; else echo "false"; fi)
+        id: skip-infinite-loop-check
+        run: echo "SKIP_INFINITE_LOOP_CHECK=$(if [ "${{ github.actor }}" == "GitHub Action" ]; then echo "true"; else echo "false"; fi)" >> $GITHUB_ENV
 
       - name: Check if Pull Request
         id: pr-check
-        run: echo ::set-output name=is_pr::$(if [ "${{ github.event_name }}" == "pull_request" ]; then echo "true"; else echo "false"; fi)
+        run: echo "IS_PR=$(if [ "${{ github.event_name }}" == "pull_request" ]; then echo "true"; else echo "false"; fi)" >> $GITHUB_ENV
 
       - name: Configure Git
-        if: steps.pr-check.outputs.is_pr == 'true' && steps.skip-check.outputs.skip != 'true'
+        if: steps.pr-check.outputs.IS_PR == 'true' && steps.skip-check.outputs.SKIP_INFINITE_LOOP_CHECK != 'true'
         run: |
             git config user.name "$(git log -n 1 --pretty=format:%an)"
             git config user.email "$(git log -n 1 --pretty=format:%ae)"
 
       - name: Commit and Push Binary
-        if: steps.pr-check.outputs.is_pr == 'true' && steps.skip-check.outputs.skip != 'true'
+        if: steps.pr-check.outputs.IS_PR == 'true' && steps.skip-check.outputs.SKIP_INFINITE_LOOP_CHECK != 'true'
         run: |
           branch_name=$(echo "${GITHUB_REF#refs/heads/}")
           git add ./marathon
