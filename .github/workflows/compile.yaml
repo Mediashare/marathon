@@ -47,13 +47,13 @@ jobs:
         run: echo "IS_PR is $IS_PR"
 
       - name: Configure Git
-        if: steps.pr-check.outputs.IS_PR == 'true' && steps.skip-infinite-loop-check.outputs.SKIP_INFINITE_LOOP_CHECK == 'false'
+        if: steps.pr-check.outputs.IS_PR == true && steps.skip-infinite-loop-check.outputs.SKIP_INFINITE_LOOP_CHECK == false
         run: |
           git config user.name "$(git log -n 1 --pretty=format:%an)"
           git config user.email "$(git log -n 1 --pretty=format:%ae)"
 
       - name: Commit and Push Binary
-        if: steps.pr-check.outputs.IS_PR == 'true' && steps.skip-infinite-loop-check.outputs.SKIP_INFINITE_LOOP_CHECK == 'false'
+        if: steps.pr-check.outputs.IS_PR == true && steps.skip-infinite-loop-check.outputs.SKIP_INFINITE_LOOP_CHECK == false
         run: |
           branch_name=$(echo "${GITHUB_REF#refs/heads/}")
           git add ./marathon
