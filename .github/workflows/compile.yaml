@@ -27,7 +27,7 @@ jobs:
             - name: Install Box builder
             run: composer global require humbug/box
 
-            - name: Run the build
+            - name: Run the build ($branch_name)
             run: box compile
 
             - name: Test marathon binary
