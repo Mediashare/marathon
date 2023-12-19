@@ -49,19 +49,19 @@ jobs:
             echo "BRANCH=$BRANCH" >> $GITHUB_ENV
       
       - name: Get username
-        if: ${{ env.INFINITE_LOOP == 'false' }}
+        if: ${{ env.INFINITE_LOOP == 'false' && env.BRANCH != 'main' }}
         run: |
             USERNAME="$(git log -n 1 --pretty=format:%an)"
             echo "USERNAME=$USERNAME" >> $GITHUB_ENV
       
       - name: Get email
-        if: ${{ env.INFINITE_LOOP == 'false' }}
+        if: ${{ env.INFINITE_LOOP == 'false' && env.BRANCH != 'main' }}
         run: |
             EMAIL=$(git log -n 1 --pretty=format:%ae)
             echo "EMAIL=$EMAIL" >> $GITHUB_ENV
 
       - name: Commit new marathon binary
-        if: ${{ env.INFINITE_LOOP == 'false' }}
+        if: ${{ env.INFINITE_LOOP == 'false' && env.BRANCH != 'main' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
             commit_message: ${{ env.BRANCH }}/compilation
