@@ -4,6 +4,8 @@ on:
   pull_request:
     types:
       - closed
+    branches:
+      - '*'
   push:
     branches:
       - '*'
@@ -45,12 +47,20 @@ jobs:
             INFINITE_LOOP=$(if [ "${{ github.actor }}" == 'GitHub Action' ]; then echo 'true'; else echo 'false'; fi)
             echo "INFINITE_LOOP=$INFINITE_LOOP" >> $GITHUB_ENV
 
+      - name: Get branch name
+        if: |
+          ${{ env.INFINITE_LOOP == 'false' }} &&
+          (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged) ||
+          (github.event_name == 'push' && github.event_name != 'pull_request')
+        run: |
+            BRANCH=${GITHUB_REF#refs/heads/}
+            echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+      
       - name: Get username
         if: |
           ${{ env.INFINITE_LOOP == 'false' }} &&
           (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged) ||
           (github.event_name == 'push' && github.event_name != 'pull_request')
-        id: get-username
         run: |
             USERNAME="$(git log -n 1 --pretty=format:%an)"
             echo "USERNAME=$USERNAME" >> $GITHUB_ENV
@@ -60,7 +70,6 @@ jobs:
           ${{ env.INFINITE_LOOP == 'false' }} &&
           (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged) ||
           (github.event_name == 'push' && github.event_name != 'pull_request')
-        id: get-email
         run: |
             EMAIL=$(git log -n 1 --pretty=format:%ae)
             echo "EMAIL=$EMAIL" >> $GITHUB_ENV
@@ -72,6 +81,6 @@ jobs:
           (github.event_name == 'push' && github.event_name != 'pull_request')
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-            commit_message: ${{ github.head_ref }}/compilation
+            commit_message: ${{ env.BRANCH }}/compilation
             commit_user_name: ${{ env.USERNAME }}
             commit_user_email: ${{ env.EMAIL }}
