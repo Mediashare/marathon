@@ -26,7 +26,7 @@ jobs:
       - name: Install Box builder
         run: composer global require humbug/box
 
-      - name: Run the build ($branch_name)
+      - name: Run the build
         run: box compile
 
       - name: Test marathon binary
@@ -57,6 +57,7 @@ jobs:
       - name: Commit and Push Binary
         if: steps.pr-check.outputs.is_pr == 'true' && steps.skip-check.outputs.skip != 'true'
         run: |
+          branch_name=$(echo "${GITHUB_REF#refs/heads/}")
           git add ./marathon
           git commit -m "$branch_name/compilation"
           git push origin HEAD:$branch_name
