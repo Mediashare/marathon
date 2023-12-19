@@ -1,0 +1,69 @@
+name: Compile marathon binary
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: PHPUnit permissions
+        run: chmod +x ./bin/phpunit
+
+      - name: Run PHPUnit
+        run: ./bin/phpunit
+
+      - name: Install Box builder
+        run: composer global require humbug/box
+
+      - name: Run the build
+        run: box compile
+
+      - name: Test marathon binary
+        run: php marathon list
+
+      - name: Check if push new marathon binary
+        id: push-it
+        run: |
+            CONDITION=$(if [ "${{ github.event_name }}" == 'pull_request' ]; then if [ "${{ github.actor }}" == 'GitHub Action' ]; then echo 'false'; else echo 'true'; fi; else echo 'false'; fi)
+            echo "CONDITION=$CONDITION" >> $GITHUB_ENV
+
+      - name: Get username
+        if: ${{ env.CONDITION == 'true' }}
+        id: get-username
+        run: |
+            USERNAME="$(git log -n 1 --pretty=format:%an)"
+            echo "USERNAME=$USERNAME" >> $GITHUB_ENV
+      
+      - name: Get email
+        if: ${{ env.CONDITION == 'true' }}
+        id: get-email
+        run: |
+            EMAIL=$(git log -n 1 --pretty=format:%ae)
+            echo "EMAIL=$EMAIL" >> $GITHUB_ENV
+
+      - name: Commit new marathon binary
+        if: ${{ env.CONDITION == 'true' }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+            commit_message: ${{ github.head_ref }}/compilation
+            commit_user_name: ${{ env.USERNAME }}
+            commit_user_email: ${{ env.EMAIL }}
