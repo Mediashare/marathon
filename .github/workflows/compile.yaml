@@ -59,6 +59,6 @@ jobs:
             git add ./marathon
             git commit -m "$branch_name/compilation"
             git push origin HEAD:$branch_name
-            
-env:
-  CUSTOM_GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+
+      env:
+        CUSTOM_GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
