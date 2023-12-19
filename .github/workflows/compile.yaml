@@ -40,24 +40,27 @@ jobs:
             CONDITION=$(if [ "${{ github.event_name }}" == 'pull_request' ]; then if [ "${{ github.actor }}" == 'GitHub Action' ]; then echo 'false'; else echo 'true'; fi; else echo 'false'; fi)
             echo "CONDITION=$CONDITION" >> $GITHUB_ENV
 
-      - name: Afficher PUSH_IT
-        run: echo "PUSH_IT is $CONDITION"
-      
-      - name: Afficher CONDITION
-        run: echo "CONDITION is $CONDITION"
-        env:
-            CONDITION: ${{ env.CONDITION }}
-
-      - name: Configure Git
+      - name: Get username
         if: ${{ env.CONDITION == 'true' }}
+        id: get-username
         run: |
-            git config user.name "$(git log -n 1 --pretty=format:%an)"
-            git config user.email "$(git log -n 1 --pretty=format:%ae)"
+            USERNAME="$(git log -n 1 --pretty=format:%an)"
+            echo "USERNAME=$USERNAME" >> $GITHUB_ENV
+      
+      - name: Get email
+        if: ${{ env.CONDITION == 'true' }}
+        id: get-email
+        run: |
+            EMAIL=$(git log -n 1 --pretty=format:%ae)
+            echo "EMAIL=$EMAIL" >> $GITHUB_ENV
 
       - name: Commit new marathon binary
         if: ${{ env.CONDITION == 'true' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-            commit_message: ${GITHUB_REF#refs/heads/}/compilation
-            commit_user_name: $(git log -n 1 --pretty=format:%an)
-            commit_user_email: $(git log -n 1 --pretty=format:%ae)
+            commit_message: ${{ github.head_ref }}/compilation
+            commit_user_name: $USERNAME
+            commit_user_email: $EMAIL
+        env:
+            USERNAME: ${{ env.USERNAME }}
+            EMAIL: ${{ env.EMAIL }}
