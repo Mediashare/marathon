@@ -34,13 +34,15 @@ jobs:
 
       - name: Check if push new marathon binary
         id: push-it
-        run: echo "CONDITION=$(if [ "${{ github.event_name }}" == 'pull_request' ]; then if [ "${{ github.actor }}" == 'GitHub Action' ]; then echo 'false'; else echo 'true'; fi; else echo 'false'; fi)" >> $GITHUB_ENV
+        run: |
+            CONDITION=$(if [ "${{ github.event_name }}" == 'pull_request' ]; then if [ "${{ github.actor }}" == 'GitHub Action' ]; then echo 'false'; else echo 'true'; fi; else echo 'false'; fi)
+            echo "CONDITION=$CONDITION"
 
       - name: Afficher PUSH_IT
         run: echo "PUSH_IT is $CONDITION"
       
       - name: Afficher CONDITION
-        run: echo "CONDITION is ${{ steps.push-it.outputs.CONDITION }}"
+        run: echo "CONDITION is ${{ env.CONDITION }}"
 
       - name: Configure Git
         if: steps.push-it.outputs.CONDITION == 'true'
