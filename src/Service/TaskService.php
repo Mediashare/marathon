@@ -110,6 +110,7 @@ class TaskService {
     ): self {
         $task = $this->getTask(createItIfNotExist: true)
             ->setRun(true)
+            ->setArchived(false)
             ->setName($name !== false ? $name : $this->getTask()->getName());
 
         if ($duration):
