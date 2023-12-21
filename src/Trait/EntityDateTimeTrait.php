@@ -34,15 +34,18 @@ trait EntityDateTimeTrait {
     }
 
     public function getEndDate(): int|null {
+        $endDate = null;
+
         switch (self::class) {
             case Task::class:
-                $endDate =
-                    $this->getCommits()?->first()?->getEndDate()
-                    ?? $this->getSteps()?->first()?->getEndDate()
-                ;
+                if (($commits = $this->getCommits())->count() > 0):
+                    $endDate = $commits->last()?->getEndDate();
+                elseif (($steps = $this->getSteps()->filter(static fn (Step $step) => $step->getEndDate()))->count() > 1):
+                    $endDate = $steps->last()->getEndDate();
+                endif;
                 break;
             case Commit::class:
-                $endDate = $this->getSteps()?->first()?->getEndDate();
+                $endDate = $this->getSteps()?->last()?->getEndDate();
                 break;
             case Step::class:
                 $endDate = $this->endDate;
