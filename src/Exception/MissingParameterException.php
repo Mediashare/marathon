@@ -2,9 +2,9 @@
 
 namespace Mediashare\Marathon\Exception;
 
-class StrToTimeException extends \Exception {
+class MissingParameterException extends \Exception {
     public function __construct(
-        string $message = "Duration format was incorrect",
+        string $message = "Missing parameter(s)",
         int $code = 404,
         \Throwable|null $previous = null,
     ) {

@@ -5,7 +5,7 @@ namespace Mediashare\Marathon\Tests\Service;
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
-use Mediashare\Marathon\Exception\StrToTimeException;
+use Mediashare\Marathon\Exception\StrToTimeDurationException;
 use Mediashare\Marathon\Service\CommitService;
 use Mediashare\Marathon\Service\StepService;
 
@@ -19,7 +19,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeException
+     * @throws StrToTimeDurationException
      */
     public function testCreateCommit(): void {
         $task = new Task();
@@ -33,7 +33,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeException
+     * @throws StrToTimeDurationException
      */
     public function testCreateCommitWithMessage(): void {
         $task = new Task();
@@ -50,7 +50,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeException
+     * @throws StrToTimeDurationException
      */
     public function testCreateCommitWithDuration(): void {
         $task = new Task();
@@ -67,7 +67,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
 
     /**
      * @throws CommitNotFoundException
-     * @throws StrToTimeException
+     * @throws StrToTimeDurationException
      */
     public function testEditCommitMessage(): void {
         $task = new Task();
@@ -88,7 +88,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
 
     /**
      * @throws CommitNotFoundException
-     * @throws StrToTimeException
+     * @throws StrToTimeDurationException
      */
     public function testEditCommitDuration(): void {
         $task = new Task();

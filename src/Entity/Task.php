@@ -124,7 +124,7 @@ class Task {
         return $this;
     }
 
-    public function toRender(string $dateTimeFormat = Config::DATETIME_FORMAT): array {
+    public function toRender(Config $config): array {
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -132,8 +132,8 @@ class Task {
             'commits' => $this->getCommits()->count(),
             'duration' => $this->getDuration(),
             'current_task' => $this->getDuration(onlyNotCommited: true),
-            'startDate' => $this->getStartDateFormated($dateTimeFormat),
-            'endDate' => $this->getEndDateFormated($dateTimeFormat),
+            'startDate' => $this->getStartDateFormated($config),
+            'endDate' => $this->getEndDateFormated($config),
         ];
     }
 }

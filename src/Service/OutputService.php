@@ -15,6 +15,7 @@ class OutputService {
 
     private Config $config;
     private TaskCollection|Task $task;
+    private int|null $maxWidthOfColumn = null;
 
     public function setOutput(OutputInterface $output): self {
         $this->output = $output;
@@ -61,8 +62,8 @@ class OutputService {
             ])
             ->setRows(
                 ($this->getTask() instanceof Task)
-                    ? [$this->getTask()->toRender($this->getConfig()->getDateTimeFormat())]
-                    : $this->getTask()->map(fn (Task $task) => $task->toRender($this->getConfig()->getDateTimeFormat()))
+                    ? [$this->getTask()->toRender($this->getConfig())]
+                    : $this->getTask()->map(fn (Task $task) => $task->toRender($this->getConfig()))
                     ->toArray()
             )
             ->render()
@@ -86,6 +87,7 @@ class OutputService {
                         fn (Commit $commit)
                             => $commit
                                 ->toRender(
+                                    $this->getConfig(),
                                     $this->getTask()->getCommits()->getKey($commit) + 1,
                                     array_sum(
                                         $this->getTask()
@@ -94,7 +96,6 @@ class OutputService {
                                             ->map(static fn (Commit $previousCommit) => $previousCommit->getSeconds())
                                             ->toArray(),
                                     ),
-                                    $this->getConfig()->getDateTimeFormat(),
                                 )
                     )
                     ->toArray(),
@@ -105,11 +106,15 @@ class OutputService {
     }
 
     private function getMaxWidthOfColumn(): int {
-        stripos(PHP_OS, 'WIN') === 0
+        if ($this->maxWidthOfColumn):
+            return $this->maxWidthOfColumn;
+        endif;
+
+        stripos(PHP_OS_FAMILY, 'WIN') === 0
             ? $terminalWidth = (int) shell_exec('powershell -Command "&{(Get-Host).UI.RawUI.WindowSize.Width}"')
             : $terminalWidth = (int) shell_exec('tput cols')
         ;
 
-        return $terminalWidth - ($terminalWidth / 1.33);
+        return $this->maxWidthOfColumn = $terminalWidth - ($terminalWidth / 1.33);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Mediashare\Marathon\Service;
 
+use Mediashare\Marathon\Entity\Task;
+use Mediashare\Marathon\Exception\DateTimeZoneException;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -11,8 +13,7 @@ class ConfigService {
     private SerializerService $serializerService;
     private Filesystem $filesystem;
 
-    private string $configPath = Config::CONFIG_PATH;
-    private Config $config;
+    private Config|null $config = null;
 
     public function __construct(
         private TaskService $taskService,
@@ -25,17 +26,19 @@ class ConfigService {
      * @throws FileNotFoundException
      * @throws JsonDecodeException
      * @throws \JsonException
+     * @throws DateTimeZoneException
      */
     public function write(
         string|null $configPath = null,
         string|null $dateTimeFormat = null,
+        string|null $dateTimeZone = null,
         string|null $taskDirectory = null,
         string|null $taskId = null,
     ): self {
-        $configPath ? $this->setConfigPath($configPath) : null;
-
         $this->config = new Config(
-            $dateTimeFormat ?? $this->getLastDateTimeFormat(),
+            $configPath ?? $this->getLastConfigPath(),
+        $dateTimeFormat ?? $this->getLastDateTimeFormat(),
+        $dateTimeZone ?? $this->getLastDateTimeZone()->getName(),
             $taskDirectory = $taskDirectory ?? $this->getLastTaskDirectory(),
             $taskId
                 ?? $this->getLastTaskId($taskDirectory)
@@ -43,12 +46,12 @@ class ConfigService {
             ,
         );
 
-        $this->filesystem->dumpFile($this->getConfigPath(), json_encode($this->getConfig()->toArray(), JSON_THROW_ON_ERROR));
+        $this->filesystem->dumpFile($this->config->getConfigPath(), json_encode($this->config->toArray(), JSON_THROW_ON_ERROR));
 
         return $this;
     }
 
-    public function getConfig(): Config {
+    public function getConfig(): Config|null {
         return $this->config;
     }
 
@@ -64,8 +67,24 @@ class ConfigService {
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
+    public function getLastConfigPath(): string {
+        return $this->getLastConfig()->getConfigPath();
+    }
+
+    /**
+     * @throws JsonDecodeException
+     * @throws FileNotFoundException
+     */
     public function getLastDateTimeFormat(): string {
         return $this->getLastConfig()->getDateTimeFormat();
+    }
+
+    /**
+     * @throws JsonDecodeException
+     * @throws FileNotFoundException
+     */
+    public function getLastDateTimeZone(): \DateTimeZone {
+        return $this->getLastConfig()->getDateTimeZone();
     }
 
     /**
@@ -76,11 +95,13 @@ class ConfigService {
         return $this->getLastConfig()->getTaskDirectory();
     }
 
-    public function getLastTaskId(string|null $taskDirectory = null): string|null {
+    public function getLastTaskId(string|null $taskDirectory = null, string|null $excludeTaskId = null): string|null {
         try {
             $lastTaskId = $this->taskService
                 ->setConfig(new Config(taskDirectory: $taskDirectory ?? $this->getLastTaskDirectory()))
-                ->getTasks()?->last()?->getId()
+                ->getTasks()
+                ?->filter(static fn (Task $task) => !$excludeTaskId || $task->getId() !== $excludeTaskId)
+                ?->last()?->getId()
             ;
 
             if ($lastTaskId):
@@ -88,21 +109,13 @@ class ConfigService {
             endif;
 
             if ($lastTaskIdByLastConfig = $this->getLastConfig()->getTaskId()):
-                return $lastTaskIdByLastConfig;
+                if (!$excludeTaskId || $lastTaskIdByLastConfig !== $excludeTaskId):
+                    return $lastTaskIdByLastConfig;
+                endif;
             endif;
         } catch (\Exception $exception) {}
 
         return null;
-    }
-
-    private function setConfigPath(string $configPath): self {
-        $this->configPath = $configPath;
-
-        return $this;
-    }
-
-    private function getConfigPath(): string|null {
-        return $this->configPath;
     }
 
     /**
@@ -110,10 +123,14 @@ class ConfigService {
      * @throws FileNotFoundException
      */
     private function getLastConfig(): Config {
-        if (!$this->isTest() && $this->filesystem->exists($this->getConfigPath())):
-            return $this->serializerService->read($this->getConfigPath(), Config::class);
-        elseif (!$this->isTest() && $this->filesystem->exists(Config::CONFIG_PATH)):
-            return $this->serializerService->read(Config::CONFIG_PATH, Config::class);
+        if (
+            $this->getConfig() instanceof Config
+            && !$this->isTest()
+            && $this->filesystem->exists($configPath = $this->getConfig()->getConfigPath())
+        ):
+            return $this->serializerService->read($configPath, Config::class);
+        elseif (!$this->isTest() && $this->filesystem->exists($configPath = Config::CONFIG_PATH)):
+            return $this->serializerService->read($configPath, Config::class);
         endif;
 
         return new Config();
