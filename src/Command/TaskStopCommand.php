@@ -28,8 +28,8 @@ class TaskStopCommand extends Command {
     }
 
     public function __construct(
-        private HandlerService $handlerService,
-        private OutputService $outputService,
+        private readonly HandlerService $handlerService,
+        private readonly OutputService $outputService,
     ) {
         parent::__construct();
     }
@@ -50,8 +50,8 @@ class TaskStopCommand extends Command {
                 ->setOutput($output)
                 ->setConfig($this->handlerService->getConfig())
                 ->setTask($this->handlerService->getTask())
-                ->renderCommits()
-                ->renderTasks();
+                ->outputRenderCommits()
+                ->outputRenderTasks();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

@@ -52,7 +52,20 @@ class OutputService {
         return $this->task;
     }
 
-    public function renderTasks(): self {
+    public function getMaxWidthOfColumn(): int {
+        if ($this->maxWidthOfColumn):
+            return $this->maxWidthOfColumn;
+        endif;
+
+        stripos(PHP_OS_FAMILY, 'WIN') === 0
+            ? $terminalWidth = (int) shell_exec('powershell -Command "&{(Get-Host).UI.RawUI.WindowSize.Width}"')
+            : $terminalWidth = (int) shell_exec('tput cols')
+        ;
+
+        return $this->maxWidthOfColumn = $terminalWidth - ($terminalWidth / 1.33);
+    }
+
+    public function outputRenderTasks(): self {
         $this
             ->getTable()
             ->setColumnMaxWidth(1, $this->getMaxWidthOfColumn())
@@ -62,17 +75,16 @@ class OutputService {
             ])
             ->setRows(
                 ($this->getTask() instanceof Task)
-                    ? [$this->getTask()->toRender($this->getConfig())]
-                    : $this->getTask()->map(fn (Task $task) => $task->toRender($this->getConfig()))
+                    ? [$this->renderTask($this->getTask())]
+                    : $this->getTask()->map(fn (Task $task) => $this->renderTask($task))
                     ->toArray()
-            )
-            ->render()
+            )->render()
         ;
 
         return $this;
     }
 
-    public function renderCommits(): self {
+    public function outputRenderCommits(): self {
         $this
             ->getTable()
             ->setColumnMaxWidth(2, $this->getMaxWidthOfColumn())
@@ -84,37 +96,46 @@ class OutputService {
                 $this->getTask()
                     ->getCommits()
                     ->map(
-                        fn (Commit $commit)
-                            => $commit
-                                ->toRender(
-                                    $this->getConfig(),
-                                    $this->getTask()->getCommits()->getKey($commit) + 1,
-                                    array_sum(
-                                        $this->getTask()
-                                            ->getCommits()
-                                            ->allPrevious($commit)
-                                            ->map(static fn (Commit $previousCommit) => $previousCommit->getSeconds())
-                                            ->toArray(),
-                                    ),
-                                )
-                    )
-                    ->toArray(),
-            )
-            ->render();
+                        fn (Commit $commit) =>
+                            $this->renderCommit(
+                                $commit,
+                                $this->getTask()->getCommits()->getKey($commit) + 1,
+                                array_sum(
+                                    $this->getTask()
+                                        ->getCommits()
+                                        ->allPrevious($commit)
+                                        ->map(static fn (Commit $previousCommit) => $previousCommit->getSeconds())
+                                        ->toArray(),
+                                ),
+                            )
+                    )->toArray(),
+            )->render();
 
         return $this;
     }
 
-    private function getMaxWidthOfColumn(): int {
-        if ($this->maxWidthOfColumn):
-            return $this->maxWidthOfColumn;
-        endif;
+    public function renderTask(Task $task): array {
+        return [
+            'id' => $task->getId(),
+            'name' => $task->getName(),
+            'running' => \ucfirst($task->getStatus()),
+            'commits' => $task->getCommits()->count(),
+            'duration' => $task->getDuration(),
+            'current_steps' => $task->getDuration(onlyCurrentSteps: true),
+            'startDate' => $task->getStartDateFormated($this->getConfig()),
+            'endDate' => $task->getEndDateFormated($this->getConfig()),
+        ];
+    }
 
-        stripos(PHP_OS_FAMILY, 'WIN') === 0
-            ? $terminalWidth = (int) shell_exec('powershell -Command "&{(Get-Host).UI.RawUI.WindowSize.Width}"')
-            : $terminalWidth = (int) shell_exec('tput cols')
-        ;
-
-        return $this->maxWidthOfColumn = $terminalWidth - ($terminalWidth / 1.33);
+    public function renderCommit(Commit $commit, int $index, int $totalSeconds): array {
+        return [
+            'index' => $index,
+            'id' => $commit->getId(),
+            'message' => $commit->getMessage(),
+            'duration' => $commit->getDuration(),
+            'duration_total' => $commit->getDuration(totalSeconds: $totalSeconds),
+            'startDate' => $commit->getStartDateFormated($this->getConfig()),
+            'endDate' => $commit->getEndDateFormated($this->getConfig()),
+        ];
     }
 }

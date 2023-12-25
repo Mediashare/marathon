@@ -27,8 +27,8 @@ class TaskDeleteCommand extends Command {
     }
 
     public function __construct(
-        private HandlerService $handlerService,
-        private OutputService $outputService,
+        private readonly HandlerService $handlerService,
+        private readonly OutputService $outputService,
     ) {
         parent::__construct();
     }
@@ -49,8 +49,8 @@ class TaskDeleteCommand extends Command {
                 ->setOutput($output)
                 ->setConfig($this->handlerService->getConfig())
                 ->setTask($this->handlerService->getTask())
-                ->renderCommits()
-                ->renderTasks();
+                ->outputRenderCommits()
+                ->outputRenderTasks();
 
             // Update config
             $this->handlerService->updateTaskIdInConfig();

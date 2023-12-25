@@ -92,15 +92,30 @@ class StepServiceTest extends AbstractServiceTestCase {
      * @throws StrToTimeDurationException
      */
     public function testCreateWithCustomDurationComplexe(): void {
-        $customDuration = '+1hour 5 minutes';
+        $customDuration = '2days +1hour 5 minutes';
         $step = $this->stepService->createWithCustomDuration($customDuration);
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
         $this->assertNotNull($step->getEndDate());
         $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
-        $this->assertEquals(3900, $step->getSeconds());
-        $this->assertEquals('01:05:00', $step->getDuration());
+        $this->assertEquals(176700, $step->getSeconds());
+        $this->assertEquals('2d 01:05:00', $step->getDuration());
+    }
+
+    /**
+     * @throws StrToTimeDurationException
+     */
+    public function testCreateWithCustomDurationComplexeBeyondMonth(): void {
+        $customDuration = '6weeks 1day +1h 5 minutes -10s';
+        $step = $this->stepService->createWithCustomDuration($customDuration);
+
+        $this->assertInstanceOf(Step::class, $step);
+        $this->assertNotNull($step->getStartDate());
+        $this->assertNotNull($step->getEndDate());
+        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
+        $this->assertEquals(3719090, $step->getSeconds());
+        $this->assertEquals('43d 01:04:50', $step->getDuration());
     }
 
     /**

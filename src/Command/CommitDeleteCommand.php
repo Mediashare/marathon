@@ -52,8 +52,8 @@ class CommitDeleteCommand extends Command {
                 ->setOutput($output)
                 ->setConfig($this->handlerService->getConfig())
                 ->setTask($this->handlerService->getTask())
-                ->renderCommits()
-                ->renderTasks();
+                ->outputRenderCommits()
+                ->outputRenderTasks();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

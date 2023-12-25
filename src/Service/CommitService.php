@@ -84,20 +84,20 @@ class CommitService {
         string|false $message = false,
         string|false $duration = false,
     ): self {
-        if ($message === false && $duration === false):
-            throw new MissingParameterException();
-        endif;
-
         $task = $this->getTask();
 
         if (($commit = $task
                 ->getCommits()
                 ->findOneBy(
-                    static fn (Commit $commit) => $commit->getId() === $id
-                )) === null
-        ) {
+                    static fn (Commit $commit) => $commit->getId() === $id)
+            ) === null
+        ):
             throw new CommitNotFoundException();
-        }
+        endif;
+
+        if ($message === false && $duration === false):
+            throw new MissingParameterException();
+        endif;
 
         $key = $task->getCommits()->getKey($commit);
 

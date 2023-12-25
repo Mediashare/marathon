@@ -26,8 +26,8 @@ class TaskListCommand extends Command {
     }
 
     public function __construct(
-        private HandlerService $handlerService,
-        private OutputService $outputService,
+        private readonly HandlerService $handlerService,
+        private readonly OutputService $outputService,
     ) {
         parent::__construct();
     }
@@ -48,7 +48,7 @@ class TaskListCommand extends Command {
                 ->setOutput($output)
                 ->setConfig($this->handlerService->getConfig())
                 ->setTask($this->handlerService->getTasks())
-                ->renderTasks();
+                ->outputRenderTasks();
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

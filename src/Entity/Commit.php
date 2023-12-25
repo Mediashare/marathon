@@ -59,20 +59,4 @@ class Commit {
 
         return $this;
     }
-
-    public function toRender(
-        Config $config,
-        int $index = 0,
-        int $totalSeconds = 0,
-    ): array {
-        return [
-            'index' => $index,
-            'id' => $this->id,
-            'message' => $this->getMessage(),
-            'duration' => $this->getDuration(),
-            'duration_total' => $this->getDuration(totalSeconds: $totalSeconds),
-            'startDate' => $this->getStartDateFormated($config),
-            'endDate' => $this->getEndDateFormated($config),
-        ];
-    }
 }
