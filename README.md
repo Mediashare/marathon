@@ -14,19 +14,19 @@ It provides a comprehensive solution for maintaining a project-related activitie
 #### Basic
 ```bash
 composer require mediashre/marathon
-./vendor/mediashare/marathon/bin/marathon <COMMAND>
+./vendor/mediashare/marathon/bin/marathon <command>
 ```
 #### Global
 ```bash
 composer global require mediashre/marathon
-marathon <COMMAND>
+marathon <command>
 ```
 ### Binary
 ```bash
 curl --output marathon https://raw.githubusercontent.com/Mediashare/marathon/main/marathon
 chmod 755 marathon
 sudo cp marathon /usr/local/bin/marathon
-marathon <COMMAND>
+marathon <command>
 ```
 ## Usage
 Here are some examples of how to use Marathon:
