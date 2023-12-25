@@ -59,20 +59,4 @@ class Commit {
 
         return $this;
     }
-
-    public function toRender(
-        int $index = 0,
-        int $totalSeconds = 0,
-        string $dateTimeFormat = Config::DATETIME_FORMAT,
-    ) {
-        return [
-            'index' => $index,
-            'id' => $this->id,
-            'message' => $this->getMessage(),
-            'duration' => $this->getDuration(),
-            'duration_total' => $this->getDuration(totalSeconds: $totalSeconds),
-            'startDate' => $this->getStartDateFormated($dateTimeFormat),
-            'endDate' => $this->getEndDateFormated($dateTimeFormat),
-        ];
-    }
 }

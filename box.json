@@ -9,4 +9,4 @@
     "files": [".env"],
     "main": "bin/marathon",
     "output": "marathon"
-  }
+}

@@ -3,6 +3,7 @@
 namespace Mediashare\Marathon\Tests\Trait;
 
 use Mediashare\Marathon\Entity\Commit;
+use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Step;
 use Mediashare\Marathon\Trait\EntityDateTimeTrait;
 
@@ -36,7 +37,13 @@ class EntityDateTimeTraitTest extends AbstractTraitTestCase {
     public function testGetStartDateFormatedForTask(): void {
         $this->task->addCommit($this->createCommit('2023-01-01 10:00:00', '2023-01-01 11:00:00'));
 
-        $startDateFormatted = $this->task->getStartDateFormated('Y-m-d H:i:s');
+        $config = $this->createMock(Config::class);
+        $config
+            ->expects($this->once())
+            ->method('getDateTimeFormat')
+            ->willReturn('Y-m-d H:i:s');
+
+        $startDateFormatted = $this->task->getStartDateFormated($config);
 
         $this->assertEquals('2023-01-01 10:00:00', $startDateFormatted);
     }
@@ -44,7 +51,13 @@ class EntityDateTimeTraitTest extends AbstractTraitTestCase {
     public function testGetStartDateFormatedForCommit(): void {
         $this->commit->addStep($this->createStep('2023-01-01 12:00:00', '2023-01-01 13:00:00'));
 
-        $startDateFormatted = $this->commit->getStartDateFormated('Y-m-d H:i:s');
+        $config = $this->createMock(Config::class);
+        $config
+            ->expects($this->once())
+            ->method('getDateTimeFormat')
+            ->willReturn('Y-m-d H:i:s');
+
+        $startDateFormatted = $this->commit->getStartDateFormated($config);
 
         $this->assertEquals('2023-01-01 12:00:00', $startDateFormatted);
     }
@@ -52,7 +65,13 @@ class EntityDateTimeTraitTest extends AbstractTraitTestCase {
     public function testGetStartDateFormatedForStep(): void {
         $this->step->setStartDate(strtotime('2023-01-01 14:00:00'));
 
-        $startDateFormatted = $this->step->getStartDateFormated('Y-m-d H:i:s');
+        $config = $this->createMock(Config::class);
+        $config
+            ->expects($this->once())
+            ->method('getDateTimeFormat')
+            ->willReturn('Y-m-d H:i:s');
+
+        $startDateFormatted = $this->step->getStartDateFormated($config);
 
         $this->assertEquals('2023-01-01 14:00:00', $startDateFormatted);
     }

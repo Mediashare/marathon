@@ -35,13 +35,13 @@ class SerializerService {
      */
     public function read(string $filepath, string $className): Task|Config {
         if (!$this->filesystem->exists($filepath)):
-            throw new FileNotFoundException($filepath);
+            throw new FileNotFoundException($filepath, $className);
         endif;
 
         $content = file_get_contents($filepath);
 
         if (!($taskArray = json_decode($content, true)) || json_last_error() !== JSON_ERROR_NONE):
-            throw new JsonDecodeException($filepath);
+            throw new JsonDecodeException($filepath, $className);
         endif;
 
         return $this->arrayToEntity($taskArray, $className);

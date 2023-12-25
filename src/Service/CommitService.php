@@ -1,11 +1,11 @@
 <?php
 namespace Mediashare\Marathon\Service;
 
-use Mediashare\Marathon\Entity\Step;
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
-use Mediashare\Marathon\Exception\StrToTimeException;
+use Mediashare\Marathon\Exception\CommandMissingLeastOnceOptionException;
+use Mediashare\Marathon\Exception\StrToTimeDurationException;
 
 class CommitService {
     private Task $task;
@@ -25,11 +25,11 @@ class CommitService {
     }
 
     /**
-     * @throws StrToTimeException
+     * @throws StrToTimeDurationException
      */
     public function create(
-        ?string $message = null,
-        ?string $duration = null
+        string|null $message = null,
+        string|null $duration = null,
     ): self {
         $task = $this->getTask();
 
@@ -46,19 +46,17 @@ class CommitService {
                         : null
                 )
             );
-        elseif (($steps = $task->getSteps())->count() > 0):
-            /** @var Step $step */
-            foreach ($steps as $step):
-                if (!$step->getEndDate()):
-                    $step->setEndDate((new \DateTime())->getTimestamp());
-                endif;
-                $commit->addStep($step);
-            endforeach;
+        elseif (($steps = $task->getSteps())?->count() > 0):
+            if (($lastStep = $steps->last())->getEndDate() === null):
+                $task->getSteps()->offsetSet(
+                    $task->getSteps()->getKey($lastStep),
+                    $lastStep->setEndDate((new \DateTime())->getTimestamp()),
+                );
+            endif;
+
+            $commit->setSteps($task->getSteps());
         else:
-            $commit
-                ->addStep((new Step())
-                ->setStartDate($dateTime = (new \DateTime())->getTimestamp())
-                ->setEndDate($dateTime));
+            $commit->addStep($this->stepService->create());
         endif;
 
         $task
@@ -78,7 +76,8 @@ class CommitService {
 
     /**
      * @throws CommitNotFoundException
-     * @throws StrToTimeException
+     * @throws StrToTimeDurationException
+     * @throws CommandMissingLeastOnceOptionException
      */
     public function edit(
         string $id,
@@ -90,11 +89,18 @@ class CommitService {
         if (($commit = $task
                 ->getCommits()
                 ->findOneBy(
-                    static fn (Commit $commit) => $commit->getId() === $id
-                )) === null
-        ) {
-            throw new CommitNotFoundException();
-        }
+                    static fn (Commit $commit) => $commit->getId() === $id)
+            ) === null
+        ):
+            throw new CommitNotFoundException($id);
+        endif;
+
+        if ($message === false && $duration === false):
+            throw new CommandMissingLeastOnceOptionException(
+                'commit:edit',
+                ['--message', '--duration']
+            );
+        endif;
 
         $key = $task->getCommits()->getKey($commit);
 
@@ -135,7 +141,7 @@ class CommitService {
         $task = $this->getTask();
         if (($commit = $task->getCommits()->findOneBy(static fn (Commit $commit) => $commit->getId() === $id)) ===
             null):
-            throw new CommitNotFoundException();
+            throw new CommitNotFoundException($id);
         endif;
 
         $task->getCommits()->remove($commit);

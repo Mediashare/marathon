@@ -4,14 +4,12 @@ namespace Mediashare\Marathon\Exception;
 
 class CommitNotFoundException extends \Exception {
     public function __construct(
-        string $message = "Commit was not found",
-        int $code = 404,
-        \Throwable|null $previous = null,
+        string $commitId,
     ) {
         parent::__construct(
-            $message,
-            $code,
-            $previous
+    "Commit ID [". $commitId ."] was not found.",
+    404,
+    null,
         );
     }
 }

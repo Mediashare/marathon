@@ -3,6 +3,7 @@
 namespace Mediashare\Marathon\Trait;
 
 use Mediashare\Marathon\Entity\Commit;
+use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Step;
 use Mediashare\Marathon\Entity\Task;
 
@@ -26,23 +27,29 @@ trait EntityDateTimeTrait {
         return $startDate;
     }
 
-    public function getStartDateFormated(string $format): string|null {
+    public function getStartDateFormated(Config $config): string|null {
         return $this->getStartDate()
-            ? (new \DateTime())->setTimestamp($this->getStartDate())->format($format)
+            ? (new \DateTime())
+                ->setTimestamp($this->getStartDate())
+                ->setTimezone($config->getDateTimeZone())
+                ->format($config->getDateTimeFormat())
             : null
         ;
     }
 
     public function getEndDate(): int|null {
+        $endDate = null;
+
         switch (self::class) {
             case Task::class:
-                $endDate =
-                    $this->getCommits()?->first()?->getEndDate()
-                    ?? $this->getSteps()?->first()?->getEndDate()
-                ;
+                if (($steps = $this->getSteps()->filter(static fn (Step $step) => $step->getEndDate()))->count() > 0):
+                    $endDate = $steps->last()->getEndDate();
+                elseif (($commits = $this->getCommits())->count() > 0):
+                    $endDate = $commits->last()->getEndDate();
+                endif;
                 break;
             case Commit::class:
-                $endDate = $this->getSteps()?->first()?->getEndDate();
+                $endDate = $this->getSteps()?->last()?->getEndDate();
                 break;
             case Step::class:
                 $endDate = $this->endDate;
@@ -52,9 +59,12 @@ trait EntityDateTimeTrait {
         return $endDate;
     }
 
-    public function getEndDateFormated(string $format): string|null {
+    public function getEndDateFormated(Config $config): string|null {
         return $this->getEndDate()
-            ? (new \DateTime())->setTimestamp($this->getEndDate())->format($format)
+            ? (new \DateTime())
+                ->setTimestamp($this->getEndDate())
+                ->setTimezone($config->getDateTimeZone())
+                ->format($config->getDateTimeFormat())
             : null
         ;
     }

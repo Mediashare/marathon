@@ -70,7 +70,7 @@ class Task {
     }
 
     public function getStatus(): string {
-        if ($this->isArchived()): return 'archived'; elseif ($this->run): return 'run'; else: return 'pending'; endif;
+        if ($this->isArchived()): return 'archived'; elseif ($this->run): return 'running'; else: return 'pending'; endif;
     }
 
     public function setCommits(CommitCollection $commits): self {
@@ -122,18 +122,5 @@ class Task {
         endif;
 
         return $this;
-    }
-
-    public function toRender(string $dateTimeFormat = Config::DATETIME_FORMAT): array {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'running' => \ucfirst($this->getStatus()),
-            'commits' => $this->getCommits()->count(),
-            'duration' => $this->getDuration(),
-            'current_task' => $this->getDuration(onlyNotCommited: true),
-            'startDate' => $this->getStartDateFormated($dateTimeFormat),
-            'endDate' => $this->getEndDateFormated($dateTimeFormat),
-        ];
     }
 }

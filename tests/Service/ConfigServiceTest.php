@@ -3,6 +3,7 @@
 namespace Mediashare\Marathon\Tests\Service;
 
 use Mediashare\Marathon\Entity\Config;
+use Mediashare\Marathon\Exception\DateTimeZoneException;
 use Mediashare\Marathon\Service\ConfigService;
 use Mediashare\Marathon\Service\TaskService;
 
@@ -22,14 +23,16 @@ class ConfigServiceTest extends AbstractServiceTestCase {
         $config = $this->configService->write(
             configPath: $this->configPath,
             dateTimeFormat: 'm/d/Y H:i:s',
-            taskDirectory: $taskDirectory = $this->marathonDirectory . DIRECTORY_SEPARATOR . 'tasks',
+            dateTimeZone: 'Europe/London',
+            taskDirectory: $this->taskDirectory,
             taskId: $taskId = 'taskId',
         )->getConfig();
 
         $this->assertFileExists($this->configPath);
         $this->assertInstanceOf(Config::class, $config);
         $this->assertEquals('m/d/Y H:i:s', $config->getDateTimeFormat());
-        $this->assertEquals($taskDirectory, $config->getTaskDirectory());
+        $this->assertEquals(timezone_open('Europe/London'), $config->getDateTimeZone());
+        $this->assertEquals($this->taskDirectory, $config->getTaskDirectory());
         $this->assertEquals($taskId, $config->getTaskId());
     }
 
@@ -53,6 +56,40 @@ class ConfigServiceTest extends AbstractServiceTestCase {
     /**
      * @throws \JsonException
      */
+    public function testGetLastDateTimeZone(): void {
+        $lastDateTimeZone = $this->configService->getLastDateTimeZone();
+
+        $this->assertEquals(timezone_open(Config::DATETIME_ZONE), $lastDateTimeZone);
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function testGetDateTimeZoneEuropeParis(): void {
+        $config = $this->configService->write(dateTimeZone: $timezone = 'europe/paris')->getConfig();
+
+        $this->assertEquals(timezone_open($timezone), $config->getDateTimeZone());
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function testGetDateTimeZoneLondonFail(): void {
+        $this->expectException(DateTimeZoneException::class);
+        $this->configService->write(dateTimeZone: 'london');
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function testSetDateTimeZoneFail(): void {
+        $this->expectException(DateTimeZoneException::class);
+        $this->configService->write(dateTimeZone: 'Gallia/Lugdunum');
+    }
+
+    /**
+     * @throws \JsonException
+     */
     public function testGetLastTaskDirectory(): void {
         $lastTaskDirectory = $this->configService->getLastTaskDirectory();
 
@@ -63,7 +100,7 @@ class ConfigServiceTest extends AbstractServiceTestCase {
      * @throws \JsonException
      */
     public function testGetLastTaskId(): void {
-        $lastTaskId = $this->configService->getLastTaskId(taskDirectory: '/path/to/task');
+        $lastTaskId = $this->configService->getLastTaskId(taskDirectory: $this->taskDirectory);
 
         $this->assertNotEquals('12345', $lastTaskId);
     }

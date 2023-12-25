@@ -6,6 +6,7 @@ use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
+use Mediashare\Marathon\Exception\StrToTimeDurationException;
 use Mediashare\Marathon\Exception\TaskNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -48,10 +49,10 @@ class TaskService {
 
     /**
      * @throws TaskNotFoundException
-     * @throws JsonDecodeException
      * @throws FileNotFoundException
+     * @throws JsonDecodeException
      */
-    public function getTask(bool $createItIfNotExist = false): Task|self {
+    public function getTask(bool $createItIfNotExist = false): Task {
         if ($this->task instanceof Task):
             return $this->task;
         endif;
@@ -61,13 +62,11 @@ class TaskService {
             return $this
                 ->setTask($this->serializerService->read($filepath, Task::class))
                 ->getTask();
-        elseif (!$taskFileExist && $createItIfNotExist):
+        elseif ($createItIfNotExist):
             return $this->create()->getTask();
-        elseif (!$taskFileExist):
-            throw new TaskNotFoundException();
+        else:
+            throw new TaskNotFoundException($this->getConfig()->getTaskId());
         endif;
-
-        return $this;
     }
 
     public function setTask(Task|null $task = null): self {
@@ -102,15 +101,17 @@ class TaskService {
     /**
      * @throws FileNotFoundException
      * @throws JsonDecodeException
+     * @throws StrToTimeDurationException
      * @throws TaskNotFoundException
      */
     public function start(
-        string|false $name = false,
-        string|false $duration = false,
+        string|null $name = null,
+        string|null $duration = null,
     ): self {
         $task = $this->getTask(createItIfNotExist: true)
             ->setRun(true)
-            ->setName($name !== false ? $name : $this->getTask()->getName());
+            ->setArchived(false)
+            ->setName($name ?? $this->getTask()->getName());
 
         if ($duration):
             $firstStep = $task->getSteps()->first();

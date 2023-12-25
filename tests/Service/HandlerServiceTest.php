@@ -4,8 +4,10 @@ namespace Mediashare\Marathon\Tests\Service;
 
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Task;
+use Mediashare\Marathon\Exception\DateTimeZoneException;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
+use Mediashare\Marathon\Exception\StrToTimeDurationException;
 use Mediashare\Marathon\Exception\TaskNotFoundException;
 use Mediashare\Marathon\Service\CommitService;
 use Mediashare\Marathon\Service\ConfigService;
@@ -17,25 +19,42 @@ class HandlerServiceTest extends AbstractServiceTestCase {
     private HandlerService $handlerService;
     private TaskService $taskService;
 
+    /**
+     * @throws DateTimeZoneException
+     * @throws FileNotFoundException
+     * @throws JsonDecodeException
+     * @throws \JsonException
+     */
     public function setUp(): void {
         parent::setUp();
 
+        $config = $this->createMock(Config::class);
+        $config->method('getConfigPath')->willReturn($this->configPath);
+        $config->method('getTaskDirectory')->willReturn($this->taskDirectory);
+
+        $configService = $this->createMock(ConfigService::class);
+        $configService->method('write')->willReturnSelf();
+        $configService->method('getConfig')->willReturn($config);
+
         $this->handlerService = (new HandlerService(
-            $configService = $this->createMock(ConfigService::class),
+            $configService,
             $this->taskService = $this->createMock(TaskService::class),
             $this->createMock(CommitService::class),
             $this->createMock(SerializerService::class),
-        ))->setConfig(
+        ))->writeConfig(
             configPath: $this->configPath,
             taskDirectory: $this->taskDirectory,
         );
-
-        $configService->method('write')->willReturnSelf();
-        $configService->method('getConfig')->willReturn($this->handlerService->getConfig());
     }
 
+    /**
+     * @throws DateTimeZoneException
+     * @throws FileNotFoundException
+     * @throws JsonDecodeException
+     * @throws \JsonException
+     */
     public function testSetAndGetConfig(): void {
-        $this->handlerService->setConfig(null, null, null, null);
+        $this->handlerService->writeConfig(null, null, null, null);
 
         $this->assertInstanceOf(Config::class, $this->handlerService->getConfig());
     }
@@ -51,7 +70,7 @@ class HandlerServiceTest extends AbstractServiceTestCase {
         $this->taskService->method('start')->willReturnSelf();
         $this->taskService->method('getTask')->willReturn($task);
 
-        $task = $this->handlerService->start()->getTask();
+        $task = $this->handlerService->taskStart()->getTask();
 
         $this->assertTrue($task->isRun());
         $this->assertInstanceOf(Task::class, $task);
@@ -69,7 +88,7 @@ class HandlerServiceTest extends AbstractServiceTestCase {
         $this->taskService->method('stop')->willReturnSelf();
         $this->taskService->method('getTask')->willReturn($task);
 
-        $task = $this->handlerService->stop()->getTask();
+        $task = $this->handlerService->taskStop()->getTask();
 
         $this->assertFalse($task->isRun());
         $this->assertInstanceOf(Task::class, $task);
@@ -86,7 +105,7 @@ class HandlerServiceTest extends AbstractServiceTestCase {
         $this->taskService->method('archive')->willReturnSelf();
         $this->taskService->method('getTask')->willReturn($task);
 
-        $task = $this->handlerService->archive()->getTask();
+        $task = $this->handlerService->taskArchive()->getTask();
 
         $this->assertTrue($task->isArchived());
         $this->assertInstanceOf(Task::class, $task);
@@ -96,6 +115,7 @@ class HandlerServiceTest extends AbstractServiceTestCase {
      * @throws TaskNotFoundException
      * @throws FileNotFoundException
      * @throws JsonDecodeException
+     * @throws StrToTimeDurationException
      */
     public function testDeleteTask(): void {
         $task = new Task();
@@ -104,11 +124,11 @@ class HandlerServiceTest extends AbstractServiceTestCase {
         $this->taskService->method('start')->willReturnSelf();
         $this->taskService->method('getTask')->willReturn($task);
 
-        $this->handlerService->start();
+        $this->handlerService->taskStart();
 
         $this->taskService->method('delete')->willReturnSelf();
 
-        $this->handlerService->delete();
+        $this->handlerService->taskDelete();
 
         $this->taskService->method('getTask')->willThrowException(new TaskNotFoundException());
 

@@ -9,26 +9,26 @@ use Mediashare\Marathon\Entity\Task;
 trait EntityDurationTrait {
     /**
      * Convert seconds to "d H:i:s" format
+     *
+     * @param bool|null $onlyCurrentSteps If true, consider only non-committed seconds.
+     * @param int $totalSeconds Additional seconds to be added to the total duration.
+     *
+     * @return string Formatted duration string.
      */
-    public function getDuration(bool|null $onlyNotCommited = false, int $totalSeconds = 0): string {
-        $seconds = $this->getSeconds($onlyNotCommited) + $totalSeconds;
-        return trim(
-            sprintf(
-                '%s %02d:%02d:%02d',
-                ((($seconds/86400%60) !== 0) ? ($seconds/86400%60) . 'd' : ''),
-                ($seconds/3600%24),
-                ($seconds/60%60),
-                $seconds%60
-            )
-        );
+    public function getDuration(bool|null $onlyCurrentSteps = false, int $totalSeconds = 0): string {
+        return (((
+                $days = floor(($seconds = $this->getSeconds($onlyCurrentSteps) + $totalSeconds) / 86400)) > 0)
+                    ? "{$days}d "
+                    : ""
+            ) . gmdate('H:i:s', $seconds);
     }
 
-    public function getSeconds(bool|null $onlyNotCommited = false): int {
+    public function getSeconds(bool|null $onlyCurrentSteps = false): int {
         switch (self::class) {
             case Task::class:
                 $seconds = array_sum(
                     array_merge(
-                        !$onlyNotCommited
+                        !$onlyCurrentSteps
                             ? $this
                                 ->getCommits()
                                 ->map(

@@ -4,14 +4,12 @@ namespace Mediashare\Marathon\Exception;
 
 class TaskNotFoundException extends \Exception {
     public function __construct(
-        string $message = "Task session was not found",
-        int $code = 404,
-        \Throwable|null $previous = null,
+        string|null $taskId = null,
     ) {
         parent::__construct(
-            $message,
-            $code,
-            $previous
+            "Task ID ". $taskId ? "[". $taskId ."] " : null ."session was not found",
+            404,
+            null,
         );
     }
 }
