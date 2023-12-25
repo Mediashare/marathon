@@ -16,7 +16,7 @@ class TaskDeleteCommand extends Command {
         $this
             ->setName('task:delete')
             ->setDescription('<comment>Deleting</comment> the task')
-            ->addArgument('task-id', InputArgument::OPTIONAL, '<comment>Task ID</comment>')
+            ->addArgument('task-id', InputArgument::REQUIRED, '<comment>Task ID</comment>')
 
             // Config
             ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Set <comment>/file/path/to/json/config</comment>')

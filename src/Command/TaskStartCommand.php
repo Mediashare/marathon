@@ -16,7 +16,7 @@ class TaskStartCommand extends Command {
         $this
             ->setName('task:start')
             ->setDescription('<comment>Starting</comment> step of task')
-            ->addArgument('name', InputArgument::OPTIONAL, 'Set the <comment>name</comment> of task', false)
+            ->addArgument('task-name', InputArgument::OPTIONAL, 'Set the task <comment>name</comment>', false)
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
             ->addOption('task-id', 'tid', InputOption::VALUE_REQUIRED, '<comment>Task ID</comment>')
             ->addOption('new', 'n', InputOption::VALUE_NONE, 'Creating <comment>new task</comment>')
@@ -48,7 +48,7 @@ class TaskStartCommand extends Command {
                     ? $input->getOption('task-id') ?? (new \DateTime())->format('YmdHis')
                     : $input->getOption('task-id'),
             )->taskStart(
-                $input->getArgument('name'),
+                $input->getArgument('task-name'),
                 $input->getOption('duration'),
             );
 
