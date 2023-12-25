@@ -4,7 +4,7 @@ namespace Mediashare\Marathon\Service;
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
-use Mediashare\Marathon\Exception\MissingParameterException;
+use Mediashare\Marathon\Exception\CommandMissingLeastOnceOptionException;
 use Mediashare\Marathon\Exception\StrToTimeDurationException;
 
 class CommitService {
@@ -77,7 +77,7 @@ class CommitService {
     /**
      * @throws CommitNotFoundException
      * @throws StrToTimeDurationException
-     * @throws MissingParameterException
+     * @throws CommandMissingLeastOnceOptionException
      */
     public function edit(
         string $id,
@@ -92,11 +92,14 @@ class CommitService {
                     static fn (Commit $commit) => $commit->getId() === $id)
             ) === null
         ):
-            throw new CommitNotFoundException();
+            throw new CommitNotFoundException($id);
         endif;
 
         if ($message === false && $duration === false):
-            throw new MissingParameterException();
+            throw new CommandMissingLeastOnceOptionException(
+                'commit:edit',
+                ['--message', '--duration']
+            );
         endif;
 
         $key = $task->getCommits()->getKey($commit);
@@ -138,7 +141,7 @@ class CommitService {
         $task = $this->getTask();
         if (($commit = $task->getCommits()->findOneBy(static fn (Commit $commit) => $commit->getId() === $id)) ===
             null):
-            throw new CommitNotFoundException();
+            throw new CommitNotFoundException($id);
         endif;
 
         $task->getCommits()->remove($commit);

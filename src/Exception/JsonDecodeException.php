@@ -5,14 +5,12 @@ namespace Mediashare\Marathon\Exception;
 class JsonDecodeException extends \Exception {
     public function __construct(
         string $filepath,
-        string $message = "Json format was corrupted",
-        int $code = 404,
-        \Throwable|null $previous = null,
+        string $className,
     ) {
         parent::__construct(
-            '['.$filepath.'] ' . $message,
-            $code,
-            $previous
+            "The file [". $filepath ."] containing the [". $className ."] object in json could not be converted to an array.",
+            400,
+            null
         );
     }
 }

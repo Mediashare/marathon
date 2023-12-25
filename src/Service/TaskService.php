@@ -65,7 +65,7 @@ class TaskService {
         elseif ($createItIfNotExist):
             return $this->create()->getTask();
         else:
-            throw new TaskNotFoundException();
+            throw new TaskNotFoundException($this->getConfig()->getTaskId());
         endif;
     }
 

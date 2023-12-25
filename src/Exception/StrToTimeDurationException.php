@@ -4,14 +4,12 @@ namespace Mediashare\Marathon\Exception;
 
 class StrToTimeDurationException extends \Exception {
     public function __construct(
-        string $message = "Duration format was incorrect",
-        int $code = 404,
-        \Throwable|null $previous = null,
+        string $duration,
     ) {
         parent::__construct(
-            $message,
-            $code,
-            $previous
+            "Duration set [". $duration ."] is not in correct format.",
+            400,
+            null
         );
     }
 }

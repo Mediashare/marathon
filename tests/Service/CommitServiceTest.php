@@ -6,7 +6,7 @@ use Mediashare\Marathon\Collection\CommitCollection;
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
-use Mediashare\Marathon\Exception\MissingParameterException;
+use Mediashare\Marathon\Exception\CommandMissingLeastOnceOptionException;
 use Mediashare\Marathon\Exception\StrToTimeDurationException;
 use Mediashare\Marathon\Service\CommitService;
 use Mediashare\Marathon\Service\StepService;
@@ -70,7 +70,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
     /**
      * @throws CommitNotFoundException
      * @throws StrToTimeDurationException
-     * @throws MissingParameterException
+     * @throws CommandMissingLeastOnceOptionException
      */
     public function testEditCommitMessage(): void {
         $task = new Task();
@@ -92,7 +92,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
     /**
      * @throws CommitNotFoundException
      * @throws StrToTimeDurationException
-     * @throws MissingParameterException
+     * @throws CommandMissingLeastOnceOptionException
      */
     public function testEditCommitWithDuration(): void {
         $task = new Task();
@@ -138,7 +138,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
 
     /**
      * @throws StrToTimeDurationException
-     * @throws MissingParameterException
+     * @throws CommandMissingLeastOnceOptionException
      */
     public function testCommitNotFoundExceptionOnEdit(): void {
         $this->expectException(CommitNotFoundException::class);
@@ -155,7 +155,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
      * @throws CommitNotFoundException
      * @throws StrToTimeDurationException
      */
-    public function testMissingParameterExceptionOnEdit(): void {
+    public function testCommandMissingLeastOnceOptionExceptionOnEdit(): void {
         $commit = $this->createMock(Commit::class);
 
         $commitCollection = $this->createMock(CommitCollection::class);
@@ -166,7 +166,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
 
         $this->commitService->setTask($task);
 
-        $this->expectException(MissingParameterException::class);
+        $this->expectException(CommandMissingLeastOnceOptionException::class);
         $this->commitService->edit('commit_edit_test_without_parameters');
     }
 }

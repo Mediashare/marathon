@@ -23,6 +23,7 @@ class StepService {
      * @param string $duration (exemple: '+5minutes', '+2hours', '+1days')
      */
     public function createWithCustomDuration(string $duration, int|null $startDate = null): Step {
+        $originalDuration = $duration;
         // Duration normalizer
         $duration = strtolower($duration);
         $duration = preg_replace('/\s+/', '', $duration);
@@ -43,7 +44,7 @@ class StepService {
         $endDate = strtotime($duration, $startDate);
 
         if (!$endDate):
-            throw new StrToTimeDurationException();
+            throw new StrToTimeDurationException($originalDuration);
         endif;
 
         return (new Step())

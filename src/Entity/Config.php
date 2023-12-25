@@ -61,13 +61,13 @@ class Config {
      * @throws DateTimeZoneException
      */
     public function setDateTimeZone(string $dateTimeZone): self {
-        $dateTimeZone = @timezone_open($dateTimeZone);
+        $dateTimeZoneObject = @timezone_open($dateTimeZone);
 
-        if (!$dateTimeZone instanceof \DateTimeZone):
-            throw new DateTimeZoneException();
+        if (!$dateTimeZoneObject instanceof \DateTimeZone):
+            throw new DateTimeZoneException($dateTimeZone);
         endif;
 
-        $this->dateTimeZone = $dateTimeZone->getName();
+        $this->dateTimeZone = $dateTimeZoneObject->getName();
 
         return $this;
     }

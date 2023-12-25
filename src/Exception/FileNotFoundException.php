@@ -5,14 +5,12 @@ namespace Mediashare\Marathon\Exception;
 class FileNotFoundException extends \Exception {
     public function __construct(
         string $filepath,
-        string $message = "File not found",
-        int $code = 404,
-        \Throwable|null $previous = null,
+        string $className,
     ) {
         parent::__construct(
-            '['.$filepath.'] ' . $message,
-            $code,
-            $previous
+            "The file [". $filepath ."] was not found for [". $className ."] object.",
+            404,
+            null
         );
     }
 }

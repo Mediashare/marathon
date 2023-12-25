@@ -9,7 +9,7 @@ use Mediashare\Marathon\Exception\CommitNotFoundException;
 use Mediashare\Marathon\Exception\DateTimeZoneException;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
-use Mediashare\Marathon\Exception\MissingParameterException;
+use Mediashare\Marathon\Exception\CommandMissingLeastOnceOptionException;
 use Mediashare\Marathon\Exception\StrToTimeDurationException;
 use Mediashare\Marathon\Exception\TaskNotFoundException;
 
@@ -181,7 +181,7 @@ class HandlerService {
      * @throws StrToTimeDurationException
      * @throws FileNotFoundException
      * @throws JsonDecodeException
-     * @throws MissingParameterException
+     * @throws CommandMissingLeastOnceOptionException
      */
     public function commitEdit(
         string $commitId,
