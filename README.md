@@ -1,4 +1,7 @@
 # Marathon
+[![Marathon GitHub Release](https://img.shields.io/github/v/release/Mediashare/marathon.svg?style=flat)]()
+[![Marathon GitHub pull requests](https://img.shields.io/github/issues-pr/Mediashare/marathon.svg?style=flat)]()
+
 ## Introduction
 Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently **manage times from tasks for your projects**. 
 It provides a comprehensive solution for maintaining a project-related activities through commit history.
