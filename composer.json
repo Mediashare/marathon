@@ -1,6 +1,6 @@
 {
     "name": "mediashare/marathon",
-    "description": "Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently manage tasks for your projects.",
+    "description": "Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently manage times from tasks for your projects.",
     "type": "library",
     "keywords": [
         "marathon",
