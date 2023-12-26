@@ -21,6 +21,12 @@ composer require mediashre/marathon
 composer global require mediashre/marathon
 marathon <command>
 ```
+### Docker
+#### Dockerfile
+```bash
+docker build -t marathon .
+docker run -it marathon <command>
+```
 ### Binary
 ```bash
 curl --output marathon https://raw.githubusercontent.com/Mediashare/marathon/main/marathon
@@ -58,7 +64,7 @@ marathon task:start "Feature Implementation" # Start a task and set the name to 
 marathon task:start --new # Start a completely new task without specifying a name.
 marathon task:start --task-id 123 # Start a task with the specified ID (e.g., ID 123).
 marathon task:start --dureation 2h # Start a task and sets the duration of the current step to 2 hours.
-marathon task:start --tid 456 -n -d 30min # Start a completely new task with the ID 456 and sets the duration of the current step to 30 minutes.
+marathon task:start --tid 456 --new -d 30min # Start a completely new task with the ID 456 and sets the duration of the current step to 30 minutes.
 ```
 #### Creating a commit
 ```bash

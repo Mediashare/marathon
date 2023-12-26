@@ -37,13 +37,13 @@ class HandlerService {
         string|null $taskDirectory = null,
         string|null $taskId = null,
     ): self {
-        $this->config = $this->configService->write(
+        $this->config = $this->configService->setConfig(
             $configPath,
             $dateTimeFormat,
             $dateTimeZone,
             $taskDirectory,
             $taskId,
-        )->getConfig();
+        )->write()->getConfig();
 
         return $this;
     }
@@ -54,11 +54,19 @@ class HandlerService {
 
     /**
      * @throws \JsonException
+     * @throws TaskNotFoundException
      */
     public function updateTaskIdInConfig(): self {
-        $this->configService->write(
-            taskId: $this->configService->getLastTaskId(excludeTaskId: $this->getConfig()->getTaskId())
-        );
+        $this->taskService->setConfig(
+            $this->configService->setConfig(
+                taskId: $this
+                ->configService
+                ->getLastTaskId(
+                    excludeTaskId: $this->getConfig()->getTaskId(),
+                    onlyUnarchived: true,
+                ) ?? (new \DateTime())->format('YmdHis')
+            )->write()->getConfig()
+        )->create(['run' => false]);
 
         return $this;
     }

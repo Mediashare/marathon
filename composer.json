@@ -30,6 +30,10 @@
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-xml": "*",
+        "ext-xmlwriter": "*",
+        "ext-dom": "*",
+        "ext-tokenizer": "*",
         "ramsey/collection": "^2.0",
         "symfony/cache": "^6.1",
         "symfony/console": "^6.1",
@@ -58,7 +62,8 @@
     "autoload": {
         "psr-4": {
             "Mediashare\\Marathon\\": "src/"
-        }
+        },
+        "classmap": ["bin/"]
     },
     "autoload-dev": {
         "psr-4": {

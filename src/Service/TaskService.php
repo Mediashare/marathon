@@ -83,7 +83,7 @@ class TaskService {
         $task = $this->serializerService->arrayToEntity($data, Task::class);
 
         if (!$task->getId()):
-            $task->setId($this->config->getTaskId() ?? (new \DateTime())->format('YmdHis'));
+            $task->setId($this->getConfig()->getTaskId() ?? (new \DateTime())->format('YmdHis'));
             $this->setConfig($this->getConfig()->setTaskId($task->getId()));
         endif;
 
@@ -125,7 +125,7 @@ class TaskService {
             );
         endif;
 
-        if (!$task->getStartDate() || !($lastStep = $task->getSteps()?->last()) || $lastStep->getEndDate()):
+        if (!$task->getStartDate() || (!($lastStep = $task->getSteps()?->last()) && $lastStep->getEndDate())):
             $task
                 ->addStep(
                     $this->stepService->create()

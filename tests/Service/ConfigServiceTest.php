@@ -20,13 +20,13 @@ class ConfigServiceTest extends AbstractServiceTestCase {
      * @throws \JsonException
      */
     public function testWrite(): void {
-        $config = $this->configService->write(
+        $config = $this->configService->setConfig(
             configPath: $this->configPath,
             dateTimeFormat: 'm/d/Y H:i:s',
             dateTimeZone: 'Europe/London',
             taskDirectory: $this->taskDirectory,
             taskId: $taskId = 'taskId',
-        )->getConfig();
+        )->write()->getConfig();
 
         $this->assertFileExists($this->configPath);
         $this->assertInstanceOf(Config::class, $config);
@@ -66,7 +66,7 @@ class ConfigServiceTest extends AbstractServiceTestCase {
      * @throws \JsonException
      */
     public function testGetDateTimeZoneEuropeParis(): void {
-        $config = $this->configService->write(dateTimeZone: $timezone = 'europe/paris')->getConfig();
+        $config = $this->configService->setConfig(dateTimeZone: $timezone = 'europe/paris')->getConfig();
 
         $this->assertEquals(timezone_open($timezone), $config->getDateTimeZone());
     }
@@ -76,7 +76,7 @@ class ConfigServiceTest extends AbstractServiceTestCase {
      */
     public function testGetDateTimeZoneLondonFail(): void {
         $this->expectException(DateTimeZoneException::class);
-        $this->configService->write(dateTimeZone: 'london');
+        $this->configService->setConfig(dateTimeZone: 'london');
     }
 
     /**
@@ -84,7 +84,7 @@ class ConfigServiceTest extends AbstractServiceTestCase {
      */
     public function testSetDateTimeZoneFail(): void {
         $this->expectException(DateTimeZoneException::class);
-        $this->configService->write(dateTimeZone: 'Gallia/Lugdunum');
+        $this->configService->setConfig(dateTimeZone: 'Gallia/Lugdunum');
     }
 
     /**
