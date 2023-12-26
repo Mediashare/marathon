@@ -33,6 +33,7 @@ class HandlerServiceTest extends AbstractServiceTestCase {
         $config->method('getTaskDirectory')->willReturn($this->taskDirectory);
 
         $configService = $this->createMock(ConfigService::class);
+        $configService->method('setConfig')->willReturnSelf();
         $configService->method('write')->willReturnSelf();
         $configService->method('getConfig')->willReturn($config);
 

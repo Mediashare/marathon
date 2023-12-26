@@ -28,7 +28,7 @@ class ConfigService {
      * @throws \JsonException
      * @throws DateTimeZoneException
      */
-    public function write(
+    public function setConfig(
         string|null $configPath = null,
         string|null $dateTimeFormat = null,
         string|null $dateTimeZone = null,
@@ -46,13 +46,30 @@ class ConfigService {
             ,
         );
 
-        $this->filesystem->dumpFile($this->config->getConfigPath(), json_encode($this->config->toArray(), JSON_THROW_ON_ERROR));
-
         return $this;
     }
 
     public function getConfig(): Config|null {
         return $this->config;
+    }
+
+    /**
+     * @throws JsonDecodeException
+     * @throws \JsonException
+     * @throws FileNotFoundException
+     */
+    public function write(): self {
+        $this
+            ->filesystem
+            ->dumpFile(
+                $this->getConfig()?->getConfigPath() ?? $this->getLastConfig()->getConfigPath(),
+                json_encode(
+                    $this->getConfig()?->toArray() ?? $this->getLastConfig()->toArray(),
+                    JSON_THROW_ON_ERROR
+                )
+            );
+
+        return $this;
     }
 
     public function isDebug(): bool {
@@ -95,13 +112,22 @@ class ConfigService {
         return $this->getLastConfig()->getTaskDirectory();
     }
 
-    public function getLastTaskId(string|null $taskDirectory = null, string|null $excludeTaskId = null): string|null {
+    public function getLastTaskId(
+        string|null $taskDirectory = null,
+        string|null $excludeTaskId = null,
+        bool $onlyUnarchived = false,
+    ): string|null {
         try {
             $lastTaskId = $this->taskService
-                ->setConfig(new Config(taskDirectory: $taskDirectory ?? $this->getLastTaskDirectory()))
-                ->getTasks()
-                ?->filter(static fn (Task $task) => !$excludeTaskId || $task->getId() !== $excludeTaskId)
-                ?->last()?->getId()
+                ->setConfig(
+                    $taskDirectory
+                        ? $this->getLastConfig()->setTaskDirectory($taskDirectory)
+                        : $this->getLastConfig()
+                )->getTasks()
+                ?->filter(static fn (Task $task) =>
+                    ($excludeTaskId !== null || $task->getId() !== $excludeTaskId)
+                    && ($onlyUnarchived !== false && $task->isArchived() === false)
+                )?->last()?->getId()
             ;
 
             if ($lastTaskId):
