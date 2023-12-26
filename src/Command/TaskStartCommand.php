@@ -20,7 +20,7 @@ class TaskStartCommand extends Command {
             ->addArgument('task-name', InputArgument::OPTIONAL, 'Set the task <comment>name</comment>', false)
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
             ->addOption('task-id', 'tid', InputOption::VALUE_REQUIRED, '<comment>Task ID</comment>')
-            ->addOption('new', 'n', InputOption::VALUE_NONE, 'Creating <comment>new task</comment>')
+            ->addOption('new', null, InputOption::VALUE_NONE, 'Creating <comment>new task</comment>')
 
             // Config
             ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Set <comment>/file/path/to/json/config</comment>')
