@@ -34,7 +34,7 @@ class Config {
     }
 
     public function getConfigPath(): string {
-        return $this->configPath;
+        return $this->configPath ?? self::CONFIG_PATH;
     }
 
     public function setTaskDirectory(string $taskDirectory): self {
@@ -44,7 +44,7 @@ class Config {
     }
 
     public function getTaskDirectory(): string {
-        return $this->taskDirectory;
+        return $this->taskDirectory ?? self::TASKS_DIRECTORY;
     }
 
     public function setDateTimeFormat(string $dateTimeFormat): self {
@@ -54,7 +54,7 @@ class Config {
     }
 
     public function getDateTimeFormat(): string {
-        return $this->dateTimeFormat;
+        return $this->dateTimeFormat ?? self::DATETIME_FORMAT;
     }
 
     /**
@@ -73,7 +73,7 @@ class Config {
     }
 
     public function getDateTimeZone(): \DateTimeZone {
-        return timezone_open($this->dateTimeZone);
+        return @timezone_open($this->dateTimeZone ?? self::DATETIME_ZONE);
     }
 
     public function setTaskId(string $taskId): self {
