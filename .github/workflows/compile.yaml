@@ -20,7 +20,9 @@ jobs:
           php-version: '8.1'
 
       - name: Install dependencies
-        run: composer install
+        run: |
+            composer install --no-scripts --no-autoloader
+            composer dump-autoload --optimize
 
       - name: PHPUnit permissions
         run: chmod +x ./bin/phpunit
