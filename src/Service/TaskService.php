@@ -125,7 +125,7 @@ class TaskService {
             );
         endif;
 
-        if (!$task->getStartDate() || (!($lastStep = $task->getSteps()?->last()) && $lastStep->getEndDate())):
+        if (!$task->getStartDate() || (!($lastStep = $task->getSteps()?->last()) || $lastStep->getEndDate())):
             $task
                 ->addStep(
                     $this->stepService->create()
