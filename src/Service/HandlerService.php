@@ -18,7 +18,7 @@ class HandlerService {
     private Task|null $task = null;
 
     public function __construct(
-        private readonly ConfigService $configService,
+        public readonly ConfigService $configService,
         private readonly TaskService $taskService,
         private readonly CommitService $commitService,
         private readonly SerializerService $serializerService,
