@@ -105,13 +105,13 @@ class TaskService {
      * @throws TaskNotFoundException
      */
     public function start(
-        string|null $name = null,
-        string|null $duration = null,
+        string|false $name = false,
+        string|false $duration = false,
     ): self {
         $task = $this->getTask(createItIfNotExist: true)
             ->setRun(true)
             ->setArchived(false)
-            ->setName($name ?? $this->getTask()->getName());
+            ->setName($name === false ? $this->getTask()->getName() : $name);
 
         if ($duration):
             $firstStep = $task->getSteps()->first();
