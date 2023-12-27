@@ -36,6 +36,9 @@ class TaskStatusCommand extends Command {
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
         try {
+            // Preload max width output
+            $this->outputService->setMaxWidthOfColumn();
+
             // Handler
             $this->handlerService->writeConfig(
                 $input->getOption('config-path'),
