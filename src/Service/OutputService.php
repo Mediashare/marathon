@@ -63,7 +63,7 @@ class OutputService {
         return $this;
     }
 
-    private function getMaxWidthOfColumn(): int {
+    public function getMaxWidthOfColumn(): int {
         return $this->maxWidthOfColumn;
     }
 
