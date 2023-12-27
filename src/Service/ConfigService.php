@@ -16,7 +16,7 @@ class ConfigService {
     private Config|null $config = null;
 
     public function __construct(
-        private TaskService $taskService,
+        private readonly TaskService $taskService,
     ) {
         $this->serializerService = new SerializerService();
         $this->filesystem = new Filesystem();
