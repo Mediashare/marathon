@@ -16,7 +16,7 @@ class ConfigService {
     private Config|null $config = null;
 
     public function __construct(
-        private TaskService $taskService,
+        private readonly TaskService $taskService,
     ) {
         $this->serializerService = new SerializerService();
         $this->filesystem = new Filesystem();
@@ -33,16 +33,16 @@ class ConfigService {
         string|null $dateTimeFormat = null,
         string|null $dateTimeZone = null,
         string|null $taskDirectory = null,
-        string|null $taskId = null,
+        string|false|null $taskId = null,
     ): self {
         $this->config = new Config(
             $configPath ?? $this->getLastConfigPath(),
         $dateTimeFormat ?? $this->getLastDateTimeFormat(),
         $dateTimeZone ?? $this->getLastDateTimeZone()->getName(),
             $taskDirectory = $taskDirectory ?? $this->getLastTaskDirectory(),
-            $taskId
-                ?? $this->getLastTaskId($taskDirectory)
-                ?? (new \DateTime())->format('YmdHis')
+            $taskId === false
+                ? null
+                : $taskId ?? $this->getLastTaskId(taskDirectory: $taskDirectory)
             ,
         );
 
@@ -115,7 +115,6 @@ class ConfigService {
     public function getLastTaskId(
         string|null $taskDirectory = null,
         string|null $excludeTaskId = null,
-        bool $onlyUnarchived = false,
     ): string|null {
         try {
             $lastTaskId = $this->taskService
@@ -124,18 +123,36 @@ class ConfigService {
                         ? $this->getLastConfig()->setTaskDirectory($taskDirectory)
                         : $this->getLastConfig()
                 )->getTasks()
-                ?->filter(static fn (Task $task) =>
-                    ($excludeTaskId !== null || $task->getId() !== $excludeTaskId)
-                    && ($onlyUnarchived !== false && $task->isArchived() === false)
-                )?->last()?->getId()
-            ;
+                ?->filter(static function (Task $task) use ($excludeTaskId) {
+                    $display = true;
+                    if ($task->getId() === $excludeTaskId):
+                        $display = false;
+                    endif;
+
+                    if ($task->isArchived() === true):
+                        $display = false;
+                    endif;
+
+                    return $display;
+                })?->last()?->getId();
+
 
             if ($lastTaskId):
                 return $lastTaskId;
             endif;
 
-            if ($lastTaskIdByLastConfig = $this->getLastConfig()->getTaskId()):
-                if (!$excludeTaskId || $lastTaskIdByLastConfig !== $excludeTaskId):
+            if (
+                ($lastTaskIdByLastConfig = $this->getLastConfig()->getTaskId())
+                && (
+                    !$excludeTaskId
+                    || $lastTaskIdByLastConfig !== $excludeTaskId
+                )
+            ):
+                $task = $this
+                    ->taskService
+                    ->setConfig($this->getLastConfig())
+                    ->getTask();
+                if ($task->isArchived() === false):
                     return $lastTaskIdByLastConfig;
                 endif;
             endif;

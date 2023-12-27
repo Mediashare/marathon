@@ -44,8 +44,8 @@ $commandsLoader = new \Symfony\Component\Console\CommandLoader\FactoryCommandLoa
     'task:archive' => function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\TaskArchiveCommand($handlerService, $outputService);
         },
-    'task:delete' => function () use ($handlerService, $outputService) {
-            return new Mediashare\Marathon\Command\TaskDeleteCommand($handlerService, $outputService);
+    'task:delete' => function () use ($handlerService) {
+            return new Mediashare\Marathon\Command\TaskDeleteCommand($handlerService);
         },
     'commit' => function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\CommitCommand($handlerService, $outputService);

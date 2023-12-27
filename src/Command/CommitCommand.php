@@ -38,6 +38,9 @@ class CommitCommand extends Command {
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
         try {
+            // Preload max width output
+            $this->outputService->setMaxWidthOfColumn();
+
             // Handler
             $this->handlerService->writeConfig(
                 $input->getOption('config-path'),
@@ -64,6 +67,11 @@ class CommitCommand extends Command {
             $output->writeln("");
             $helper = new DescriptorHelper();
             $helper->describe($output, $this);
+
+            if ($this->handlerService->configService->isDebug()):
+                $output->writeln("");
+                $output->writeln($exception->getTraceAsString());
+            endif;
 
             return Command::FAILURE;
         }

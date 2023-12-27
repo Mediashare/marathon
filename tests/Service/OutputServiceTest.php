@@ -116,6 +116,8 @@ class OutputServiceTest extends KernelTestCase {
 
         $expected = $actualWidthOfColumn - ($actualWidthOfColumn / 1.33);
 
+        $this->outputService->setMaxWidthOfColumn();
+
         $this->assertEquals((int) $expected, $this->outputService->getMaxWidthOfColumn());
     }
 }

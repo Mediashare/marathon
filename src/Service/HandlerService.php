@@ -18,7 +18,7 @@ class HandlerService {
     private Task|null $task = null;
 
     public function __construct(
-        private readonly ConfigService $configService,
+        public readonly ConfigService $configService,
         private readonly TaskService $taskService,
         private readonly CommitService $commitService,
         private readonly SerializerService $serializerService,
@@ -54,19 +54,11 @@ class HandlerService {
 
     /**
      * @throws \JsonException
-     * @throws TaskNotFoundException
      */
     public function updateTaskIdInConfig(): self {
-        $this->taskService->setConfig(
-            $this->configService->setConfig(
-                taskId: $this
-                ->configService
-                ->getLastTaskId(
-                    excludeTaskId: $this->getConfig()->getTaskId(),
-                    onlyUnarchived: true,
-                ) ?? (new \DateTime())->format('YmdHis')
-            )->write()->getConfig()
-        )->create(['run' => false]);
+        $this->configService->setConfig(
+            taskId: false
+        )->write();
 
         return $this;
     }
@@ -129,7 +121,7 @@ class HandlerService {
         return $this->setTask(
             $this->taskService
                 ->setConfig($this->getConfig())
-                ->stop()
+                ->stop(createItIfNotExist: true)
                 ->getTask()
         )->writeTask();
     }

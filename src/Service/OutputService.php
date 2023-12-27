@@ -52,17 +52,19 @@ class OutputService {
         return $this->task;
     }
 
-    public function getMaxWidthOfColumn(): int {
-        if ($this->maxWidthOfColumn):
-            return $this->maxWidthOfColumn;
-        endif;
-
+    public function setMaxWidthOfColumn(): self {
         stripos(PHP_OS_FAMILY, 'WIN') === 0
             ? $terminalWidth = (int) shell_exec('powershell -Command "&{(Get-Host).UI.RawUI.WindowSize.Width}"')
             : $terminalWidth = (int) shell_exec('tput cols')
         ;
 
-        return $this->maxWidthOfColumn = $terminalWidth - ($terminalWidth / 1.33);
+        $this->maxWidthOfColumn = $terminalWidth - ($terminalWidth / 1.33);
+
+        return $this;
+    }
+
+    public function getMaxWidthOfColumn(): int {
+        return $this->maxWidthOfColumn;
     }
 
     public function outputRenderTasks(): self {

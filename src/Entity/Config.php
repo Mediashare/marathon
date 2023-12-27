@@ -76,7 +76,7 @@ class Config {
         return @timezone_open($this->dateTimeZone ?? self::DATETIME_ZONE);
     }
 
-    public function setTaskId(string $taskId): self {
+    public function setTaskId(string|null $taskId = null): self {
         $this->taskId = $taskId;
 
         return $this;

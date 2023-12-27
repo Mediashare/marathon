@@ -29,7 +29,6 @@ class TaskDeleteCommand extends Command {
 
     public function __construct(
         private readonly HandlerService $handlerService,
-        private readonly OutputService $outputService,
     ) {
         parent::__construct();
     }
@@ -45,14 +44,6 @@ class TaskDeleteCommand extends Command {
                 $input->getArgument('task-id'),
             )->taskDelete();
 
-            // Output render into terminal
-            $this->outputService
-                ->setOutput($output)
-                ->setConfig($this->handlerService->getConfig())
-                ->setTask($this->handlerService->getTask())
-                ->outputRenderCommits()
-                ->outputRenderTasks();
-
             // Update config
             $this->handlerService->updateTaskIdInConfig();
 
@@ -62,6 +53,11 @@ class TaskDeleteCommand extends Command {
             $output->writeln("");
             $helper = new DescriptorHelper();
             $helper->describe($output, $this);
+
+            if ($this->handlerService->configService->isDebug()):
+                $output->writeln("");
+                $output->writeln($exception->getTraceAsString());
+            endif;
 
             return Command::FAILURE;
         }
