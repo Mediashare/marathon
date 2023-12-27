@@ -75,9 +75,6 @@ class TaskService {
         return $this;
     }
 
-    /**
-     * @throws TaskNotFoundException
-     */
     public function create(array $data = []): self {
         /** @var Task $task */
         $task = $this->serializerService->arrayToEntity($data, Task::class);
@@ -140,9 +137,9 @@ class TaskService {
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
-    public function stop(): self {
+    public function stop(bool $createItIfNotExist = false): self {
         $task = $this
-            ->getTask(createItIfNotExist: true)
+            ->getTask($createItIfNotExist)
             ->setRun(false);
 
         if (($lastStep = $task->getSteps()?->last()) && !$lastStep->getEndDate()):
@@ -171,9 +168,6 @@ class TaskService {
         return $this;
     }
 
-    /**
-     * @throws TaskNotFoundException
-     */
     public function delete(): self {
         $this->filesystem
             ->remove($this->getTaskFilepath())
@@ -182,14 +176,7 @@ class TaskService {
         return $this->setTask(null);
     }
 
-    /**
-     * @throws TaskNotFoundException
-     */
     public function getTaskFilepath(): string {
-        if (!$this->getConfig()->getTaskId()):
-            throw new TaskNotFoundException();
-        endif;
-
-        return $this->getConfig()->getTaskDirectory().DIRECTORY_SEPARATOR. $this->getConfig()->getTaskId().'.json';
+        return $this->getConfig()->getTaskDirectory().DIRECTORY_SEPARATOR.$this->getConfig()->getTaskId().'.json';
     }
 }
