@@ -33,16 +33,16 @@ class ConfigService {
         string|null $dateTimeFormat = null,
         string|null $dateTimeZone = null,
         string|null $taskDirectory = null,
-        string|null $taskId = null,
+        string|false|null $taskId = null,
     ): self {
         $this->config = new Config(
             $configPath ?? $this->getLastConfigPath(),
         $dateTimeFormat ?? $this->getLastDateTimeFormat(),
         $dateTimeZone ?? $this->getLastDateTimeZone()->getName(),
             $taskDirectory = $taskDirectory ?? $this->getLastTaskDirectory(),
-            $taskId
-                ?? $this->getLastTaskId($taskDirectory)
-                ?? (new \DateTime())->format('YmdHis')
+            $taskId === false
+                ? null
+                : $taskId ?? $this->getLastTaskId(taskDirectory: $taskDirectory)
             ,
         );
 
