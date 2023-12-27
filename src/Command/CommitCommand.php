@@ -65,6 +65,11 @@ class CommitCommand extends Command {
             $helper = new DescriptorHelper();
             $helper->describe($output, $this);
 
+            if ($this->handlerService->configService->isDebug()):
+                $output->writeln("");
+                $output->writeln($exception->getTraceAsString());
+            endif;
+
             return Command::FAILURE;
         }
     }
