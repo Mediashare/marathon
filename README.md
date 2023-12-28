@@ -13,12 +13,12 @@ It provides a comprehensive solution for maintaining a project-related activitie
 ### Composer
 #### Basic
 ```bash
-composer require mediashre/marathon
+composer require mediashre/marathon:*
 ./vendor/mediashare/marathon/bin/marathon <command>
 ```
 #### Global
 ```bash
-composer global require mediashre/marathon
+composer global require mediashare/marathon:*
 marathon <command>
 ```
 ### Docker
