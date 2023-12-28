@@ -54,9 +54,14 @@ class CommitService {
                 );
             endif;
 
-            $commit->setSteps($task->getSteps());
+            foreach ($task->getSteps() as $step):
+                $commit->setSteps($step);
+            endforeach;
         else:
-            $commit->addStep($this->stepService->create());
+            $commit->addStep($this->stepService->create(
+                startDate: $endDate = (new \DateTime())->getTimestamp(),
+                endDate: $endDate,
+            ));
         endif;
 
         $task

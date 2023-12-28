@@ -25,6 +25,7 @@
             "email": "thibault@marquand.pro"
         }
     ],
+    "prefer-stable": true,
     "minimum-stability": "stable",
     "require": {
         "php": ">=8.1",
