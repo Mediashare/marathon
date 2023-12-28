@@ -46,8 +46,8 @@ Here are some examples of how to use Marathon:
   marathon task:start <?task-name>          Starting step of task
   marathon task:stop <?task-id>             Stoping step of task
   marathon task:status <?task-id>           Displaying status of task
-  marathon task:archive <?task-id>          Archiving the task
-  marathon task:delete <task-id>            Deleting the task
+  marathon task:archive <task-id>           Archiving the task by ID
+  marathon task:delete <task-id>            Deleting the task by ID
 
   marathon commit <?commit-message>         Creating new commit into task
   marathon commit:edit <commit-id>          Editing the commit from task
@@ -64,22 +64,22 @@ marathon task:start "Feature Implementation" # Start a task and set the name to 
 marathon task:start --new # Start a completely new task without specifying a name.
 marathon task:start --task-id 123 # Start a task with the specified ID (e.g., ID 123).
 marathon task:start --dureation 2h # Start a task and sets the duration of the current step to 2 hours.
-marathon task:start --tid 456 --new -d 30min # Start a completely new task with the ID 456 and sets the duration of the current step to 30 minutes.
+marathon task:start --task-id 456 --new --duration 30min # Start a completely new task with the ID 456 and sets the duration of the current step to 30 minutes.
 ```
 #### Creating a commit
 ```bash
 marathon commit # Create a new commit without specifying a message.
 marathon commit "Initial commit" # Create a new commit for the current task with the specified message.
 marathon commit "This is a very long commit message describing the changes made in this commit. It covers multiple lines and provides detailed information about the updates." # Create a new commit with a long and detailed commit message.
-marathon commit "Your commit message" -d 1h # Create a new commit with a message and sets its duration to 1 hour.
+marathon commit "Your commit message" --duration 1h # Create a new commit with a message and sets its duration to 1 hour.
 marathon commit "Test update older task with ID 123 or create it" --task-id 123 # Create a new commit for the task specified by the ID.
-marathon commit "Rollback" -d "-1hour" # Create a new commit with a message and sets its duration to rollback (negative duration).
+marathon commit "Rollback" --duration "-1hour" # Create a new commit with a message and sets its duration to rollback (negative duration).
 ```
 #### Editing a commit
 ```bash
-marathon commit:edit <commit-id> -m "Updated message" -d 30min # Edit the message and duration of a specific commit.
-marathon commit:edit 456 -d 1h # Edit the commit with ID 456 and updates its duration to 1 hour.
-marathon commit:edit 456 --task-id 123 -m "Update commit with ID 456 from task ID 123" # Edit the last commit from the task specified by the ID.
+marathon commit:edit <commit-id> -message "Updated message" --duration 30min # Edit the message and duration of a specific commit.
+marathon commit:edit 456 --duration 1h # Edit the commit with ID 456 and updates its duration to 1 hour.
+marathon commit:edit 456 --task-id 123 -message "Update commit with ID 456 from task ID 123" # Edit the last commit from the task specified by the ID.
 ```
 #### Deleting a commit
 ```bash
@@ -96,14 +96,12 @@ marathon task:status 123 # Display the status of the task with ID 123.
 ```bash
 marathon task:stop # Stop the current step of the task with the default duration.
 marathon task:stop <?task-id> # Stop the task step with task ID.
-marathon task:stop 123 -d 1h # Stop the task step with ID 123 and updates its duration to 1 hour.
+marathon task:stop 123 --duration 1h # Stop the task step with ID 123 and updates its duration to 1 hour.
 ```
 #### Archiving or deleting a task
 ```bash
-marathon task:archive # Archive the current task without stopping the current step.
-marathon task:archive <?task-id> # Archive the task with ID without stopping the current step.
+marathon task:archive <task-id> # Archive the task with ID without stopping the current step.
 marathon task:archive 123 # Archive the task with ID 123.
-marathon task:archive 123 -s # Archive the task with ID 123 and stop the current step.
 
 # or delete the task
 
@@ -157,7 +155,8 @@ box
 ```
 #### Box usage
 ```bash
-composer dump-env dev
+composer install --no-scripts --no-autoloader
+composer dump-autoload --optimize
 box compile
 ```
 ## Conclusion

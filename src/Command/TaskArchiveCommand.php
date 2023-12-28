@@ -17,8 +17,7 @@ class TaskArchiveCommand extends Command {
         $this
             ->setName('task:archive')
             ->setDescription('<comment>Archiving</comment> the task')
-            ->addArgument('task-id', InputArgument::OPTIONAL, '<comment>Task ID</comment>')
-            ->addOption('stop', 's', InputOption::VALUE_NONE, '<comment>Stop</comment> current step of task')
+            ->addArgument('task-id', InputArgument::REQUIRED, '<comment>Task ID</comment>')
 
             // Config
             ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Set <comment>/file/path/to/json/config</comment>')
