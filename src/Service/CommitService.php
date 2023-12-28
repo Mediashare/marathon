@@ -55,7 +55,7 @@ class CommitService {
             endif;
 
             foreach ($task->getSteps() as $step):
-                $commit->setSteps($step);
+                $commit->addStep($step);
             endforeach;
         else:
             $commit->addStep($this->stepService->create(
