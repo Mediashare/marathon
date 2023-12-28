@@ -99,8 +99,17 @@ class ConfigServiceTest extends AbstractServiceTestCase {
     /**
      * @throws \JsonException
      */
-    public function testGetLastTaskId(): void {
-        $lastTaskId = $this->configService->getLastTaskId(taskDirectory: $this->taskDirectory);
+    public function testGetLastTaskIdByDirectory(): void {
+        $lastTaskId = $this->configService->getLastTaskIdByDirectory(taskDirectory: $this->taskDirectory);
+
+        $this->assertNotEquals('12345', $lastTaskId);
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function testGetLastTaskIdByConfig(): void {
+        $lastTaskId = $this->configService->getLastTaskIdByConfig(taskDirectory: $this->taskDirectory);
 
         $this->assertNotEquals('12345', $lastTaskId);
     }

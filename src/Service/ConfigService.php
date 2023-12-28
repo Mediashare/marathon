@@ -25,8 +25,8 @@ class ConfigService {
     /**
      * @throws FileNotFoundException
      * @throws JsonDecodeException
-     * @throws \JsonException
      * @throws DateTimeZoneException
+     * @throws \JsonException
      */
     public function setConfig(
         string|null $configPath = null,
@@ -35,14 +35,20 @@ class ConfigService {
         string|null $taskDirectory = null,
         string|false|null $taskId = null,
     ): self {
+        if ($configPath && $configPath !== $this->getLastConfigPath()):
+            $this->writeLastConfigPathIntoMainConfig($configPath);
+        endif;
+
         $this->config = new Config(
-            $configPath ?? $this->getLastConfigPath(),
-        $dateTimeFormat ?? $this->getLastDateTimeFormat(),
-        $dateTimeZone ?? $this->getLastDateTimeZone()->getName(),
+            $configPath = $configPath ?? $this->getLastConfigPath(),
+            $dateTimeFormat ?? $this->getLastDateTimeFormat(),
+            $dateTimeZone ?? $this->getLastDateTimeZone()->getName(),
             $taskDirectory = $taskDirectory ?? $this->getLastTaskDirectory(),
             $taskId === false
                 ? null
-                : $taskId ?? $this->getLastTaskId(taskDirectory: $taskDirectory)
+                : $taskId
+                    ?? $this->getLastTaskIdByConfig(configPath: $configPath, taskDirectory: $taskDirectory)
+                    ?? $this->getLastTaskIdByDirectory(configPath: $configPath, taskDirectory: $taskDirectory)
             ,
         );
 
@@ -58,11 +64,11 @@ class ConfigService {
      * @throws \JsonException
      * @throws FileNotFoundException
      */
-    public function write(): self {
+    public function write(string|null $configPath = null): self {
         $this
             ->filesystem
             ->dumpFile(
-                $this->getConfig()?->getConfigPath() ?? $this->getLastConfig()->getConfigPath(),
+                $configPath ?? $this->getConfig()?->getConfigPath() ?? $this->getLastConfigPath(),
                 json_encode(
                     $this->getConfig()?->toArray() ?? $this->getLastConfig()->toArray(),
                     JSON_THROW_ON_ERROR
@@ -112,7 +118,34 @@ class ConfigService {
         return $this->getLastConfig()->getTaskDirectory();
     }
 
-    public function getLastTaskId(
+    public function getLastTaskIdByConfig(
+        string|null $configPath = null,
+        string|null $taskDirectory = null,
+        string|null $excludeTaskId = null,
+    ): string|null {
+        try {
+            if (
+                ($lastTaskIdByLastConfig = $this->getLastConfig($configPath)->getTaskId())
+                && (
+                    !$excludeTaskId
+                    || $lastTaskIdByLastConfig !== $excludeTaskId
+                )
+            ):
+                return $this
+                    ->taskService
+                    ->setConfig(
+                        ($lastConfig = $this->getLastConfig($configPath))
+                            ->setTaskDirectory($taskDirectory ?? $lastConfig->getTaskDirectory())
+                    )->getTask()
+                    ->getId();
+            endif;
+        } catch (\Exception $exception) {}
+
+        return null;
+    }
+
+    public function getLastTaskIdByDirectory(
+        string|null $configPath = null,
         string|null $taskDirectory = null,
         string|null $excludeTaskId = null,
     ): string|null {
@@ -120,8 +153,8 @@ class ConfigService {
             $lastTaskId = $this->taskService
                 ->setConfig(
                     $taskDirectory
-                        ? $this->getLastConfig()->setTaskDirectory($taskDirectory)
-                        : $this->getLastConfig()
+                        ? $this->getLastConfig($configPath)->setTaskDirectory($taskDirectory)
+                        : $this->getLastConfig($configPath)
                 )->getTasks()
                 ?->filter(static function (Task $task) use ($excludeTaskId) {
                     $display = true;
@@ -140,22 +173,6 @@ class ConfigService {
             if ($lastTaskId):
                 return $lastTaskId;
             endif;
-
-            if (
-                ($lastTaskIdByLastConfig = $this->getLastConfig()->getTaskId())
-                && (
-                    !$excludeTaskId
-                    || $lastTaskIdByLastConfig !== $excludeTaskId
-                )
-            ):
-                $task = $this
-                    ->taskService
-                    ->setConfig($this->getLastConfig())
-                    ->getTask();
-                if ($task->isArchived() === false):
-                    return $lastTaskIdByLastConfig;
-                endif;
-            endif;
         } catch (\Exception $exception) {}
 
         return null;
@@ -165,17 +182,34 @@ class ConfigService {
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      */
-    private function getLastConfig(): Config {
-        if (
-            $this->getConfig() instanceof Config
-            && !$this->isTest()
-            && $this->filesystem->exists($configPath = $this->getConfig()->getConfigPath())
-        ):
+    private function getLastConfig(string|null $configPath = null): Config {
+        if ($configPath !== null && $this->filesystem->exists($configPath)):
+            return $this->serializerService->read($configPath, Config::class);
+        elseif (
+                $this->getConfig() instanceof Config
+                && !$this->isTest()
+                && $this->filesystem->exists($configPath = $this->getConfig()->getConfigPath())
+            ):
             return $this->serializerService->read($configPath, Config::class);
         elseif (!$this->isTest() && $this->filesystem->exists($configPath = Config::CONFIG_PATH)):
             return $this->serializerService->read($configPath, Config::class);
         endif;
 
         return new Config();
+    }
+
+    /**
+     * If new configPath then write this into main config
+     *
+     * @throws FileNotFoundException
+     * @throws JsonDecodeException
+     * @throws \JsonException
+     */
+    private function writeLastConfigPathIntoMainConfig(string $configPath): void
+    {
+        $this->config = $this->getLastConfig(Config::CONFIG_PATH)
+            ->setConfigPath($configPath)
+        ;
+        $this->write(Config::CONFIG_PATH);
     }
 }
