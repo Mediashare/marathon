@@ -63,7 +63,7 @@ marathon task:start # Start a task without specifying a name.
 marathon task:start "Feature Implementation" # Start a task and set the name to "Feature Implementation".
 marathon task:start --new # Start a completely new task without specifying a name.
 marathon task:start --task-id 123 # Start a task with the specified ID (e.g., ID 123).
-marathon task:start --dureation 2h # Start a task and sets the duration of the current step to 2 hours.
+marathon task:start --duration 2h # Start a task and sets the duration of the current step to 2 hours.
 marathon task:start --task-id 456 --new --duration 30min # Start a completely new task with the ID 456 and sets the duration of the current step to 30 minutes.
 ```
 #### Creating a commit
