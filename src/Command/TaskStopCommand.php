@@ -56,7 +56,7 @@ class TaskStopCommand extends Command {
                         ? (new \DateTime())->format('YmdHis')
                         : $input->getArgument('task-id')
                     : $input->getArgument('task-id'),
-            )->taskStop()->updateTask(
+            )->taskStop(
                 name: $input->getOption('name'),
                 duration: $input->getOption('duration'),
                 remaining: $input->getOption('remaining'),

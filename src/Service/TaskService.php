@@ -98,40 +98,18 @@ class TaskService {
      * @throws StrToTimeDurationException
      * @throws TaskNotFoundException
      */
-    public function start(
-        string|false $name = false,
-        string|false $duration = false,
-        string|false $remaining = false,
-    ): self {
-        $task = $this->getTask(createItIfNotExist: true)
+    public function start(bool|null $createItIfNotExist = true): self {
+        $task = $this->getTask($createItIfNotExist)
             ->setRun(true)
-            ->setArchived(false)
-            ->setName($name === false ? $this->getTask()->getName() : $name);
+            ->setArchived(false);
 
-        if ($duration):
-            $firstStep = $task->getSteps()->first();
-            $task->getSteps()->clear();
-            $task->addStep($this
-                ->stepService
-                ->createWithCustomDuration(
-                    $duration,
-                    $firstStep?->getStartDate(),
-                )
-            );
-        elseif (!$task->getStartDate() || (!($lastStep = $task->getSteps()?->last()) || $lastStep->getEndDate())):
+        if (!$task->getStartDate() || (!($lastStep = $task->getSteps()?->last()) || $lastStep->getEndDate())):
             $task
                 ->addStep(
                     $this->stepService->create()
                 );
         endif;
-
-        if ($remaining !== false):
-            $remaining = $this->timestampService->convert($remaining);
-            $timestamp = strtotime($remaining, $now = (new \DateTime())->getTimestamp());
-            $seconds = $timestamp - $now;
-            $task->setRemaining($seconds);
-        endif;
-
+        
         return $this->setTask($task);
     }
 
@@ -192,7 +170,7 @@ class TaskService {
             return $this;
         endif;
 
-        $task = $this->getTask();
+        $task = $this->getTask(createItIfNotExist: true);
         $task->setName($name !== false ? $name : $this->getTask()->getName());
 
         if ($duration !== false):

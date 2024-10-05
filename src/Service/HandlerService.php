@@ -110,7 +110,8 @@ class HandlerService {
         return $this->setTask(
             $this->taskService
                 ->setConfig($this->getConfig())
-                ->start($name, $duration, $remaining)
+                ->start(createItIfNotExist: true)
+                ->update($name, $duration, $remaining)
                 ->getTask()
         )->writeTask();
     }
@@ -120,11 +121,16 @@ class HandlerService {
      * @throws FileNotFoundException
      * @throws JsonDecodeException
      */
-    public function taskStop(): self {
+    public function taskStop(
+        string|false $name = false,
+        string|false $duration = false,
+        string|false $remaining = false,
+    ): self {
         return $this->setTask(
             $this->taskService
                 ->setConfig($this->getConfig())
                 ->stop(createItIfNotExist: true)
+                ->update($name, $duration, $remaining)
                 ->getTask()
         )->writeTask();
     }
@@ -134,11 +140,16 @@ class HandlerService {
      * @throws FileNotFoundException
      * @throws JsonDecodeException
      */
-    public function taskArchive(): self {
+    public function taskArchive(
+        string|false $name = false,
+        string|false $duration = false,
+        string|false $remaining = false,
+    ): self {
         return $this->setTask(
             $this->taskService
                 ->setConfig($this->getConfig())
                 ->archive()
+                ->update($name, $duration, $remaining)
                 ->getTask()
         )->writeTask();
     }
