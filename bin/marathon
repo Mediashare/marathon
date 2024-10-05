@@ -1,5 +1,9 @@
 #!/usr/bin/env php
 <?php
+
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
+
 require __DIR__ . '/../vendor/autoload.php';
 
 
@@ -67,7 +71,7 @@ $commandsLoader = new \Symfony\Component\Console\CommandLoader\FactoryCommandLoa
             return new Mediashare\Marathon\Command\GitGitignoreCommand();
         },
     'version:upgrade' => function () {
-            return new Mediashare\Marathon\Command\VersionUpgradeCommand();
+            return new Mediashare\Marathon\Command\VersionUpgradeCommand(new NativeHttpClient());
         },
 ]);
 $app->setCommandLoader($commandsLoader);

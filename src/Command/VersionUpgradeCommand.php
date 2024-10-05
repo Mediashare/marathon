@@ -26,11 +26,6 @@ Class VersionUpgradeCommand extends Command {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
-        if (!\Phar::running()):
-            $output->writeln("<info>Use <comment>git fetch && git checkout {$tag['name']} && git pull</comment> for upgrade Marathon.</info>");
-            return Command::INVALID;
-        endif;
-
         $response = $this->client->request("GET", "https://api.github.com/repos/Mediashare/marathon/tags");
         $tags = $response->toArray();
         if (($version = $input->getArgument('version')) === 'main'):
@@ -45,6 +40,11 @@ Class VersionUpgradeCommand extends Command {
         if (!$tag):
             $output->writeln("The <error>$version</error> version was not found.");
             $output->writeln("Versions list: <comment>main</comment>" . implode("", array_map(static fn (array $tag) => " | <comment>{$tag['name']}</comment>", $tags)));
+            return Command::INVALID;
+        endif;
+
+        if (!\Phar::running()):
+            $output->writeln("<info>Use <comment>git fetch && git checkout {$version} && git pull</comment> for upgrade Marathon.</info>");
             return Command::INVALID;
         endif;
 
