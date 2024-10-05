@@ -40,39 +40,52 @@ $handlerService = new \Mediashare\Marathon\Service\HandlerService(
 $outputService = new \Mediashare\Marathon\Service\OutputService($timestampService);
 
 $commandsLoader = new \Symfony\Component\Console\CommandLoader\FactoryCommandLoader([
-    'task:list' => function () use ($handlerService, $outputService) {
+    'task:list' => $list = function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\TaskListCommand($handlerService, $outputService);
         },
-    'task:start' => function () use ($handlerService, $outputService) {
+    'todo' => $list,
+    'task:start' => $start = function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\TaskStartCommand($handlerService, $outputService);
         },
-    'task:stop' => function () use ($handlerService, $outputService) {
+    'start' => $start,
+    'task' => $start,
+    'task:stop' => $stop = function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\TaskStopCommand($handlerService, $outputService);
         },
-    'task:status' => function () use ($handlerService, $outputService) {
+    'stop' => $stop,
+    'task:status' => $status = function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\TaskStatusCommand($handlerService, $outputService);
         },
-    'task:archive' => function () use ($handlerService, $outputService) {
+    'status' => $status,
+    'task:archive' => $archive = function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\TaskArchiveCommand($handlerService, $outputService);
         },
-    'task:delete' => function () use ($handlerService, $outputService) {
+    'archive' => $archive,
+    'task:delete' => $delete = function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\TaskDeleteCommand($handlerService, $outputService);
         },
-    'commit:create' => function () use ($handlerService, $outputService) {
+    'delete' => $delete,
+    'commit:create' => $commit = function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\CommitCreateCommand($handlerService, $outputService);
         },
-    'commit:edit' => function () use ($handlerService, $outputService) {
+    'commit' => $commit,
+    'beer' => $commit,
+    'commit:edit' => $edit = function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\CommitEditCommand($handlerService, $outputService);
         },
+    'edit' => $edit,
     'commit:delete' => function () use ($handlerService, $outputService) {
             return new Mediashare\Marathon\Command\CommitDeleteCommand($handlerService, $outputService);
         },
-    'git:gitignore' => function () {
+    'git:gitignore' => $gitignore = function () {
             return new Mediashare\Marathon\Command\GitGitignoreCommand();
         },
-    'version:upgrade' => function () {
+    'gitignore' => $gitignore,
+    'version:upgrade' => $upgrade = function () {
             return new Mediashare\Marathon\Command\VersionUpgradeCommand(new NativeHttpClient());
         },
+    'upgrade' => $upgrade,
+    'update' => $upgrade,
 ]);
 $app->setCommandLoader($commandsLoader);
 $app->run();

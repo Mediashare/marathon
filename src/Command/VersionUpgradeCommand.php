@@ -20,6 +20,9 @@ Class VersionUpgradeCommand extends Command {
     protected function configure() {
         $this
             ->setName('version:upgrade')
+            ->setAliases([
+                'upgrade', 'update',
+            ])
             ->setDescription('<comment>Update</comment> version of Marathon')
             ->addArgument('version', InputArgument::OPTIONAL, 'Marathon <comment>version</comment> to update', 'main')    
         ;

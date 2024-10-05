@@ -16,6 +16,9 @@ class CommitCreateCommand extends Command {
     protected function configure() {
         $this
             ->setName('commit:create')
+            ->setAliases([
+                'commit', 'beer',
+            ])
             ->setDescription('<comment>Creating</comment> new commit into task')
             ->addArgument('message', InputArgument::OPTIONAL, 'Define a commit <comment>message</comment>', false)
             ->addOption('editor', 'e', InputOption::VALUE_NONE, 'Open default message <comment>editor</comment>')

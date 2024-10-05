@@ -16,6 +16,9 @@ class TaskArchiveCommand extends Command {
     protected function configure() {
         $this
             ->setName('task:archive')
+            ->setAliases([
+                'archive',
+            ])
             ->setDescription('<comment>Archive</comment> the task')
             ->addArgument('task-id', InputArgument::REQUIRED, '<comment>Task ID</comment>')
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
