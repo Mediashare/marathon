@@ -16,8 +16,11 @@ class TaskArchiveCommand extends Command {
     protected function configure() {
         $this
             ->setName('task:archive')
-            ->setDescription('<comment>Archiving</comment> the task')
+            ->setDescription('<comment>Archive</comment> the task')
             ->addArgument('task-id', InputArgument::REQUIRED, '<comment>Task ID</comment>')
+            ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
+            ->addOption('remaining', 'r', InputOption::VALUE_REQUIRED, 'Set the <comment>remaining</comment> expected for task (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>")', false)
+            ->addOption('name', 'N', InputOption::VALUE_REQUIRED, 'Set the task <comment>name</comment>', false)
 
             // Config
             ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Set <comment>/file/path/to/json/config</comment>', false)
@@ -48,7 +51,11 @@ class TaskArchiveCommand extends Command {
                 $input->getOption('config-task-dir'),
                 $input->getOption('config-editor'),
                 $input->getArgument('task-id'),
-            )->taskArchive();
+            )->taskArchive(
+                name: $input->getOption('name'),
+                duration: $input->getOption('duration'),
+                remaining: $input->getOption('remaining'),
+            );
 
             // Output render into terminal
             $this->outputService
