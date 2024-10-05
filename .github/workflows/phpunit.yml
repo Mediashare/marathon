@@ -1,0 +1,27 @@
+name: Run PHPUnit Tests
+
+on:
+    push:
+        branches:
+            - '*'
+jobs:
+    run_tests:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.2'
+
+            - name: Install dependencies
+              run: composer install
+
+            - name: PHPUnit permissions
+              run: chmod +x ./bin/phpunit
+
+            - name: Run PHPUnit
+              run: ./bin/phpunit

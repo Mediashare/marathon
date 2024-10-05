@@ -1,0 +1,26 @@
+{
+    "chmod": "0755",
+    "main": "bin/marathon",
+    "output": "marathon",
+    "alias": "marathon",
+    "force-autodiscovery": true,
+    "directories": [
+        "src",
+        "vendor"
+    ],
+    "files": [
+        ".env",
+        "composer.json"
+    ],
+    "finder": [
+        {
+            "name": "*.php",
+            "exclude": ["Tests", "tests", "test"],
+            "in": "src"
+        }
+    ],
+    "banner": "*** Marathon (Version 1.2.8) ***",
+    "stub": true,
+    "dump-autoload": false,
+    "annotations": false
+}

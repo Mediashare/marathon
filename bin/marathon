@@ -1,0 +1,74 @@
+#!/usr/bin/env php
+<?php
+require __DIR__ . '/../vendor/autoload.php';
+
+
+$dotenv = new \Symfony\Component\Dotenv\Dotenv();
+$dotenv->load(__DIR__.'/../.env');
+
+if (!empty($_ENV['APP_ENV']) && strtolower($_ENV['APP_ENV']) === 'prod') {
+    error_reporting(E_ALL ^ E_DEPRECATED);
+}
+
+$app = new Symfony\Component\Console\Application(
+        'Marathon',
+        !empty($_ENV['APP_VERSION']) ? $_ENV['APP_VERSION'] : 'test'
+);
+
+$handlerService = new \Mediashare\Marathon\Service\HandlerService(
+    $configService = new \Mediashare\Marathon\Service\ConfigService(
+        $taskService = new \Mediashare\Marathon\Service\TaskService(
+            $stepService = new \Mediashare\Marathon\Service\StepService(
+                    $timestampService = new \Mediashare\Marathon\Service\TimestampService()
+            ),
+            $timestampService,
+            $serializer = new \Mediashare\Marathon\Service\SerializerService(
+                    $filesystem = new Symfony\Component\Filesystem\Filesystem()
+            ),
+            $filesystem
+        ), $serializer, $filesystem
+    ),
+    $taskService,
+    new \Mediashare\Marathon\Service\CommitService($stepService, new \Mediashare\Marathon\Service\EditorService($configService)),
+    $serializer,
+);
+
+$outputService = new \Mediashare\Marathon\Service\OutputService($timestampService);
+
+$commandsLoader = new \Symfony\Component\Console\CommandLoader\FactoryCommandLoader([
+    'task:list' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskListCommand($handlerService, $outputService);
+        },
+    'task:start' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskStartCommand($handlerService, $outputService);
+        },
+    'task:stop' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskStopCommand($handlerService, $outputService);
+        },
+    'task:status' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskStatusCommand($handlerService, $outputService);
+        },
+    'task:archive' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskArchiveCommand($handlerService, $outputService);
+        },
+    'task:delete' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\TaskDeleteCommand($handlerService, $outputService);
+        },
+    'commit:create' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\CommitCreateCommand($handlerService, $outputService);
+        },
+    'commit:edit' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\CommitEditCommand($handlerService, $outputService);
+        },
+    'commit:delete' => function () use ($handlerService, $outputService) {
+            return new Mediashare\Marathon\Command\CommitDeleteCommand($handlerService, $outputService);
+        },
+    'git:gitignore' => function () {
+            return new Mediashare\Marathon\Command\GitGitignoreCommand();
+        },
+    'version:upgrade' => function () {
+            return new Mediashare\Marathon\Command\VersionUpgradeCommand();
+        },
+]);
+$app->setCommandLoader($commandsLoader);
+$app->run();

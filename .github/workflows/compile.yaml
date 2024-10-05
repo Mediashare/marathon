@@ -1,0 +1,104 @@
+name: Compile marathon binary
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install Box builder
+        run: composer global require humbug/box
+
+      - name: Run PHPUnit tests & build Marathon project
+        run: |
+            make build
+
+      - name: Test marathon binary
+        run: php marathon list
+
+      - name: Check infinite loop
+        run: |
+            INFINITE_LOOP=$(if [ "${{ github.actor }}" == 'GitHub Action' ]; then echo 'true'; else echo 'false'; fi)
+            echo "INFINITE_LOOP=$INFINITE_LOOP" >> $GITHUB_ENV
+
+      - name: Get branch name
+        if: ${{ env.INFINITE_LOOP == 'false' }}
+        run: |
+            BRANCH=${GITHUB_REF#refs/heads/}
+            echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+      
+      - name: Get username
+        if: ${{ env.INFINITE_LOOP == 'false' && env.BRANCH != 'main' }}
+        run: |
+            USERNAME="$(git log -n 1 --pretty=format:%an)"
+            git config --global user.name "$USERNAME"
+            echo "USERNAME=$USERNAME" >> $GITHUB_ENV
+      
+      - name: Get email
+        if: ${{ env.INFINITE_LOOP == 'false' && env.BRANCH != 'main' }}
+        run: |
+            EMAIL=$(git log -n 1 --pretty=format:%ae)
+            git config --global user.email "$EMAIL"
+            echo "EMAIL=$EMAIL" >> $GITHUB_ENV
+
+      - name: Commit new marathon binary
+        if: ${{ env.INFINITE_LOOP == 'false' && env.BRANCH != 'main' }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+            commit_message: ${{ env.BRANCH }}/compilation
+            commit_user_name: ${{ env.USERNAME }}
+            commit_user_email: ${{ env.EMAIL }}
+
+      - name: Update tag for main branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+            if git show-ref --tags | grep 'refs/tags/${{ env.BRANCH }}$'; then
+                git tag -d ${{ env.BRANCH }}
+                git push origin ${{ env.BRANCH }}
+            fi
+            git tag -fa ${{ env.BRANCH }} -m "${{ env.USERNAME }} <${{ env.EMAIL }}>"
+            git push --follow-tags 
+
+      - name: Get merging branch name or last tag
+        if: github.ref == 'refs/heads/main'
+        run: |
+            if [[ "${{ github.event.pull_request.head.sha }}" != "" ]]; then
+              MERGING_BRANCH=$(git branch --contains ${{ github.event.pull_request.head.sha }} | grep -v 'main')
+              echo "TAG=$MERGING_BRANCH" >> $GITHUB_ENV
+            else
+              # Get last tag and increment the last part
+              git checkout main
+              LAST_TAG=$(git describe --tags --abbrev=0)
+              # Split the tag into an array
+              IFS='.' read -ra VERSION_PARTS <<< "$LAST_TAG"
+              # Increment the last part of the version
+              VERSION_PARTS[2]=$((VERSION_PARTS[2] + 1))
+              # Join the version parts back into a string
+              NEW_TAG="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.${VERSION_PARTS[2]}"
+              # Print the new tag
+              echo "TAG=$NEW_TAG" >> $GITHUB_ENV
+            fi
+
+      - name: Create or update GitHub release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+            tag_name: ${{ env.TAG }}
+            name: ${{ env.TAG }}
+            draft: false
+            prerelease: false
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

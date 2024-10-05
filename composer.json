@@ -1,0 +1,127 @@
+{
+    "name": "mediashare/marathon",
+    "description": "Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently manage times from tasks for your projects.",
+    "type": "library",
+    "keywords": [
+        "marathon",
+        "task",
+        "todo-list",
+        "todo",
+        "list",
+        "time",
+        "timer",
+        "time tracking",
+        "time management",
+        "task management",
+        "productivity",
+        "command line",
+        "projects",
+        "version control",
+        "commit history",
+        "workflow",
+        "developer tools"
+    ],
+    "homepage": "https://github.com/Mediashare/marathon",
+    "authors": [
+        {
+            "name": "Thibault Marquand",
+            "email": "thibault@marquand.pro"
+        }
+    ],
+    "prefer-stable": true,
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.2",
+        "ext-ctype": "*",
+        "ext-dom": "*",
+        "ext-iconv": "*",
+        "ext-tokenizer": "*",
+        "ext-xml": "*",
+        "ext-xmlwriter": "*",
+        "phppkg/cli-markdown": "^2.0",
+        "ramsey/collection": "^2.0",
+        "symfony/cache": "^7.1",
+        "symfony/console": "^7.1",
+        "symfony/dotenv": "^7.1",
+        "symfony/flex": "*",
+        "symfony/framework-bundle": "^7.1",
+        "symfony/polyfill-ctype": "^1.28",
+        "symfony/process": "^7.1",
+        "symfony/property-access": "^7.1",
+        "symfony/serializer": "^7.1",
+        "symfony/yaml": "^7.1",
+        "symfony/runtime": "^7.1"
+    },
+    "bin": ["marathon"],
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "bin-dir": "../../bin",
+        "allow-plugins": {
+            "symfony/flex": true,
+            "symfony/runtime": true
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Mediashare\\Marathon\\": "src/"
+        },
+        "classmap": ["bin/"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mediashare\\Marathon\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "paragonie/random_compat": "2.*",
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php71": "*",
+        "symfony/polyfill-php70": "*",
+        "symfony/polyfill-php56": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts",
+            "Mediashare\\Marathon\\Composer\\Installer::install"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts",
+            "Mediashare\\Marathon\\Composer\\Installer::install"
+        ],
+        "console-package": "php bin/marathon"
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "^7.1",
+            "console": "bin/console"
+        },
+        "marathon": {
+            "console": "bin/marathon"
+        }
+    },
+    "require-dev": {
+        "ext-dom": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-tokenizer": "*",
+        "ext-xml": "*",
+        "ext-xmlwriter": "*",
+        "phpunit/phpunit": "^9.5",
+        "symfony/browser-kit": "^7.1",
+        "symfony/css-selector": "^7.1",
+        "symfony/phpunit-bridge": "^7.1"
+    }
+}
