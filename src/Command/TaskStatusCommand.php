@@ -52,7 +52,7 @@ class TaskStatusCommand extends Command {
                 $input->getOption('config-task-dir'),
                 $input->getOption('config-editor'),
                 $input->getOption('new')
-                    ? ($input->getArgument('task-id') === false)
+                    ? ($input->getArgument('task-id') === null)
                         ? (new \DateTime())->format('YmdHis')
                         : $input->getArgument('task-id')
                     : $input->getArgument('task-id'),

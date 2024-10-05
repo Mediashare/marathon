@@ -51,7 +51,7 @@ class TaskListCommand extends Command {
                 $input->getOption('config-task-dir'),
                 $input->getOption('config-editor'),
                 $input->getOption('new')
-                    ? ($input->getOption('task-id') === false)
+                    ? ($input->getOption('task-id') === null)
                         ? (new \DateTime())->format('YmdHis')
                         : $input->getOption('task-id')
                     : $input->getOption('task-id'),
