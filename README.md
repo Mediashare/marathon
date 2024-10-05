@@ -48,7 +48,7 @@ Here are some examples of how to use Marathon:
   marathon task:start <?task-id>            Starting step of task
   marathon task:stop <?task-id>             Stoping step of task
   marathon task:status <?task-id>           Displaying status of task
-  marathon task:archive <task-id>           Archiving the task by ID
+  marathon task:archive <task-id>           Archive the task by ID
   marathon task:delete <task-id>            Deleting the task by ID
 
   marathon commit:create <?commit-message>  Creating new commit into task
@@ -103,7 +103,7 @@ marathon task:stop # Stop the current step of the task with the default duration
 marathon task:stop <?task-id> # Stop the task step with task ID.
 marathon task:stop 123 --duration 1h # Stop the task step with ID 123 and updates its duration to 1 hour.
 ```
-#### Archiving or deleting a task
+#### Archive or deleting a task
 ```bash
 marathon task:archive <task-id> # Archive the task with ID without stopping the current step.
 marathon task:archive 123 # Archive the task with ID 123.
