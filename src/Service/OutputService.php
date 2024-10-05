@@ -134,7 +134,7 @@ class OutputService {
             : $terminalWidth = (int) shell_exec('tput cols')
         ;
 
-        $this->maxWidthOfColumn = $terminalWidth - ($terminalWidth / 5);
+        $this->maxWidthOfColumn = $terminalWidth - (int) ($terminalWidth / 5);
 
         return $this;
     }
