@@ -21,6 +21,7 @@ class TaskStatusCommand extends Command {
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
             ->addOption('remaining', 'r', InputOption::VALUE_REQUIRED, 'Set the <comment>remaining</comment> expected for task (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>")', false)
             ->addOption('name', 'N', InputOption::VALUE_REQUIRED, 'Set the task <comment>name</comment>', false)
+            ->addOption('new', null, InputOption::VALUE_NONE, 'Creating <comment>new task</comment>')
 
             // Config
             ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Set <comment>/file/path/to/json/config</comment>', false)
@@ -50,7 +51,11 @@ class TaskStatusCommand extends Command {
                 $input->getOption('config-datetime-zone'),
                 $input->getOption('config-task-dir'),
                 $input->getOption('config-editor'),
-                $input->getArgument('task-id'),
+                $input->getOption('new')
+                    ? ($input->getArgument('task-id') === false)
+                        ? (new \DateTime())->format('YmdHis')
+                        : $input->getArgument('task-id')
+                    : $input->getArgument('task-id'),
             )->updateTask(
                 name: $input->getOption('name'),
                 duration: $input->getOption('duration'),
