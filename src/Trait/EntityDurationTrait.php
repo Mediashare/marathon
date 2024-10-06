@@ -27,7 +27,7 @@ trait EntityDurationTrait {
         );
     }
 
-    public function getSeconds(bool|null $onlyCurrentSteps = false): int {
+    public function getSeconds(bool|null $onlyCurrentSteps = false): int|null {
         switch (self::class) {
             case Task::class:
                 $seconds = array_sum(
@@ -55,7 +55,7 @@ trait EntityDurationTrait {
                 );
                 break;
             case Step::class:
-                $seconds = ($this->getEndDate() ?? (new \DateTime())->getTimestamp()) - $this->getStartDate();
+                $seconds = $this->seconds ? $this->seconds : (new \DateTime())->getTimestamp() - $this->getStartDate();
                 break;
             default: $seconds = 0;
         }

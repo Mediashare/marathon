@@ -101,9 +101,10 @@ class TaskService {
     public function start(bool|null $createItIfNotExist = true): self {
         $task = $this->getTask($createItIfNotExist)
             ->setRun(true)
-            ->setArchived(false);
+            ->setArchived(false)
+        ;
 
-        if (!$task->getStartDate() || (!($lastStep = $task->getSteps()?->last()) || $lastStep->getEndDate())):
+        if (!$task->getStartDate() || (!($lastStep = $task->getSteps()?->last()) || $lastStep->getSeconds())):
             $task
                 ->addStep(
                     $this->stepService->create()
@@ -123,12 +124,12 @@ class TaskService {
             ->getTask($createItIfNotExist)
             ->setRun(false);
 
-        if (($lastStep = $task->getSteps()?->last()) && !$lastStep->getEndDate()):
+        if (($lastStep = $task->getSteps()?->last()) && $lastStep->getSeconds() === null):
             $task
                 ->getSteps()
                 ->offsetSet(
                     $task->getSteps()->getKey($lastStep),
-                    $lastStep->setEndDate((new \DateTime())->getTimestamp()),
+                    $lastStep->setSeconds((new \DateTime())->getTimestamp() - $lastStep->getStartDate()),
                 );
         endif;
 

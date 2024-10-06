@@ -15,11 +15,11 @@
     "finder": [
         {
             "name": "*.php",
-            "exclude": ["Tests", "tests", "test"],
+            "exclude": ["Tests", "tests", "test", "Docs", "docs"],
             "in": "src"
         }
     ],
-    "banner": "*** Marathon (Version 0.1.2) ***",
+    "banner": "*** Marathon (Version 0.1.3) ***",
     "stub": true,
     "dump-autoload": false,
     "annotations": false

@@ -21,7 +21,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
-        $this->assertNull($step->getEndDate());
     }
 
     public function testCreateWithCustomStartDate(): void {
@@ -30,7 +29,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertEquals($customStartDate, $step->getStartDate());
-        $this->assertNull($step->getEndDate());
     }
 
     public function testCreateWithEndDate(): void {
@@ -39,7 +37,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
-        $this->assertEquals($endDate, $step->getEndDate());
     }
 
     public function testCreateStepWithCustomDates(): void {
@@ -50,8 +47,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertEquals($startDate, $step->getStartDate());
-        $this->assertEquals($endDate, $step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(86400, $step->getSeconds());
         $this->assertEquals('1d', $step->getDuration());
     }
@@ -68,8 +63,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertEquals($startDate, $step->getStartDate());
-        $this->assertEquals($endDate, $step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(172800, $step->getSeconds());
         $this->assertEquals('2d', $step->getDuration());
     }
@@ -83,8 +76,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
-        $this->assertNotNull($step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(300, $step->getSeconds());
         $this->assertEquals('5min', $step->getDuration());
     }
@@ -98,8 +89,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
-        $this->assertNotNull($step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(176700, $step->getSeconds());
         $this->assertEquals('2d 1h 5min', $step->getDuration());
     }
@@ -113,8 +102,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
-        $this->assertNotNull($step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(3719090, $step->getSeconds());
         $this->assertEquals('43d 1h 4min 50s', $step->getDuration());
     }
@@ -128,8 +115,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
-        $this->assertNotNull($step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(604800, $step->getSeconds());
         $this->assertEquals('7d', $step->getDuration());
     }
@@ -143,8 +128,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
-        $this->assertNotNull($step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(86400, $step->getSeconds());
         $this->assertEquals('1d', $step->getDuration());
     }
@@ -158,8 +141,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
-        $this->assertNotNull($step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(3600, $step->getSeconds());
         $this->assertEquals('1h', $step->getDuration());
     }
@@ -173,8 +154,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
-        $this->assertNotNull($step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(60, $step->getSeconds());
         $this->assertEquals('1min', $step->getDuration());
     }
@@ -188,8 +167,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertNotNull($step->getStartDate());
-        $this->assertNotNull($step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(1, $step->getSeconds());
         $this->assertEquals('1s', $step->getDuration());
     }
@@ -204,8 +181,6 @@ class StepServiceTest extends AbstractServiceTestCase {
 
         $this->assertInstanceOf(Step::class, $step);
         $this->assertEquals($customStartDate, $step->getStartDate());
-        $this->assertNotNull($step->getEndDate());
-        $this->assertGreaterThan($step->getStartDate(), $step->getEndDate());
         $this->assertEquals(7200, $step->getSeconds());
         $this->assertEquals('2h', $step->getDuration());
     }

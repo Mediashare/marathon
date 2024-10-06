@@ -5,6 +5,7 @@ use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\OutputService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\DescriptorHelper;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,7 +20,7 @@ class TaskListCommand extends Command {
                 'todo',
             ])
             ->setDescription('<comment>Displaying</comment> the tasks list')
-            ->addOption('task-id', 't', InputOption::VALUE_REQUIRED, '<comment>Task ID</comment>', null)
+            ->addArgument('task-id', InputArgument::OPTIONAL, '<comment>Task ID</comment>', null)
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
             ->addOption('remaining', 'r', InputOption::VALUE_REQUIRED, 'Set the <comment>remaining</comment> expected for task (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>")', false)
             ->addOption('name', 'N', InputOption::VALUE_REQUIRED, 'Set the task <comment>name</comment>', false)
@@ -54,10 +55,10 @@ class TaskListCommand extends Command {
                 $input->getOption('config-task-dir'),
                 $input->getOption('config-editor'),
                 $input->getOption('new')
-                    ? ($input->getOption('task-id') === null)
+                    ? ($input->getArgument('task-id') === null)
                         ? (new \DateTime())->format('YmdHis')
-                        : $input->getOption('task-id')
-                    : $input->getOption('task-id'),
+                        : $input->getArgument('task-id')
+                    : $input->getArgument('task-id'),
             )->updateTask(
                 name: $input->getOption('name'),
                 duration: $input->getOption('duration'),

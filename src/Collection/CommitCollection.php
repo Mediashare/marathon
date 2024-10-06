@@ -24,9 +24,9 @@ class CommitCollection extends AbstractCollection
         return array_search($commit, $this->data, true);
     }
 
-    public function allPrevious(Commit $commit): CommitCollection {
+    public function allPrevious(Commit $commit): self {
         $currentKey = $this->getKey($commit);
-        return new CommitCollection(
+        return new self(
             array_filter(
                 array_map(
                     static fn (Commit $commit, int $key) => $key < $currentKey ? $commit : null,

@@ -28,8 +28,8 @@ class EntityDurationTraitTest extends AbstractTraitTestCase {
     }
 
     public function testGetDurationForStep(): void {
-        $this->step->setStartDate(strtotime('2023-01-01 12:00:00'));
-        $this->step->setEndDate(strtotime('2023-01-01 13:30:00'));
+        $this->step->setStartDate($startDate = strtotime('2023-01-01 12:00:00'));
+        $this->step->setSeconds(strtotime('2023-01-01 13:30:00') - $startDate);
 
         $duration = $this->step->getDuration();
 
@@ -37,8 +37,8 @@ class EntityDurationTraitTest extends AbstractTraitTestCase {
     }
 
     public function testGetDurationForMonths(): void {
-        $this->step->setStartDate(strtotime('2023-01-01 12:00:00'));
-        $this->step->setEndDate(strtotime('2023-02-02 22:30:00'));
+        $this->step->setStartDate($startDate = strtotime('2023-01-01 12:00:00'));
+        $this->step->setSeconds(strtotime('2023-02-02 22:30:00') - $startDate);
 
         $duration = $this->step->getDuration();
 
@@ -46,8 +46,8 @@ class EntityDurationTraitTest extends AbstractTraitTestCase {
     }
 
     public function testGetDurationForDays(): void {
-        $this->step->setStartDate(strtotime('2023-01-01 12:00:00'));
-        $this->step->setEndDate(strtotime('2023-01-02 22:30:00'));
+        $this->step->setStartDate($startDate = strtotime('2023-01-01 12:00:00'));
+        $this->step->setSeconds(strtotime('2023-01-02 22:30:00') - $startDate);
 
         $duration = $this->step->getDuration();
 
@@ -55,8 +55,8 @@ class EntityDurationTraitTest extends AbstractTraitTestCase {
     }
 
     public function testGetDurationForHours(): void {
-        $this->step->setStartDate(strtotime('2023-01-01 12:00:00'));
-        $this->step->setEndDate(strtotime('2023-01-01 13:01:00'));
+        $this->step->setStartDate($startDate = strtotime('2023-01-01 12:00:00'));
+        $this->step->setSeconds(strtotime('2023-01-01 13:01:00') - $startDate);
 
         $duration = $this->step->getDuration();
 
@@ -64,8 +64,8 @@ class EntityDurationTraitTest extends AbstractTraitTestCase {
     }
 
     public function testGetDurationForMinutes(): void {
-        $this->step->setStartDate(strtotime('2023-01-01 12:00:00'));
-        $this->step->setEndDate(strtotime('2023-01-01 12:30:10'));
+        $this->step->setStartDate($startDate = strtotime('2023-01-01 12:00:00'));
+        $this->step->setSeconds(strtotime('2023-01-01 12:30:10') - $startDate);
 
         $duration = $this->step->getDuration();
 
@@ -73,8 +73,8 @@ class EntityDurationTraitTest extends AbstractTraitTestCase {
     }
 
     public function testGetDurationForSeconds(): void {
-        $this->step->setStartDate(strtotime('2023-01-01 12:00:00'));
-        $this->step->setEndDate(strtotime('2023-01-01 12:00:01'));
+        $this->step->setStartDate($startDate = strtotime('2023-01-01 12:00:00'));
+        $this->step->setSeconds(strtotime('2023-01-01 12:00:01') - $startDate);
 
         $duration = $this->step->getDuration();
 
@@ -100,8 +100,8 @@ class EntityDurationTraitTest extends AbstractTraitTestCase {
     }
 
     public function testGetSecondsForStep(): void {
-        $this->step->setStartDate(strtotime('2023-01-01 12:00:00'));
-        $this->step->setEndDate(strtotime('2023-01-01 13:30:00'));
+        $this->step->setStartDate($startDate = strtotime('2023-01-01 12:00:00'));
+        $this->step->setSeconds(strtotime('2023-01-01 13:30:00') - $startDate);
 
         $seconds = $this->step->getSeconds();
 
@@ -123,7 +123,7 @@ class EntityDurationTraitTest extends AbstractTraitTestCase {
         $startDate = strtotime('2023-01-01 00:00:00');
         $endDate = $startDate + $durationInSeconds;
         $step->setStartDate($startDate);
-        $step->setEndDate($endDate);
+        $step->setSeconds($endDate - $startDate);
 
         return $step;
     }
