@@ -17,7 +17,7 @@ class TaskStopCommand extends Command {
         $this
             ->setName('task:stop')
             ->setAliases([
-                'stop',
+                'stop', 'pause',
             ])
             ->setDescription('<comment>Stoping</comment> task step')
             ->addArgument('task-id', InputArgument::OPTIONAL, '<comment>Task ID</comment>', null)
