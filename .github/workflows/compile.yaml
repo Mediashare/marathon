@@ -27,7 +27,7 @@ jobs:
             make build
 
       - name: Test marathon binary
-        run: php marathon list
+        run: php marathon todo
 
       - name: Check infinite loop
         run: |
