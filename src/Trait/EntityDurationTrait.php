@@ -55,7 +55,7 @@ trait EntityDurationTrait {
                 );
                 break;
             case Step::class:
-                $seconds = $this->seconds ? $this->seconds : (new \DateTime())->getTimestamp() - $this->getStartDate();
+                $seconds = $this->seconds ? $this->seconds : ($this->getEndDate() !== null ? $this->getEndDate() : (new \DateTime())->getTimestamp()) - $this->getStartDate();
                 break;
             default: $seconds = 0;
         }
