@@ -134,10 +134,12 @@ Marathon provides several configuration options, edit the configuration file wit
 * `--config-datetime-format`: Set the DateTimeFormat for date format displayed.
 * `--config-datetime-zone`: Set the DateTimeZone for UTC used.
 * `--config-task-dir`: Set the directory path containing task files.
+* `--config-editor`: Set the default editor command to use to write commits messages.
 
 ```bash
-marathon task:start --config-path=/path/to/config/file --config-datetime-format="d/m/Y H:i:s" --config-datetime-zone="Europe/London" --config-task-dir=/path/to/tasks/directory
+marathon task:start --config-path=/path/to/config/file --config-datetime-format="d/m/Y H:i:s" --config-datetime-zone="Europe/London" --config-task-dir=/path/to/tasks/directory --config-editor vim
 ```
+
 Feel free to explore and make the most of Marathon to streamline your project management workflow!
 
 ## Contributing
