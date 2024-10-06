@@ -2,6 +2,7 @@
 
 namespace Mediashare\Marathon\Trait;
 
+use DateTime;
 use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Step;
 use Mediashare\Marathon\Entity\Task;
@@ -27,21 +28,22 @@ trait EntityDurationTrait {
         );
     }
 
-    public function getSeconds(bool|null $onlyCurrentSteps = false): int|null {
+    public function getSeconds(bool|null $onlyCurrentSteps = false, bool|null $isRun = false): int|null {
         switch (self::class) {
             case Task::class:
+                $isRun = $this->isRun();
                 $seconds = array_sum(
                     array_merge(
                         !$onlyCurrentSteps
                             ? $this
                                 ->getCommits()
                                 ->map(
-                                    static fn (Commit $commit) => $commit->getSeconds()
+                                    static fn (Commit $commit) => $commit->getSeconds(isRun: $isRun)
                                 )->toArray()
                             : [],
                         $this
                             ->getSteps()
-                            ->map(static fn (Step $step) => $step->getSeconds())
+                            ->map(static fn (Step $step) => $step->getSeconds(isRun: $isRun))
                             ->toArray(),
                     )
                 );
@@ -55,7 +57,15 @@ trait EntityDurationTrait {
                 );
                 break;
             case Step::class:
-                $seconds = $this->seconds ? $this->seconds : ($this->getEndDate() !== null ? $this->getEndDate() : (new \DateTime())->getTimestamp()) - $this->getStartDate();
+                $seconds = $this->seconds 
+                    ? $this->seconds 
+                    : ($this->getEndDate() 
+                        ? $this->getEndDate() - $this->getStartDate()
+                        : ($isRun 
+                            ? (new DateTime())->getTimestamp() - $this->getStartDate()
+                            : null
+                        )
+                    );
                 break;
             default: $seconds = 0;
         }
