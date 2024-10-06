@@ -23,7 +23,7 @@ class TaskCollection extends AbstractCollection
      * @return Task|null
      */
     public function lastUpdated(): Task|null {
-        return (new TaskCollection($this->data))->orderByDayDesc()->first();
+        return (new self($this->data))->orderByDayDesc()->first();
     }
 
     /**
@@ -34,39 +34,39 @@ class TaskCollection extends AbstractCollection
     }
 
     /**
-     * @return Task[]
+     * @return self
      */
-    public function usort(callable $callback): TaskCollection {
+    public function usort(callable $callback): self {
         $tasks = $this->data;
 
         usort($tasks, $callback);
 
-        return new TaskCollection($tasks);
+        return new self($tasks);
     }
 
     /**
-     * @return Task[]
+     * @return self
      */
-    public function orderByDayAsc(): TaskCollection {
+    public function orderByDayAsc(): self {
         return $this->usort(
             static fn (Task $a, Task $b)
             =>
-                ($a->getLastUpdateDate() ?? $a->getEndDate() ?? $a->getStartDate())
+                ($a->getLastUpdateDate() ?? $a->getStartDate())
                 -
-                ($b->getLastUpdateDate() ?? $b->getEndDate() ?? $b->getStartDate())
+                ($b->getLastUpdateDate() ?? $b->getStartDate())
         );
     }
 
     /**
-     * @return Task[]
+     * @return self
      */
-    public function orderByDayDesc(): TaskCollection {
+    public function orderByDayDesc(): self {
         return $this->usort(
             static fn (Task $a, Task $b)
             =>
-                ($b->getLastUpdateDate() ?? $b->getEndDate() ?? $b->getStartDate())
+                ($b->getLastUpdateDate() ?? $b->getStartDate())
                 -
-                ($a->getLastUpdateDate() ?? $a->getEndDate() ?? $a->getStartDate())
+                ($a->getLastUpdateDate() ?? $a->getStartDate())
         );
     }
 }

@@ -37,6 +37,7 @@ trait EntityDateTimeTrait {
         ;
     }
 
+    /** @deprecated 0.1.3 */
     public function getEndDate(): int|null {
         $endDate = null;
 
@@ -65,6 +66,7 @@ trait EntityDateTimeTrait {
         return $endDate;
     }
 
+    /** @deprecated 0.1.3 */
     public function getEndDateFormated(Config $config): string|null {
         return $this->getEndDate()
             ? (new \DateTime())

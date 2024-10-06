@@ -14,8 +14,8 @@ class StepService {
         int|null $endDate = null,
     ): Step {
         return (new Step())
-            ->setStartDate($startDate ?? (new \DateTime())->getTimestamp())
-            ->setEndDate($endDate)
+            ->setStartDate($startDate = $startDate ?? (new \DateTime())->getTimestamp())
+            ->setSeconds($endDate ? $endDate - $startDate : null)
         ;
     }
 
@@ -39,6 +39,7 @@ class StepService {
 
         return (new Step())
             ->setStartDate($startDate)
-            ->setEndDate($endDate);
+            ->setSeconds($endDate - $startDate)
+        ;
     }
 }

@@ -47,16 +47,16 @@ class CommitService {
             $commit->addStep(
                 $this->stepService->createWithCustomDuration(
                     $duration,
-                    ($lastStep = $task->getSteps()?->last())?->getEndDate()
-                        ? $lastStep->getStartDate()
-                        : null
+                    ($lastStep = $task->getSteps()?->last())?->getSeconds() !== null
+                    ? $lastStep->getStartDate()
+                    : null
                 )
             );
-        elseif (($steps = $task->getSteps())?->count() > 0):
-            if (($lastStep = $steps->last())->getEndDate() === null):
+        elseif (!($steps = $task->getSteps())?->isEmpty()):
+            if (($lastStep = $steps->last())->getSeconds() === null):
                 $task->getSteps()->offsetSet(
                     $task->getSteps()->getKey($lastStep),
-                    $lastStep->setEndDate((new \DateTime())->getTimestamp()),
+                    $lastStep->setSeconds((new \DateTime())->getTimestamp() - $lastStep->getStartDate()),
                 );
             endif;
 
