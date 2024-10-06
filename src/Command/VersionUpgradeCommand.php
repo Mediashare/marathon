@@ -3,27 +3,56 @@ namespace Mediashare\Marathon\Command;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 Class VersionUpgradeCommand extends Command {
     protected static $defaultName = 'version:upgrade';
 
+    public function __construct(
+        private readonly HttpClientInterface $client,
+    ) { 
+        parent::__construct();
+    }
+
     protected function configure() {
         $this
             ->setName('version:upgrade')
-            ->setDescription('<comment>Upgrading</comment> to latest version of Marathon');
+            ->setAliases([
+                'upgrade', 'update',
+            ])
+            ->setDescription('<comment>Update</comment> version of Marathon')
+            ->addArgument('version', InputArgument::OPTIONAL, 'Marathon <comment>version</comment> to update', 'main')    
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
+        $response = $this->client->request("GET", "https://api.github.com/repos/Mediashare/marathon/tags");
+        $tags = $response->toArray();
+        if (($version = $input->getArgument('version')) === 'main'):
+            $tag = $tags[0] ?? null;
+        else:
+            $tag = array_filter(
+                $tags,
+                static fn (array $tag) => $tag["name"] === $version
+            )[0] ?? null;
+        endif;
+
+        if (!$tag):
+            $output->writeln("The <error>$version</error> version was not found.");
+            $output->writeln("Versions list: <comment>main</comment>" . implode("", array_map(static fn (array $tag) => " | <comment>{$tag['name']}</comment>", $tags)));
+            return Command::INVALID;
+        endif;
+
         if (!\Phar::running()):
-            $output->writeln("<info>Use <comment>git pull</comment> for upgrade Marathon.</info>");
+            $output->writeln("<info>Use <comment>git fetch && git checkout {$version} && git pull</comment> for upgrade Marathon.</info>");
             return Command::INVALID;
         endif;
 
         $file = \Phar::running();
         $file = str_replace('phar://', '', $file);
-        $url = 'https://raw.githubusercontent.com/Mediashare/marathon/main/marathon';
         $tmp = tempnam(sys_get_temp_dir(), 'marathon');
         if (!is_writable(\pathinfo($tmp, PATHINFO_DIRNAME))):
             $text = "<error>You have not permission for write <comment>".$tmp."</comment> file.</error>";
@@ -34,14 +63,16 @@ Class VersionUpgradeCommand extends Command {
         endif;
 
         // Download
-        file_put_contents($tmp, file_get_contents($url));
+        $head = $version === 'main' ? $version : $tag['name'];
+        $marathonBin = "https://github.com/Mediashare/marathon/raw/refs/heads/$head/marathon";
+        file_put_contents($tmp, file_get_contents($marathonBin));
         if (!\file_exists($tmp)):
-            $text = "<error>Error download <comment>".$url."</comment>.</error>";
+            $text = "<error>Error download <comment>[".$marathonBin."]</comment>.</error>";
             $output->writeln($text);
             return Command::FAILURE;
         endif;
         
-        // Check version
+        // Check Version
         $filesystem = new Filesystem();
         // if (filesize($file) !== filesize($tmp)
         //     || md5_file($file) !== md5_file($tmp)):
@@ -55,7 +86,7 @@ Class VersionUpgradeCommand extends Command {
         $filesystem->rename($tmp, $file);
         $filesystem->chmod($file, 0755);
 
-        $output->writeln("<info>Marathon successly <comment>upgraded</comment>.</info>");
+        $output->writeln("<info>Marathon successly <comment>upgraded</comment> to {$tag['name']} version.</info>");
 
         return Command::SUCCESS;
     }

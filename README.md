@@ -3,7 +3,7 @@
 [![Marathon GitHub pull requests](https://img.shields.io/github/issues-pr/Mediashare/marathon.svg?style=flat)]()
 
 ## Introduction
-Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently **manage times from tasks for your projects**. 
+Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently **manage todo-list for your projects**. 
 It provides a comprehensive solution for maintaining a project-related activities through commit history.
 ### Features
 - **Commit:** Easily associate time entries with project commits to maintain a detailed history of actions taken during the development process.
@@ -48,7 +48,7 @@ Here are some examples of how to use Marathon:
   marathon task:start <?task-id>            Starting step of task
   marathon task:stop <?task-id>             Stoping step of task
   marathon task:status <?task-id>           Displaying status of task
-  marathon task:archive <task-id>           Archiving the task by ID
+  marathon task:archive <task-id>           Archive the task by ID
   marathon task:delete <task-id>            Deleting the task by ID
 
   marathon commit:create <?commit-message>  Creating new commit into task
@@ -103,7 +103,7 @@ marathon task:stop # Stop the current step of the task with the default duration
 marathon task:stop <?task-id> # Stop the task step with task ID.
 marathon task:stop 123 --duration 1h # Stop the task step with ID 123 and updates its duration to 1 hour.
 ```
-#### Archiving or deleting a task
+#### Archive or deleting a task
 ```bash
 marathon task:archive <task-id> # Archive the task with ID without stopping the current step.
 marathon task:archive 123 # Archive the task with ID 123.
@@ -134,10 +134,12 @@ Marathon provides several configuration options, edit the configuration file wit
 * `--config-datetime-format`: Set the DateTimeFormat for date format displayed.
 * `--config-datetime-zone`: Set the DateTimeZone for UTC used.
 * `--config-task-dir`: Set the directory path containing task files.
+* `--config-editor`: Set the default editor command to use to write commits messages.
 
 ```bash
-marathon task:start --config-path=/path/to/config/file --config-datetime-format="d/m/Y H:i:s" --config-datetime-zone="Europe/London" --config-task-dir=/path/to/tasks/directory
+marathon task:start --config-path=/path/to/config/file --config-datetime-format="d/m/Y H:i:s" --config-datetime-zone="Europe/London" --config-task-dir=/path/to/tasks/directory --config-editor vim
 ```
+
 Feel free to explore and make the most of Marathon to streamline your project management workflow!
 
 ## Contributing

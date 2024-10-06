@@ -45,12 +45,13 @@
         "symfony/dotenv": "^7.1",
         "symfony/flex": "*",
         "symfony/framework-bundle": "^7.1",
+        "symfony/http-client": "^7.1",
         "symfony/polyfill-ctype": "^1.28",
         "symfony/process": "^7.1",
         "symfony/property-access": "^7.1",
+        "symfony/runtime": "^7.1",
         "symfony/serializer": "^7.1",
-        "symfony/yaml": "^7.1",
-        "symfony/runtime": "^7.1"
+        "symfony/yaml": "^7.1"
     },
     "bin": ["marathon"],
     "config": {

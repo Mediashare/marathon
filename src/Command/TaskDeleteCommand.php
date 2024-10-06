@@ -16,6 +16,9 @@ class TaskDeleteCommand extends Command {
     protected function configure() {
         $this
             ->setName('task:delete')
+            ->setAliases([
+                'delete',
+            ])
             ->setDescription('<comment>Deleting</comment> the task')
             ->addArgument('task-id', InputArgument::REQUIRED, '<comment>Task ID</comment>')
 

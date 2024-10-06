@@ -69,6 +69,7 @@ class HandlerServiceTest extends AbstractServiceTestCase {
         $task = new Task();
         $this->taskService->method('setConfig')->willReturnSelf();
         $this->taskService->method('start')->willReturnSelf();
+        $this->taskService->method('update')->willReturnSelf();
         $this->taskService->method('getTask')->willReturn($task);
 
         $task = $this->handlerService->taskStart()->getTask();
@@ -104,6 +105,7 @@ class HandlerServiceTest extends AbstractServiceTestCase {
         $task = (new Task())->setArchived(true);
         $this->taskService->method('setConfig')->willReturnSelf();
         $this->taskService->method('archive')->willReturnSelf();
+        $this->taskService->method('update')->willReturnSelf();
         $this->taskService->method('getTask')->willReturn($task);
 
         $task = $this->handlerService->taskArchive()->getTask();

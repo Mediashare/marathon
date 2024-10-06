@@ -16,6 +16,9 @@ class TaskStartCommand extends Command {
     protected function configure() {
         $this
             ->setName('task:start')
+            ->setAliases([
+                'start', 'task:run', 'run',
+            ])
             ->setDescription('<comment>Starting</comment> step of task')
             ->addArgument('task-id', InputArgument::OPTIONAL, '<comment>Task ID</comment>', null)
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)

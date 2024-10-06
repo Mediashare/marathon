@@ -16,6 +16,9 @@ class TaskStopCommand extends Command {
     protected function configure() {
         $this
             ->setName('task:stop')
+            ->setAliases([
+                'stop',
+            ])
             ->setDescription('<comment>Stoping</comment> task step')
             ->addArgument('task-id', InputArgument::OPTIONAL, '<comment>Task ID</comment>', null)
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
@@ -56,7 +59,7 @@ class TaskStopCommand extends Command {
                         ? (new \DateTime())->format('YmdHis')
                         : $input->getArgument('task-id')
                     : $input->getArgument('task-id'),
-            )->taskStop()->updateTask(
+            )->taskStop(
                 name: $input->getOption('name'),
                 duration: $input->getOption('duration'),
                 remaining: $input->getOption('remaining'),

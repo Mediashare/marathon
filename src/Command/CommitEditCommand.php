@@ -16,6 +16,9 @@ class CommitEditCommand extends Command {
     protected function configure() {
         $this
             ->setName('commit:edit')
+            ->setAliases([
+                'edit',
+            ])
             ->setDescription('<comment>Editing</comment> the commit from task')
             ->addArgument('commit-id', InputArgument::REQUIRED, '<comment>Commit ID</comment>')
             ->addOption('editor', 'e', InputOption::VALUE_NONE, 'Open default message <comment>editor</comment>')
