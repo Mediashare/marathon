@@ -301,7 +301,7 @@ class OutputService {
 
         if ($message = $commit->getMessage()):
             $this->getSymfonyStyle()->write(
-                $this->wordWrap($this->markdownRender($message), $this->getMaxWidthOfColumn())
+                html_entity_decode($this->wordWrap($this->markdownRender($message), $this->getMaxWidthOfColumn()))
             );
         endif;
 
