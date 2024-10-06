@@ -83,7 +83,7 @@ Class VersionUpgradeCommand extends Command {
         $filesystem->rename($tmp, $file);
         $filesystem->chmod($file, 0755);
 
-        $output->writeln("<info>Marathon successly <comment>updated</comment> to <comment>{$tag['name']}</comment> version.</info>");
+        $output->writeln("<info>Marathon successly <comment>updated</comment> to <comment>{$version}</comment> version.</info>");
 
         return Command::SUCCESS;
     }
