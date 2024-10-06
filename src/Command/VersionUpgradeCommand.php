@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 Class VersionUpgradeCommand extends Command {
-    protected static $defaultName = 'version:upgrade';
+    protected static $defaultName = 'version:update';
 
     public function __construct(
         private readonly HttpClientInterface $client,
@@ -19,10 +19,7 @@ Class VersionUpgradeCommand extends Command {
 
     protected function configure() {
         $this
-            ->setName('version:upgrade')
-            ->setAliases([
-                'upgrade', 'update',
-            ])
+            ->setName('version:update')
             ->setDescription('<comment>Update</comment> version of Marathon')
             ->addArgument('version', InputArgument::OPTIONAL, 'Marathon <comment>version</comment> to update', 'main')    
         ;
@@ -47,7 +44,7 @@ Class VersionUpgradeCommand extends Command {
         endif;
 
         if (!\Phar::running()):
-            $output->writeln("<info>Use <comment>git fetch && git checkout {$version} && git pull</comment> for upgrade Marathon.</info>");
+            $output->writeln("<info>Use <comment>git fetch && git checkout {$version} && git pull</comment> for update Marathon.</info>");
             return Command::INVALID;
         endif;
 
@@ -86,7 +83,7 @@ Class VersionUpgradeCommand extends Command {
         $filesystem->rename($tmp, $file);
         $filesystem->chmod($file, 0755);
 
-        $output->writeln("<info>Marathon successly <comment>upgraded</comment> to {$tag['name']} version.</info>");
+        $output->writeln("<info>Marathon successly <comment>updated</comment> to <comment>{$version}</comment> version.</info>");
 
         return Command::SUCCESS;
     }

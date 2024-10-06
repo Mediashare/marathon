@@ -187,7 +187,7 @@ class OutputService {
             . ($taskArray['duration'] ? "<green-bold>" . $taskArray['duration'] . "</green-bold> " : "")
             . ((!empty($taskArray['current_steps']) && $taskArray['current_steps'] !== $taskArray['duration']) ? "<magenta-blink>(+". $taskArray['current_steps'] . ")</magenta-blink> " : "")
             . ($taskArray['remaining'] ? "🏋️‍♀️" . $taskArray['remaining'] . " " : "")
-            . ($taskArray['commits'] ? "🍻" . $taskArray['commits'] . " " : "")
+            . ($taskArray['commits'] ? "🍻<yellow>" . $taskArray['commits'] . "</yellow> " : "")
             . "<blue>[" . $taskArray['id']."]</blue>"
         );
 
@@ -301,7 +301,7 @@ class OutputService {
 
         if ($message = $commit->getMessage()):
             $this->getSymfonyStyle()->write(
-                $this->wordWrap($this->markdownRender($message), $this->getMaxWidthOfColumn())
+                htmlspecialchars_decode($this->wordWrap($this->markdownRender($message), $this->getMaxWidthOfColumn()))
             );
         endif;
 
