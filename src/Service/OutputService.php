@@ -268,7 +268,7 @@ class OutputService {
                         . ($task['duration'] ? "<green-bold>" . $task['duration'] . "</green-bold> " : "")
                         . ((!empty($task['current_steps']) && $task['current_steps'] !== $task['duration']) ? "<magenta>(+". $task['current_steps'] . ")</magenta> " : "")
                         . ($task['remaining'] ? "🏋️‍♀️" . $task['remaining'] . " " : "")
-                        . ($task['commits'] ? "🍻" . $task['commits'] . " " : "")
+                        . ($task['commits'] ? "🍻<yellow>" . $task['commits'] . "</yellow> " : "")
                         . "<blue>[" . $task['id']."]</blue>"
                     );
                 endforeach;
