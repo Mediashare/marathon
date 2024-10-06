@@ -9,6 +9,7 @@
 
 ###> mediashare/marathon ###
 .marathon*
+marathon.json
 .time-tracking
 .vscode
 .idea
