@@ -37,7 +37,7 @@ class TaskService {
      */
     public function getTasks(): TaskCollection {
         $taskCollection = new TaskCollection();
-        foreach (glob($this->config->getTaskDirectory() . DIRECTORY_SEPARATOR . '*') as $filepath):
+        foreach (glob($this->config->getTaskDirectory() . DIRECTORY_SEPARATOR . '*.json') as $filepath):
             $taskCollection->add($this->serializerService->read($filepath, Task::class));
         endforeach;
 

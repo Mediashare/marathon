@@ -8,8 +8,8 @@ use Mediashare\Marathon\Trait\EntityUnserializerTrait;
 class Config {
     use EntityUnserializerTrait;
 
-    public const CONFIG_PATH = '.'.DIRECTORY_SEPARATOR.'.marathon'.DIRECTORY_SEPARATOR.'config.json';
-    public const TASKS_DIRECTORY = '.'.DIRECTORY_SEPARATOR.'.marathon'.DIRECTORY_SEPARATOR.'tasks';
+    public const CONFIG_PATH = '.'.DIRECTORY_SEPARATOR.'marathon.json';
+    public const TASKS_DIRECTORY = '.'.DIRECTORY_SEPARATOR.'.marathon';
 
     public const DATETIME_FORMAT = 'd/m/Y H:i:s';
     public const DATETIME_ZONE = 'Europe/Paris';

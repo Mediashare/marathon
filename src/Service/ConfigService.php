@@ -40,7 +40,7 @@ class ConfigService {
             $configPath = $configPath ?: $this->getLastConfigPath(),
             $dateTimeFormat ?: $this->getLastDateTimeFormat(),
             $dateTimeZone ?: $this->getLastDateTimeZone()->getName(),
-            $taskDirectory = $taskDirectory ?: $this->getLastTaskDirectory(),
+            $taskDirectory ?: $this->getLastTaskDirectory(),
             $editor ?: $this->getLastEditor(),
             $taskId === false
                 ? null
