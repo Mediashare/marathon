@@ -186,7 +186,7 @@ class OutputService {
             . ($taskArray['name'] ? " <cyan>" . $taskArray['name'] . "</cyan> " : " ")
             . ($taskArray['duration'] ? "<green-bold>" . $taskArray['duration'] . "</green-bold> " : "")
             . ((!empty($taskArray['current_steps']) && $taskArray['current_steps'] !== $taskArray['duration']) ? "<magenta-blink>(+". $taskArray['current_steps'] . ")</magenta-blink> " : "")
-            . ($taskArray['remaining'] ? "🏋️" . $taskArray['remaining'] . " " : "")
+            . ($taskArray['remaining'] ? "🏋️‍" . $taskArray['remaining'] . " " : "")
             . ($taskArray['commits'] ? "🍻<yellow>" . $taskArray['commits'] . "</yellow> " : "")
             . "<blue>[" . $taskArray['id']."]</blue>"
         );
@@ -267,8 +267,8 @@ class OutputService {
                         . ($task['name'] ? " <cyan>" . $task['name'] . "</cyan> " : " ")
                         . ($task['duration'] ? "<green-bold>" . $task['duration'] . "</green-bold> " : "")
                         . ((!empty($task['current_steps']) && $task['current_steps'] !== $task['duration']) ? "<magenta>(+". $task['current_steps'] . ")</magenta> " : "")
-                        . ($task['remaining'] ? "🏋️" . $task['remaining'] . " " : "")
-                        . ($task['commits'] ? "🍻<yellow>" . $task['commits'] . "</yellow> " : "")
+                        . ($task['remaining'] ? "🏋️‍" . $task['remaining'] . " " : "")
+                        . ($task['commits'] ? "🍻" . $task['commits'] . " " : "")
                         . "<blue>[" . $task['id']."]</blue>"
                     );
                 endforeach;

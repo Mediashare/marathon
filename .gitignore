@@ -8,7 +8,7 @@
 ###< symfony/framework-bundle ###
 
 ###> mediashare/marathon ###
-.marathon
+.marathon*
 marathon.json
 .time-tracking
 .vscode
