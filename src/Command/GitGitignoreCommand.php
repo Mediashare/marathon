@@ -12,9 +12,6 @@ class GitGitignoreCommand extends Command {
     protected function configure() {
         $this
             ->setName('git:gitignore')
-            ->setAliases([
-                'gitignore',
-            ])
             ->setDescription('Adding <comment>.marathon</comment> rule into <comment>.gitgnore</comment>')
         ;
     }

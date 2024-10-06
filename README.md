@@ -56,7 +56,7 @@ Here are some examples of how to use Marathon:
   marathon commit:delete <commit-id>        Deleting the commit from task
   
   marathon git:gitignore                    Adding .marathon rule into .gitgnore
-  marathon version:upgrade                  Upgrading to latest version of Marathon
+  marathon version:update                   Update to latest version of Marathon
 ```
 ### Task Workflow
 #### Creating a task
@@ -123,9 +123,9 @@ Adding Marathon rule to .gitignore
 ```bash
 marathon git:gitignore # Add the .marathon rule to your project .gitignore file.
 ```
-### Upgrading Marathon to the latest version
+### Update Marathon to the latest version
 ```bash
-marathon version:upgrade # Upgrade Marathon to the latest version.
+marathon version:update # Update Marathon to the latest version.
 ```
 ### Configuration Options
 Marathon provides several configuration options, edit the configuration file with the given parameters, that you can customize:

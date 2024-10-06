@@ -70,16 +70,7 @@ $commandsLoader = new \Symfony\Component\Console\CommandLoader\FactoryCommandLoa
     'git:gitignore' => function () {
             return new Mediashare\Marathon\Command\GitGitignoreCommand();
         },
-    'gitignore' => function () {
-            return new Mediashare\Marathon\Command\GitGitignoreCommand();
-        },
-    'version:upgrade' => function () {
-            return new Mediashare\Marathon\Command\VersionUpgradeCommand(new NativeHttpClient());
-        },
-    'update' => function () {
-            return new Mediashare\Marathon\Command\VersionUpgradeCommand(new NativeHttpClient());
-        },
-    'upgrade' => function () {
+    'version:update' => function () {
             return new Mediashare\Marathon\Command\VersionUpgradeCommand(new NativeHttpClient());
         },
 ]);
