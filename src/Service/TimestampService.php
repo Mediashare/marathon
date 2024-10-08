@@ -44,7 +44,7 @@ class TimestampService {
 
         $interval = $startDate->diff($endDate);
 
-        $prefix = $startDate > $endDate ? "+" : "";
+        $prefix = $startDate > $endDate ? "+" : " ";
         $color = $startDate > $endDate
             ? ($running ? "red-blink" : "red")
             : ($running ? "green-blink" : "green")

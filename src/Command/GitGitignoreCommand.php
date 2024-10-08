@@ -12,15 +12,15 @@ class GitGitignoreCommand extends Command {
     protected function configure() {
         $this
             ->setName('git:gitignore')
-            ->setDescription('Adding <comment>.marathon</comment> rule into <comment>.gitgnore</comment>')
+            ->setDescription('Adding <comment>.marathon</comment> && <comment>marathon.json</comment> rule into <comment>.gitgnore</comment>')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
         if (file_exists($filepath = './.gitignore')):
             $currentContent = file_get_contents($filepath);
-            if (str_contains($currentContent, '.marathon')):
-                $output->writeln("<info><comment>.gitignore</comment> contains already <comment>.marathon</comment> rule.</info>");
+            if (str_contains($currentContent, '.marathon') && str_contains($currentContent, 'marathon.json')):
+                $output->writeln("<info><comment>.gitignore</comment> contains already <comment>.marathon</comment> && <comment>marathon.json</comment> rule.</info>");
                 return Command::SUCCESS;
             endif;
         endif;
@@ -38,11 +38,11 @@ class GitGitignoreCommand extends Command {
         else:
             $output->writeln('<info><comment>'.$filepath.'</comment> creating</info>');
         endif;
-        $content .= "###> mediashare/marathon ###\n.marathon\n###< mediashare/marathon ###\n";
+        $content .= "###> mediashare/marathon ###\n.marathon\nmarathon.json\n###< mediashare/marathon ###\n";
 
         file_put_contents($filepath, $content, FILE_APPEND);
 
-        $output->writeln('<info>Adding <comment>.marathon</comment> rule into <comment>'.$filepath.'</comment></info>');
+        $output->writeln('<info>Adding <comment>.marathon</comment> && <comment>marathon.json</comment> rule into <comment>'.$filepath.'</comment></info>');
 
         return Command::SUCCESS;
     }

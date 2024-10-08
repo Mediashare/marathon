@@ -11,8 +11,8 @@ class AbstractServiceTestCase extends TestCase {
 
     public function setUp(): void {
         $this->marathonDirectory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'marathon';
-        $this->configPath = $this->marathonDirectory . DIRECTORY_SEPARATOR . 'config.json';
-        $this->taskDirectory = $this->marathonDirectory . DIRECTORY_SEPARATOR . 'tasks';
+        $this->configPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'marathon.json';
+        $this->taskDirectory = $this->marathonDirectory;
 
         @mkdir($this->marathonDirectory, recursive: true);
         @mkdir($this->taskDirectory, recursive: true);
