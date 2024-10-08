@@ -110,8 +110,8 @@ class HandlerService {
         return $this->setTask(
             $this->taskService
                 ->setConfig($this->getConfig())
-                ->start(createItIfNotExist: true)
                 ->update($name, $duration, $remaining)
+                ->start()
                 ->getTask()
         )->writeTask();
     }
@@ -129,8 +129,8 @@ class HandlerService {
         return $this->setTask(
             $this->taskService
                 ->setConfig($this->getConfig())
-                ->stop(createItIfNotExist: true)
                 ->update($name, $duration, $remaining)
+                ->stop()
                 ->getTask()
         )->writeTask();
     }
@@ -148,8 +148,8 @@ class HandlerService {
         return $this->setTask(
             $this->taskService
                 ->setConfig($this->getConfig())
-                ->archive()
                 ->update($name, $duration, $remaining)
+                ->archive()
                 ->getTask()
         )->writeTask();
     }
