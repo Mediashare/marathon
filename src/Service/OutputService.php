@@ -206,31 +206,70 @@ class OutputService {
             ]);
             return $this;
         endif;
+
+        $dateFiltered = false;
+        if (
+            ($input = $this->getInput())->getOption('today')
+            || $input->getOption('yesterday')
+            || $input->getOption('weekly')
+            || $input->getOption('monthly')
+        ):
+            $dateFiltered = true;
+        endif;
+
         foreach ($tasks ?? [] as $task):
-            $lastUpdateDate = (new \DateTime(timezone: $this->getConfig()->getDateTimeZone()))->setTimestamp($task->getLastUpdateDate());
-            $startDate = (new \DateTime(timezone: $this->getConfig()->getDateTimeZone()))->setTimestamp($task->getStartDate());
-            $now = new \DateTime(timezone: $this->getConfig()->getDateTimeZone());
+            $lastUpdateDate = (new \DateTime())->setTimestamp($task->getLastUpdateDate());
+            $startDate = (new \DateTime())->setTimestamp($task->getStartDate());
+            $now = new \DateTime();
             if (
-                $lastUpdateDate->format('Y-m-d') === $now->format('Y-m-d')
-                || $startDate->format('Y-m-d') === $now->format('Y-m-d')
+                (
+                    $lastUpdateDate->format('Y-m-d') === $now->format('Y-m-d')
+                    || $startDate->format('Y-m-d') === $now->format('Y-m-d')
+                ) && (
+                    $dateFiltered === false
+                    || $input->getOption('today')
+                    || $input->getOption('yesterday')
+                    || $input->getOption('weekly')
+                    || $input->getOption('monthly')
+                ) && $input->getOption('archived') === $task->isArchived()
             ):
                 $tables[0][] = $task;
             elseif (
-                $lastUpdateDate->format('Y-m-d') === ($yesterday = $now->modify('-1day'))->format('Y-m-d')
-                || $startDate->format('Y-m-d') === $yesterday->format('Y-m-d')
+                (
+                    $lastUpdateDate->format('Y-m-d') === ($yesterday = $now->modify('-1day'))->format('Y-m-d')
+                    || $startDate->format('Y-m-d') === $yesterday->format('Y-m-d')
+                ) && (
+                    $dateFiltered === false
+                    || $input->getOption('yesterday')
+                    || $input->getOption('weekly')
+                    || $input->getOption('monthly')
+                ) && $input->getOption('archived') === $task->isArchived()
             ):
                 $tables[1][] = $task;
             elseif (
-                $task->getLastUpdateDate() >= ($week = $now->modify('-1week')->getTimestamp())
-                || $task->getStartDate() >= $week
+                (
+                    $task->getLastUpdateDate() >= ($week = $now->modify('-1week')->getTimestamp())
+                    || $task->getStartDate() >= $week
+                ) && (
+                    $dateFiltered === false
+                    || $input->getOption('weekly')
+                    || $input->getOption('monthly')
+                ) && $input->getOption('archived') === $task->isArchived()
             ):
                 $tables[2][] = $task;
             elseif (
-                $task->getLastUpdateDate() >= ($month = $now->modify('-1month')->getTimestamp())
-                || $task->getStartDate() >= $month
+                (
+                    $task->getLastUpdateDate() >= ($month = $now->modify('-1month')->getTimestamp())
+                    || $task->getStartDate() >= $month
+                )
+                && ($dateFiltered === false || $input->getOption('monthly'))
+                && $input->getOption('archived') === $task->isArchived()
             ):
                 $tables[3][] = $task;
-            else:
+            elseif (
+                $dateFiltered === false
+                && $input->getOption('archived') === $task->isArchived()
+            ):
                 $tables[4][] = $task;
             endif;
         endforeach;

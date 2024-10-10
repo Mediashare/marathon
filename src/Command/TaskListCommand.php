@@ -26,9 +26,16 @@ class TaskListCommand extends Command {
             ->addOption('name', 'N', InputOption::VALUE_REQUIRED, 'Set the task <comment>name</comment>', false)
             ->addOption('new', null, InputOption::VALUE_NONE, 'Creating <comment>new task</comment>')
 
+            // Displaying options
+            ->addOption('today', 't', InputOption::VALUE_NONE, 'Display <comment>today\'s</comment> tasks')
+            ->addOption('yesterday', 'y', InputOption::VALUE_NONE, 'Display <comment>yesterday\'s</comment> tasks')
+            ->addOption('weekly', 'w', InputOption::VALUE_NONE, 'Display of <comment>weekly</comment> tasks')
+            ->addOption('monthly', 'm', InputOption::VALUE_NONE, 'Display of <comment>monthly</comment> tasks')
+            ->addOption('archived', 'a', InputOption::VALUE_NONE, '<comment>Archived</comment> tasks display')
+
             // Config
-            ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Set <comment>/file/path/to/json/config</comment>', false)
-            ->addOption('config-task-dir', 'p', InputOption::VALUE_REQUIRED, 'Set <comment>/directory/path/to/tasks</comment> containing a reports', false)
+            ->addOption('config-path', 'C', InputOption::VALUE_REQUIRED, 'Set <comment>/file/path/to/json/config</comment>', false)
+            ->addOption('config-task-dir', 'P', InputOption::VALUE_REQUIRED, 'Set <comment>/directory/path/to/tasks</comment> containing a reports', false)
             ->addOption('config-editor', 'E', InputOption::VALUE_REQUIRED, 'Set default <comment>editor</comment> (ex: "<comment>nano</comment>", "<comment>vim</comment>")', false)
         ;
     }
