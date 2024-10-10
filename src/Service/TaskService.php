@@ -104,7 +104,7 @@ class TaskService {
             ->setArchived(false)
         ;
 
-        if (!$task->getStartDate() || (!($lastStep = $task->getSteps()?->last()) || $lastStep->getSeconds())):
+        if (!$task->getStartDate() || (!($lastStep = $task->getSteps()?->last()) || $lastStep->getSeconds() !== null)):
             $task
                 ->addStep(
                     $this->stepService->create()

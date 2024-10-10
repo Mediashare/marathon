@@ -14,7 +14,6 @@ class EntityUnserializerTraitTest extends TestCase {
 
     public function testUnserializeConfig(): void {
         $serializedData = [
-            'dateTimeFormat' => 'Y-m-d H:i:s',
             'taskDirectory' => '/path/to/tasks',
             'taskId' => '123',
         ];
@@ -22,7 +21,6 @@ class EntityUnserializerTraitTest extends TestCase {
         $config = new Config();
         $config->__unserialize($serializedData);
 
-        $this->assertEquals('Y-m-d H:i:s', $config->getDateTimeFormat());
         $this->assertEquals('/path/to/tasks', $config->getTaskDirectory());
         $this->assertEquals('123', $config->getTaskId());
     }
@@ -68,6 +66,5 @@ class EntityUnserializerTraitTest extends TestCase {
         $step->__unserialize($serializedData);
 
         $this->assertEquals($startDate, $step->getStartDate());
-        $this->assertEquals($endDate, $step->getEndDate());
     }
 }

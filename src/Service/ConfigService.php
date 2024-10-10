@@ -3,7 +3,6 @@
 namespace Mediashare\Marathon\Service;
 
 use Mediashare\Marathon\Entity\Task;
-use Mediashare\Marathon\Exception\DateTimeZoneException;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -21,13 +20,10 @@ class ConfigService {
     /**
      * @throws FileNotFoundException
      * @throws JsonDecodeException
-     * @throws DateTimeZoneException
      * @throws \JsonException
      */
     public function setConfig(
         string|false $configPath = false,
-        string|false $dateTimeFormat = false,
-        string|false $dateTimeZone = false,
         string|false $taskDirectory = false,
         string|false $editor = false,
         string|null|false $taskId = null,
@@ -38,8 +34,6 @@ class ConfigService {
 
         $this->config = new Config(
             $configPath = $configPath ?: $this->getLastConfigPath(),
-            $dateTimeFormat ?: $this->getLastDateTimeFormat(),
-            $dateTimeZone ?: $this->getLastDateTimeZone()->getName(),
             $taskDirectory ?: $this->getLastTaskDirectory(),
             $editor ?: $this->getLastEditor(),
             $taskId === false
@@ -91,22 +85,6 @@ class ConfigService {
      */
     public function getLastConfigPath(): string {
         return $this->getLastConfig()->getConfigPath();
-    }
-
-    /**
-     * @throws JsonDecodeException
-     * @throws FileNotFoundException
-     */
-    public function getLastDateTimeFormat(): string {
-        return $this->getLastConfig()->getDateTimeFormat();
-    }
-
-    /**
-     * @throws JsonDecodeException
-     * @throws FileNotFoundException
-     */
-    public function getLastDateTimeZone(): \DateTimeZone {
-        return $this->getLastConfig()->getDateTimeZone();
     }
 
     /**

@@ -31,12 +31,12 @@ class CommitService {
     public function create(
         string|null $message = null,
         string|null $duration = null,
-        bool $editor = false,
+        bool|null $editor = false,
     ): self {
         $task = $this->getTask();
 
         if ($editor):
-            $message = $this->editorService->getMessageFromEditor();
+            $message = $this->editorService->getMessageFromEditor($message);
         endif;
 
         $commit = (new Commit())
