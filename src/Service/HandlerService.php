@@ -6,7 +6,6 @@ use Mediashare\Marathon\Collection\TaskCollection;
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
-use Mediashare\Marathon\Exception\DateTimeZoneException;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
 use Mediashare\Marathon\Exception\CommandMissingLeastOnceOptionException;
@@ -28,20 +27,15 @@ class HandlerService {
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      * @throws \JsonException
-     * @throws DateTimeZoneException
      */
     public function writeConfig(
         string|false $configPath = false,
-        string|false $dateTimeFormat = false,
-        string|false $dateTimeZone = false,
         string|false $taskDirectory = false,
         string|false $editor = false,
         string|null $taskId = null,
     ): self {
         $this->config = $this->configService->setConfig(
             $configPath,
-            $dateTimeFormat,
-            $dateTimeZone,
             $taskDirectory,
             $editor,
             $taskId,

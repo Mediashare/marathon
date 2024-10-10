@@ -14,7 +14,6 @@ class ArrayToEntityTraitTest extends TestCase {
 
     public function testArrayToEntityWithConfig(): void {
         $array = [
-            'dateTimeFormat' => 'Y-m-d H:i:s',
             'taskDirectory' => '/path/to/tasks',
             'taskId' => '123',
         ];
@@ -22,7 +21,6 @@ class ArrayToEntityTraitTest extends TestCase {
         $result = $this->arrayToEntity($array, Config::class);
 
         $this->assertInstanceOf(Config::class, $result);
-        $this->assertEquals('Y-m-d H:i:s', $result->getDateTimeFormat());
         $this->assertEquals('/path/to/tasks', $result->getTaskDirectory());
         $this->assertEquals('123', $result->getTaskId());
     }
@@ -67,6 +65,5 @@ class ArrayToEntityTraitTest extends TestCase {
 
         $this->assertInstanceOf(Step::class, $result);
         $this->assertEquals($startDate, $result->getStartDate());
-        $this->assertEquals($endDate, $result->getEndDate());
     }
 }

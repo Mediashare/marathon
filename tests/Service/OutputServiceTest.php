@@ -2,7 +2,6 @@
 
 namespace Mediashare\Marathon\Tests\Service;
 
-use Mediashare\Marathon\Exception\DateTimeZoneException;
 use Mediashare\Marathon\Service\TimestampService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Mediashare\Marathon\Service\OutputService;
@@ -11,9 +10,6 @@ class OutputServiceTest extends KernelTestCase {
     private OutputService $outputService;
     private TimestampService $timestampService;
 
-    /**
-     * @throws DateTimeZoneException
-     */
     public function setUp(): void {
         parent::setUp();
 
