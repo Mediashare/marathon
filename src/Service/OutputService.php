@@ -75,6 +75,9 @@ class OutputService {
         $this->output->getFormatter()->setStyle('black-blink', $blackBlink);
 
         $this->cliMarkdown = new CliMarkdown();
+        $this->cliMarkdown->setTheme([
+            'inlineCode' => 'cyan',
+        ]);
     }
 
     private InputInterface $input;
