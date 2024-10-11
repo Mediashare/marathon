@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Emoji\EmojiTransliterator;
 
 class OutputService {
     public function __construct(
@@ -99,12 +100,16 @@ class OutputService {
         $this->cliMarkdown->setTheme([
             'inlineCode' => 'cyan-bg',
         ]);
+
+        $this->transliterator = EmojiTransliterator::create('text-emoji');
     }
 
     private InputInterface $input;
     private OutputInterface $output;
 
     private CliMarkdown $cliMarkdown;
+
+    private EmojiTransliterator $transliterator;
 
     private Config $config;
     private TaskCollection|Task $task;
@@ -156,6 +161,10 @@ class OutputService {
 
     private function getTask(): TaskCollection|Task {
         return $this->task;
+    }
+
+    private function getTransliterator(): EmojiTransliterator {
+        return $this->transliterator;
     }
 
     public function setMaxWidthOfColumn(): self {
@@ -363,12 +372,21 @@ class OutputService {
         );
 
         if ($message = $commit->getMessage()):
-            $this->getSymfonyStyle()->write(
-                htmlspecialchars_decode($this->wordWrap($this->markdownRender($message), $this->getMaxWidthOfColumn()))
-            );
+            $this->getSymfonyStyle()->write($this->renderMessage($message));
         endif;
 
         return $this;
+    }
+
+    private function renderMessage(string $message): string {
+        return htmlspecialchars_decode(
+            $this->wordWrap(
+                $this->markdownRender(
+                    $this->getTransliterator()->transliterate($message) ?? $message
+                ),
+                $this->getMaxWidthOfColumn()
+            )
+        );
     }
 
     public function markdownRender(string $markdown): string {
