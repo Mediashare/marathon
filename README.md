@@ -8,6 +8,7 @@ It provides a comprehensive solution for maintaining a project-related activitie
 ### Features
 - **Commit:** Easily associate time entries with project commits to maintain a history of actions taken during the task.
 - **Remaining time:** Organize your time into tasks with time remaining.
+- **Emojies supports:** (:dizzy: `:dizzy:`, :pencil: `:pencil:`, :beer: `:beer:` ect...) 5000+ emojies supported into commit message.
 - **Markdown support:** Implementation of markdown synthax into commit message.
 - **Custom tags supports:** (`<red>`, `<green-bg>`, `<bold>` ect...) Implemented into commit message.
 ## Installation
