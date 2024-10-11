@@ -74,6 +74,20 @@ class OutputService {
         $blackBlink = new OutputFormatterStyle('black', options: ['blink']);
         $this->output->getFormatter()->setStyle('black-blink', $blackBlink);
 
+
+        $whiteBackground = new OutputFormatterStyle('black', 'white');
+        $this->output->getFormatter()->setStyle('white-bg', $whiteBackground);
+        $blackBackground = new OutputFormatterStyle('white', 'black');
+        $this->output->getFormatter()->setStyle('black-bg', $blackBackground);
+        $cyanBackground = new OutputFormatterStyle('black', 'cyan');
+        $this->output->getFormatter()->setStyle('cyan-bg', $cyanBackground);
+        $magentaBackground = new OutputFormatterStyle('black', 'magenta');
+        $this->output->getFormatter()->setStyle('magenta-bg', $magentaBackground);
+        $yellowBackground = new OutputFormatterStyle('black', 'yellow');
+        $this->output->getFormatter()->setStyle('yellow-bg', $yellowBackground);
+        $blueBackground = new OutputFormatterStyle('black', 'blue');
+        $this->output->getFormatter()->setStyle('blue-bg', $blueBackground);
+
         $this->cliMarkdown = new CliMarkdown();
         $this->cliMarkdown->setTheme([
             'inlineCode' => 'cyan',
