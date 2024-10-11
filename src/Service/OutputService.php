@@ -92,9 +92,12 @@ class OutputService {
         $greenBackground = new OutputFormatterStyle('black', 'green');
         $this->output->getFormatter()->setStyle('green-bg', $greenBackground);
 
+        $bold = new OutputFormatterStyle('default', options: ['bold']);
+        $this->output->getFormatter()->setStyle('bold', $bold);
+
         $this->cliMarkdown = new CliMarkdown();
         $this->cliMarkdown->setTheme([
-            'inlineCode' => 'cyan',
+            'inlineCode' => 'cyan-bg',
         ]);
     }
 
