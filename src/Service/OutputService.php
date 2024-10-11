@@ -87,6 +87,10 @@ class OutputService {
         $this->output->getFormatter()->setStyle('yellow-bg', $yellowBackground);
         $blueBackground = new OutputFormatterStyle('black', 'blue');
         $this->output->getFormatter()->setStyle('blue-bg', $blueBackground);
+        $redBackground = new OutputFormatterStyle('black', 'red');
+        $this->output->getFormatter()->setStyle('red-bg', $redBackground);
+        $greenBackground = new OutputFormatterStyle('black', 'green');
+        $this->output->getFormatter()->setStyle('green-bg', $greenBackground);
 
         $this->cliMarkdown = new CliMarkdown();
         $this->cliMarkdown->setTheme([
