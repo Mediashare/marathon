@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Emoji\EmojiTransliterator;
 
 class OutputService {
     public function __construct(
@@ -74,13 +75,41 @@ class OutputService {
         $blackBlink = new OutputFormatterStyle('black', options: ['blink']);
         $this->output->getFormatter()->setStyle('black-blink', $blackBlink);
 
+
+        $whiteBackground = new OutputFormatterStyle('black', 'white');
+        $this->output->getFormatter()->setStyle('white-bg', $whiteBackground);
+        $blackBackground = new OutputFormatterStyle('white', 'black');
+        $this->output->getFormatter()->setStyle('black-bg', $blackBackground);
+        $cyanBackground = new OutputFormatterStyle('black', 'cyan');
+        $this->output->getFormatter()->setStyle('cyan-bg', $cyanBackground);
+        $magentaBackground = new OutputFormatterStyle('black', 'magenta');
+        $this->output->getFormatter()->setStyle('magenta-bg', $magentaBackground);
+        $yellowBackground = new OutputFormatterStyle('black', 'yellow');
+        $this->output->getFormatter()->setStyle('yellow-bg', $yellowBackground);
+        $blueBackground = new OutputFormatterStyle('black', 'blue');
+        $this->output->getFormatter()->setStyle('blue-bg', $blueBackground);
+        $redBackground = new OutputFormatterStyle('black', 'red');
+        $this->output->getFormatter()->setStyle('red-bg', $redBackground);
+        $greenBackground = new OutputFormatterStyle('black', 'green');
+        $this->output->getFormatter()->setStyle('green-bg', $greenBackground);
+
+        $bold = new OutputFormatterStyle('default', options: ['bold']);
+        $this->output->getFormatter()->setStyle('bold', $bold);
+
         $this->cliMarkdown = new CliMarkdown();
+        $this->cliMarkdown->setTheme([
+            'inlineCode' => 'cyan-bg',
+        ]);
+
+        $this->transliterator = EmojiTransliterator::create('text-emoji');
     }
 
     private InputInterface $input;
     private OutputInterface $output;
 
     private CliMarkdown $cliMarkdown;
+
+    private EmojiTransliterator $transliterator;
 
     private Config $config;
     private TaskCollection|Task $task;
@@ -134,6 +163,10 @@ class OutputService {
         return $this->task;
     }
 
+    private function getTransliterator(): EmojiTransliterator {
+        return $this->transliterator;
+    }
+
     public function setMaxWidthOfColumn(): self {
         stripos(PHP_OS_FAMILY, 'WIN') === 0
             ? $terminalWidth = (int) shell_exec('powershell -Command "&{(Get-Host).UI.RawUI.WindowSize.Width}"')
@@ -185,8 +218,8 @@ class OutputService {
             )
             . ($taskArray['name'] ? " <cyan>" . $taskArray['name'] . "</cyan> " : " ")
             . ($taskArray['duration'] ? "<green-bold>" . $taskArray['duration'] . "</green-bold> " : "")
-            . ((!empty($taskArray['current_steps']) && $taskArray['current_steps'] !== $taskArray['duration']) ? "<magenta-blink>(+". $taskArray['current_steps'] . ")</magenta-blink> " : "")
-            . ($taskArray['remaining'] ? "🏋️‍" . $taskArray['remaining'] . " " : "")
+            . ((!empty($taskArray['current_steps']) && $taskArray['current_steps'] !== $taskArray['duration']) ? "<magenta>(+". $taskArray['current_steps'] . ")</magenta> " : "")
+            . ($taskArray['remaining'] ? "🏋️" . $taskArray['remaining'] . " " : "")
             . ($taskArray['commits'] ? "🍻 <yellow>" . $taskArray['commits'] . "</yellow> " : "")
             . "<blue>[" . $taskArray['id']."]</blue>"
         );
@@ -206,31 +239,70 @@ class OutputService {
             ]);
             return $this;
         endif;
+
+        $dateFiltered = false;
+        if (
+            ($input = $this->getInput())->getOption('today')
+            || $input->getOption('yesterday')
+            || $input->getOption('weekly')
+            || $input->getOption('monthly')
+        ):
+            $dateFiltered = true;
+        endif;
+
         foreach ($tasks ?? [] as $task):
-            $lastUpdateDate = (new \DateTime(timezone: $this->getConfig()->getDateTimeZone()))->setTimestamp($task->getLastUpdateDate());
-            $startDate = (new \DateTime(timezone: $this->getConfig()->getDateTimeZone()))->setTimestamp($task->getStartDate());
-            $now = new \DateTime(timezone: $this->getConfig()->getDateTimeZone());
+            $lastUpdateDate = (new \DateTime())->setTimestamp($task->getLastUpdateDate());
+            $startDate = (new \DateTime())->setTimestamp($task->getStartDate());
+            $now = new \DateTime();
             if (
-                $lastUpdateDate->format('Y-m-d') === $now->format('Y-m-d')
-                || $startDate->format('Y-m-d') === $now->format('Y-m-d')
+                (
+                    $lastUpdateDate->format('Y-m-d') === $now->format('Y-m-d')
+                    || $startDate->format('Y-m-d') === $now->format('Y-m-d')
+                ) && (
+                    $dateFiltered === false
+                    || $input->getOption('today')
+                    || $input->getOption('yesterday')
+                    || $input->getOption('weekly')
+                    || $input->getOption('monthly')
+                ) && $input->getOption('archived') === $task->isArchived()
             ):
                 $tables[0][] = $task;
             elseif (
-                $lastUpdateDate->format('Y-m-d') === ($yesterday = $now->modify('-1day'))->format('Y-m-d')
-                || $startDate->format('Y-m-d') === $yesterday->format('Y-m-d')
+                (
+                    $lastUpdateDate->format('Y-m-d') === ($yesterday = $now->modify('-1day'))->format('Y-m-d')
+                    || $startDate->format('Y-m-d') === $yesterday->format('Y-m-d')
+                ) && (
+                    $dateFiltered === false
+                    || $input->getOption('yesterday')
+                    || $input->getOption('weekly')
+                    || $input->getOption('monthly')
+                ) && $input->getOption('archived') === $task->isArchived()
             ):
                 $tables[1][] = $task;
             elseif (
-                $task->getLastUpdateDate() >= ($week = $now->modify('-1week')->getTimestamp())
-                || $task->getStartDate() >= $week
+                (
+                    $task->getLastUpdateDate() >= ($week = $now->modify('-1week')->getTimestamp())
+                    || $task->getStartDate() >= $week
+                ) && (
+                    $dateFiltered === false
+                    || $input->getOption('weekly')
+                    || $input->getOption('monthly')
+                ) && $input->getOption('archived') === $task->isArchived()
             ):
                 $tables[2][] = $task;
             elseif (
-                $task->getLastUpdateDate() >= ($month = $now->modify('-1month')->getTimestamp())
-                || $task->getStartDate() >= $month
+                (
+                    $task->getLastUpdateDate() >= ($month = $now->modify('-1month')->getTimestamp())
+                    || $task->getStartDate() >= $month
+                )
+                && ($dateFiltered === false || $input->getOption('monthly'))
+                && $input->getOption('archived') === $task->isArchived()
             ):
                 $tables[3][] = $task;
-            else:
+            elseif (
+                $dateFiltered === false
+                && $input->getOption('archived') === $task->isArchived()
+            ):
                 $tables[4][] = $task;
             endif;
         endforeach;
@@ -267,7 +339,7 @@ class OutputService {
                         . ($task['name'] ? " <cyan>" . $task['name'] . "</cyan> " : " ")
                         . ($task['duration'] ? "<green-bold>" . $task['duration'] . "</green-bold> " : "")
                         . ((!empty($task['current_steps']) && $task['current_steps'] !== $task['duration']) ? "<magenta>(+". $task['current_steps'] . ")</magenta> " : "")
-                        . ($task['remaining'] ? "🏋️‍" . $task['remaining'] . " " : "")
+                        . ($task['remaining'] ? "🏋️" . $task['remaining'] . " " : "")
                         . ($task['commits'] ? "🍻 <yellow>" . $task['commits'] . "</yellow> " : "")
                         . "<blue>[" . $task['id']."]</blue>"
                     );
@@ -300,12 +372,21 @@ class OutputService {
         );
 
         if ($message = $commit->getMessage()):
-            $this->getSymfonyStyle()->write(
-                htmlspecialchars_decode($this->wordWrap($this->markdownRender($message), $this->getMaxWidthOfColumn()))
-            );
+            $this->getSymfonyStyle()->write($this->renderMessage($message));
         endif;
 
         return $this;
+    }
+
+    private function renderMessage(string $message): string {
+        return htmlspecialchars_decode(
+            $this->wordWrap(
+                $this->markdownRender(
+                    $this->getTransliterator()->transliterate($message) ?? $message
+                ),
+                $this->getMaxWidthOfColumn()
+            )
+        );
     }
 
     public function markdownRender(string $markdown): string {

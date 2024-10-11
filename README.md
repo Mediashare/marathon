@@ -6,19 +6,17 @@
 Marathon is a command-line tool written in PHP and Symfony that empowers you to efficiently **manage todo-list for your projects**. 
 It provides a comprehensive solution for maintaining a project-related activities through commit history.
 ### Features
-- **Commit:** Easily associate time entries with project commits to maintain a detailed history of actions taken during the development process.
-- **Efficient Time Management:** Streamline your workflow by seamlessly integrating time into your version control system. Focus on development while keeping an accurate record of time spent on each task.
-- **Symfony Framework:** Built on the robust Symfony framework, ensuring reliability, scalability, and ease of maintenance for your time management needs.
+- **Commit:** Easily associate time entries with project commits to maintain a history of actions taken during the task.
+- **Remaining time:** Organize your time into tasks with time remaining.
+- **Emojies supports:** ( :pencil: `:pencil:`, :tada: `:tada:`, :beer: `:beer:` ect...) 5000+ emojies supported into commit message.
+- **Markdown support:** Implementation of markdown synthax into commit message.
+- **Custom tags supports:** (`<red>`, `<green-bg>`, `<bold>` ect...) Implemented into commit message.
 ## Installation
-### Composer
-#### Basic
+### Binary
 ```bash
-composer require mediashare/marathon
-./vendor/mediashare/marathon/bin/marathon <command>
-```
-#### Global
-```bash
-composer global require mediashare/marathon
+curl --output marathon https://raw.githubusercontent.com/Mediashare/marathon/main/marathon
+chmod 755 marathon
+sudo cp marathon /usr/local/bin/marathon
 marathon <command>
 ```
 ### Docker
@@ -29,11 +27,15 @@ cd marathon
 docker build -t marathon .
 docker run -it marathon <command>
 ```
-### Binary
+### Composer
+#### Basic
 ```bash
-curl --output marathon https://raw.githubusercontent.com/Mediashare/marathon/main/marathon
-chmod 755 marathon
-sudo cp marathon /usr/local/bin/marathon
+composer require mediashare/marathon
+./vendor/mediashare/marathon/bin/marathon <command>
+```
+#### Global
+```bash
+composer global require mediashare/marathon
 marathon <command>
 ```
 ## Usage
@@ -56,7 +58,7 @@ Here are some examples of how to use Marathon:
   marathon commit:delete <commit-id>        Deleting the commit from task
   
   marathon git:gitignore                    Adding .marathon rule into .gitgnore
-  marathon version:update                   Update to latest version of Marathon
+  marathon version:update <?version>        Update version of Marathon
 ```
 ### Task Workflow
 #### Creating a task

@@ -38,11 +38,13 @@
         "ext-tokenizer": "*",
         "ext-xml": "*",
         "ext-xmlwriter": "*",
+        "ext-intl": "*",
         "phppkg/cli-markdown": "^2.0",
         "ramsey/collection": "^2.0",
         "symfony/cache": "^7.1",
         "symfony/console": "^7.1",
         "symfony/dotenv": "^7.1",
+        "symfony/emoji": "^7.1",
         "symfony/flex": "*",
         "symfony/framework-bundle": "^7.1",
         "symfony/http-client": "^7.1",
@@ -90,12 +92,10 @@
             "cache:clear": "symfony-cmd"
         },
         "post-install-cmd": [
-            "@auto-scripts",
-            "Mediashare\\Marathon\\Composer\\Installer::install"
+            "@auto-scripts"
         ],
         "post-update-cmd": [
-            "@auto-scripts",
-            "Mediashare\\Marathon\\Composer\\Installer::install"
+            "@auto-scripts"
         ],
         "console-package": "php bin/marathon"
     },
@@ -120,6 +120,7 @@
         "ext-tokenizer": "*",
         "ext-xml": "*",
         "ext-xmlwriter": "*",
+        "ext-intl": "*",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "^7.1",
         "symfony/css-selector": "^7.1",

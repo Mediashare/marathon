@@ -4,7 +4,6 @@ namespace Mediashare\Marathon\Tests\Service;
 
 use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Task;
-use Mediashare\Marathon\Exception\DateTimeZoneException;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
 use Mediashare\Marathon\Exception\StrToTimeDurationException;
@@ -20,7 +19,6 @@ class HandlerServiceTest extends AbstractServiceTestCase {
     private TaskService $taskService;
 
     /**
-     * @throws DateTimeZoneException
      * @throws FileNotFoundException
      * @throws JsonDecodeException
      * @throws \JsonException
@@ -49,7 +47,6 @@ class HandlerServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws DateTimeZoneException
      * @throws FileNotFoundException
      * @throws JsonDecodeException
      * @throws \JsonException

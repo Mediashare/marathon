@@ -27,16 +27,6 @@ trait EntityDateTimeTrait {
         return $startDate;
     }
 
-    public function getStartDateFormated(Config $config): string|null {
-        return $this->getStartDate()
-            ? (new \DateTime())
-                ->setTimestamp($this->getStartDate())
-                ->setTimezone($config->getDateTimeZone())
-                ->format($config->getDateTimeFormat())
-            : null
-        ;
-    }
-
     /** @deprecated 0.1.3 */
     public function getEndDate(): int|null {
         $endDate = null;
@@ -64,16 +54,5 @@ trait EntityDateTimeTrait {
         }
 
         return $endDate;
-    }
-
-    /** @deprecated 0.1.3 */
-    public function getEndDateFormated(Config $config): string|null {
-        return $this->getEndDate()
-            ? (new \DateTime())
-                ->setTimestamp($this->getEndDate())
-                ->setTimezone($config->getDateTimeZone())
-                ->format($config->getDateTimeFormat())
-            : null
-        ;
     }
 }
