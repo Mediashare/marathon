@@ -213,7 +213,7 @@ class OutputService {
                 ? "🏃"
                 : ($taskArray['archived']
                     ? "🏁"
-                    : "⏸ "
+                    : ($taskArray['duration'] ? "⏸ " : "🎉")
                 )
             )
             . ($taskArray['name'] ? " <cyan>" . $taskArray['name'] . "</cyan> " : " ")
@@ -333,7 +333,7 @@ class OutputService {
                             ? "🏃"
                             : ($task['archived']
                                 ? "🏁"
-                                : "⏸ "
+                                : ($task['duration'] ? "⏸ " : "🎉")
                             )
                         )
                         . ($task['name'] ? " <cyan>" . $task['name'] . "</cyan> " : " ")
