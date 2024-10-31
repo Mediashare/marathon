@@ -83,10 +83,6 @@ class TaskService {
 
         $this->setConfig($this->getConfig()->setTaskId($task->getId()));
 
-        if ($task->isRun()):
-            $task->addStep($this->stepService->create());
-        endif;
-
         $this->serializerService->writeTask($this->getTaskFilepath(), $task);
 
         return $this->setTask($task);
@@ -123,7 +119,7 @@ class TaskService {
         $task = $this
             ->getTask($createItIfNotExist)
             ->setRun(false);
-
+        
         if (($lastStep = $task->getSteps()?->last()) && $lastStep->getSeconds() === null):
             $task
                 ->getSteps()
