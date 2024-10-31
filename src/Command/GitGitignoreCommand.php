@@ -1,20 +1,19 @@
 <?php
 namespace Mediashare\Marathon\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
+#[AsCommand(
+    name: 'git:gitignore',
+    description: 'Adding <comment>.marathon</comment> && <comment>marathon.json</comment> rule into <comment>.gitgnore</comment>',
+    aliases: ['gitignore', 'git'],
+)]
 class GitGitignoreCommand extends Command {
     protected static $defaultName = 'git:gitignore';
-
-    protected function configure() {
-        $this
-            ->setName('git:gitignore')
-            ->setDescription('Adding <comment>.marathon</comment> && <comment>marathon.json</comment> rule into <comment>.gitgnore</comment>')
-        ;
-    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
         if (file_exists($filepath = './.gitignore')):

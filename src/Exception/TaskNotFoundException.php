@@ -7,7 +7,7 @@ class TaskNotFoundException extends \Exception {
         string|null $taskId = null,
     ) {
         parent::__construct(
-            "Task ID ". ($taskId ? "[". $taskId ."] " : "") ."session was not found",
+            "Task ". ($taskId ? "[". $taskId ."] " : "") ."session was not found",
             404,
             null,
         );

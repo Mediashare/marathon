@@ -3,7 +3,6 @@
 namespace Mediashare\Marathon\Service;
 
 use Mediashare\Marathon\Collection\TaskCollection;
-use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
 use Mediashare\Marathon\Exception\FileNotFoundException;
@@ -11,52 +10,47 @@ use Mediashare\Marathon\Exception\JsonDecodeException;
 use Mediashare\Marathon\Exception\CommandMissingLeastOnceOptionException;
 use Mediashare\Marathon\Exception\StrToTimeDurationException;
 use Mediashare\Marathon\Exception\TaskNotFoundException;
+use Symfony\Component\Filesystem\Filesystem;
 
 class HandlerService {
-    private Config $config;
     private Task|null $task = null;
 
     public function __construct(
-        public readonly ConfigService $configService,
+        private readonly ConfigService $configService,
         private readonly TaskService $taskService,
         private readonly CommitService $commitService,
         private readonly SerializerService $serializerService,
-    ) {}
+    ) {
+        $this->getConfigService()->setTaskService($taskService);
+        $this->getConfigService()->setFilesystem(new Filesystem());
+        $this->getConfigService()->setSerializerService($serializerService);
+    }
 
     /**
      * @throws JsonDecodeException
      * @throws FileNotFoundException
      * @throws \JsonException
      */
-    public function writeConfig(
+    public function init(
         string|false $configPath = false,
         string|false $taskDirectory = false,
         string|false $editor = false,
         string|null $taskId = null,
     ): self {
-        $this->config = $this->configService->setConfig(
-            $configPath,
-            $taskDirectory,
-            $editor,
-            $taskId,
-        )->write()->getConfig();
+        
+        $this->getConfigService()
+            ->initConfig(
+                $configPath,
+                $taskDirectory,
+                $editor,
+                $taskId,
+            )->write();
 
         return $this;
     }
 
-    public function getConfig(): Config {
-        return $this->config;
-    }
-
-    /**
-     * @throws \JsonException
-     */
-    public function updateTaskIdInConfig(): self {
-        $this->configService->setConfig(
-            taskId: false
-        )->write();
-
-        return $this;
+    public function getConfigService(): ConfigService {
+        return $this->configService;
     }
 
     private function setTask(Task|null $task): self {
@@ -75,9 +69,7 @@ class HandlerService {
             return $this->task;
         endif;
 
-        return $this->taskService
-            ->setConfig($this->getConfig())
-            ->getTask($createItIfNotExist);
+        return $this->taskService->getTask($createItIfNotExist);
     }
 
     /**
@@ -85,9 +77,7 @@ class HandlerService {
      * @throws FileNotFoundException
      */
     public function getTasks(): TaskCollection {
-        return $this->taskService
-            ->setConfig($this->getConfig())
-            ->getTasks();
+        return $this->taskService->getTasks();
     }
 
     /**
@@ -103,7 +93,6 @@ class HandlerService {
     ): self {
         return $this->setTask(
             $this->taskService
-                ->setConfig($this->getConfig())
                 ->update($name, $duration, $remaining)
                 ->start()
                 ->getTask()
@@ -122,7 +111,6 @@ class HandlerService {
     ): self {
         return $this->setTask(
             $this->taskService
-                ->setConfig($this->getConfig())
                 ->update($name, $duration, $remaining)
                 ->stop()
                 ->getTask()
@@ -141,7 +129,6 @@ class HandlerService {
     ): self {
         return $this->setTask(
             $this->taskService
-                ->setConfig($this->getConfig())
                 ->update($name, $duration, $remaining)
                 ->archive()
                 ->getTask()
@@ -154,11 +141,8 @@ class HandlerService {
      * @throws FileNotFoundException
      */
     public function taskDelete(): self {
-        $taskService = $this->taskService->setConfig($this->getConfig());
-
-        $this->setTask($taskService->getTask());
-
-        $taskService->delete();
+        $this->setTask($this->taskService->getTask());
+        $this->taskService->delete();
 
         return $this->setTask(null);
     }
@@ -238,7 +222,6 @@ class HandlerService {
 
         return $this->setTask(
             $this->taskService
-                ->setConfig($this->getConfig())
                 ->update(
                     name: $name,
                     duration: $duration,
