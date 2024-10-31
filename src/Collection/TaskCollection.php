@@ -69,4 +69,8 @@ class TaskCollection extends AbstractCollection
                 ($a->getLastUpdateDate() ?? $a->getStartDate())
         );
     }
+
+    public function findByName(string $name): self {
+        return $this->filter(static fn (Task $task) => $task->getName() === $name);
+    }
 }

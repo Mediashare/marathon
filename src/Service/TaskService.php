@@ -11,7 +11,7 @@ use Mediashare\Marathon\Exception\TaskNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 
 class TaskService {
-    private Config $config;
+    // private ConfigService|null $configService = null;
     private Task|null $task = null;
 
     public function __construct(
@@ -19,16 +19,21 @@ class TaskService {
         private readonly TimestampService $timestampService,
         private readonly SerializerService $serializerService,
         private readonly Filesystem $filesystem,
+        private readonly ConfigService $configService,
     ) {}
 
+    public function getConfigService(): ConfigService|null {
+        return $this->configService;
+    }
+
     public function setConfig(Config $config): self {
-        $this->config = $config;
+        $this->getConfigService()->setConfig($config);
 
         return $this;
     }
 
     public function getConfig(): Config {
-        return $this->config;
+        return $this->getConfigService()->getConfig();
     }
 
     /**
@@ -37,7 +42,7 @@ class TaskService {
      */
     public function getTasks(): TaskCollection {
         $taskCollection = new TaskCollection();
-        foreach (glob($this->config->getTaskDirectory() . DIRECTORY_SEPARATOR . '*.json') as $filepath):
+        foreach (glob($this->getConfig()->getTaskDirectory() . DIRECTORY_SEPARATOR . '*.json') as $filepath):
             $taskCollection->add($this->serializerService->read($filepath, Task::class));
         endforeach;
 
@@ -59,11 +64,24 @@ class TaskService {
             return $this
                 ->setTask($this->serializerService->read($filepath, Task::class))
                 ->getTask();
+        elseif ($task = $this->findTaskByName($this->getConfig()->getTaskId())):
+            return $task;
         elseif ($createItIfNotExist):
             return $this->create()->getTask();
-        else:
-            throw new TaskNotFoundException($this->getConfig()->getTaskId());
         endif;
+
+        throw new TaskNotFoundException($this->getConfig()->getTaskId());
+    }
+
+    private function findTaskByName(string $name): Task|null {
+        if (($tasks = $this->getTasks()->findByName($name))->count() > 0):
+            if ($tasks->count() === 1):
+                return $tasks->first();
+            endif;
+            throw new \Exception("Multiple tasks found with the same name"); 
+        endif;
+
+        return null;
     }
 
     public function setTask(Task|null $task = null): self {
