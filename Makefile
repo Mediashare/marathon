@@ -1,4 +1,15 @@
 ##
+##Cache
+##
+cache-clear: ## Cache clear
+	php bin/console cache:clear
+cache-warmup: ## Cache warmup
+	php bin/console cache:warmup
+
+cache: cache-clear cache-warmup
+clear: cache-clear cache-warmup
+
+##
 ##Tests
 ##
 tests: ## Run PHPUnit tests
@@ -11,18 +22,18 @@ test: tests ## Run PHPUnit tests
 ##
 ##Build
 ##
-compile: tests ## Marathon phar compilation
+compile: cache tests ## Marathon phar compilation
 	composer install --no-scripts --no-autoloader --no-dev
 	composer dump-autoload --classmap-authoritative --no-dev --optimize
-	php bin/console cache:clear --env=prod
 	box compile
+
 build: compile ## Build Marathon project
 
-build-without-tests: ## Build Marathon project without running tests
+build-without-tests: cache ## Build Marathon project without running tests
 	composer install --no-scripts --no-autoloader --no-dev
 	composer dump-autoload --classmap-authoritative --no-dev --optimize
-	php bin/console cache:clear --env=prod
 	box compile
+
 build-without-test: build-without-tests ## Build Marathon project without running tests
 compile-without-tests: build-without-tests ## Build Marathon project without running tests
 compile-without-test: build-without-tests ## Build Marathon project without running tests
