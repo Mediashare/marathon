@@ -7,7 +7,7 @@ use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
 use Mediashare\Marathon\Exception\CommandMissingLeastOnceOptionException;
-use Mediashare\Marathon\Exception\StrToTimeDurationException;
+use Mediashare\Marathon\Exception\DurationStrToTimeException;
 use Mediashare\Marathon\Service\CommitService;
 use Mediashare\Marathon\Service\StepService;
 use Mediashare\Marathon\Service\EditorService;
@@ -22,7 +22,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateCommit(): void {
         $task = new Task();
@@ -36,7 +36,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateCommitWithMessage(): void {
         $task = new Task();
@@ -53,7 +53,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateCommitWithDuration(): void {
         $task = new Task();
@@ -70,7 +70,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
 
     /**
      * @throws CommitNotFoundException
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      * @throws CommandMissingLeastOnceOptionException
      */
     public function testEditCommitMessage(): void {
@@ -92,7 +92,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
 
     /**
      * @throws CommitNotFoundException
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      * @throws CommandMissingLeastOnceOptionException
      */
     public function testEditCommitWithDuration(): void {
@@ -138,7 +138,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      * @throws CommandMissingLeastOnceOptionException
      */
     public function testCommitNotFoundExceptionOnEdit(): void {
@@ -154,7 +154,7 @@ class CommitServiceTest extends AbstractServiceTestCase {
 
     /**
      * @throws CommitNotFoundException
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCommandMissingLeastOnceOptionExceptionOnEdit(): void {
         $commit = $this->createMock(Commit::class);

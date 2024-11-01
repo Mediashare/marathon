@@ -6,7 +6,7 @@ use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
-use Mediashare\Marathon\Exception\StrToTimeDurationException;
+use Mediashare\Marathon\Exception\DurationStrToTimeException;
 use Mediashare\Marathon\Exception\TaskNotFoundException;
 use Mediashare\Marathon\Service\CommitService;
 use Mediashare\Marathon\Service\ConfigService;
@@ -112,7 +112,7 @@ class HandlerServiceTest extends AbstractServiceTestCase {
      * @throws TaskNotFoundException
      * @throws FileNotFoundException
      * @throws JsonDecodeException
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testDeleteTask(): void {
         $task = new Task();
