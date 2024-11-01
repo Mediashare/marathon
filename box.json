@@ -1,26 +1,37 @@
 {
-    "chmod": "0755",
+    "chmod": "0750",
     "main": "bin/marathon",
     "output": "marathon",
     "alias": "marathon",
     "force-autodiscovery": true,
     "directories": [
-        "src",
-        "vendor"
+        "config",
+        "src"
     ],
+    "directories-bin": [],
     "files": [
-        ".env",
-        "composer.json"
+        "composer.json",
+        ".env"
     ],
     "finder": [
         {
             "name": "*.php",
             "exclude": ["Tests", "tests", "test", "Docs", "docs"],
-            "in": "src"
+            "in": "vendor"
+        },
+        {
+            "name": ["*.yaml", "*.yml"],
+            "exclude": ["test"],
+            "in": "config"
         }
     ],
-    "banner": "*** Marathon (Version 0.1.7) ***",
+    "finder-bin": [],
+    "banner": "*** Marathon (Version 0.1.8) ***",
     "stub": true,
     "dump-autoload": false,
-    "annotations": false
+    "annotations": false,
+    "metadata": [
+        "symfony-console"
+    ],
+    "check-requirements": true
 }

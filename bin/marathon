@@ -1,26 +1,27 @@
 #!/usr/bin/env php
 <?php
 
+if (strpos(__FILE__, 'phar:') === 0) {
+    require_once 'phar://' . __FILE__ . '/vendor/autoload_runtime.php';
+} else {
+    require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+}
+
 use Mediashare\Marathon\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArgvInput;
-
-require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
 
 return function (array $context) {
-    if (!empty($context['APP_ENV']) && strtolower($context['APP_ENV']) === 'prod') {
+    $env = $context['APP_ENV'] ?? 'prod';
+    if (!empty($context['APP_ENV']) && strtolower($env) === 'prod') {
         error_reporting(E_ALL ^ E_DEPRECATED);
     }
 
-    $input = new ArgvInput();
-    $env = $context['APP_ENV'];
-    $debug = (bool) $context['APP_DEBUG'] ?? 'prod' !== $context['APP_ENV'];
+    $debug = (bool) $context['APP_DEBUG'] ?? 'prod' !== $env;
 
     $kernel = new Kernel($env, $debug);
     $application = new Application($kernel);
     $application->setName("Marathon");
-    $application->setVersion($_ENV['APP_VERSION']);
+    $application->setVersion($_ENV['APP_VERSION'] ?? '');
     
-    // Le CommandProvider sera automatiquement chargé grâce au tag
     return $application;
 };

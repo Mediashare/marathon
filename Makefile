@@ -37,6 +37,9 @@ compile: tests install-opti cache warmup ## Build Marathon project
 	box compile
 build: compile ## Build Marathon project
 
+build-prod: tests install-opti cache warmup ## Build Marathon project
+	box compile
+
 build-without-tests: install-opti cache warmup ## Build Marathon project without running tests
 	box compile
 build-without-test: build-without-tests ## Build Marathon project without running tests
