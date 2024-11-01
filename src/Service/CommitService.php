@@ -5,7 +5,7 @@ use Mediashare\Marathon\Entity\Commit;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\CommitNotFoundException;
 use Mediashare\Marathon\Exception\CommandMissingLeastOnceOptionException;
-use Mediashare\Marathon\Exception\StrToTimeDurationException;
+use Mediashare\Marathon\Exception\DurationStrToTimeException;
 
 class CommitService {
     private Task $task;
@@ -26,7 +26,7 @@ class CommitService {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function create(
         string|null $message = null,
@@ -87,7 +87,7 @@ class CommitService {
 
     /**
      * @throws CommitNotFoundException
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      * @throws CommandMissingLeastOnceOptionException
      */
     public function edit(

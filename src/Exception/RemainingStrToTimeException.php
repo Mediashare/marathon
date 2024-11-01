@@ -2,12 +2,12 @@
 
 namespace Mediashare\Marathon\Exception;
 
-class StrToTimeDurationException extends \Exception {
+class RemainingStrToTimeException extends \Exception {
     public function __construct(
-        string $duration,
+        string $remaining,
     ) {
         parent::__construct(
-            "Duration set [". $duration ."] is not in correct format.",
+            "Remaining set [". $remaining ."] is not in correct format.",
             400,
             null
         );
