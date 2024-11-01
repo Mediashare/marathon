@@ -5,7 +5,7 @@ install-opti: ## Composer install optimized
 	composer install --no-scripts --no-autoloader --no-dev
 	composer dump-autoload --classmap-authoritative --no-dev --optimize
 install: ## Composer install
-	composer install --no-autoloader
+	composer install --no-scripts --no-autoloader
 	composer dump-autoload --classmap-authoritative --optimize
 
 ##

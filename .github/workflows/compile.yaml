@@ -23,8 +23,7 @@ jobs:
         run: composer global require humbug/box
 
       - name: Run PHPUnit tests & build Marathon project
-        run: |
-            make build
+        run: make build
 
       - name: Test marathon binary
         run: php marathon task:list
