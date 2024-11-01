@@ -14,16 +14,19 @@ class ConfigService {
     private SerializerService $serializerService;
     private Filesystem $filesystem;
 
-    public function setTaskService(TaskService $taskService): void {
+    public function setTaskService(TaskService $taskService): self {
         $this->taskService = $taskService;
+        return $this;
     }
 
-    public function setSerializerService(SerializerService $serializerService): void {
+    public function setSerializerService(SerializerService $serializerService): self {
         $this->serializerService = $serializerService;
+        return $this;
     }
 
-    public function setFilesystem(Filesystem $filesystem): void {
+    public function setFilesystem(Filesystem $filesystem): self {
         $this->filesystem = $filesystem;
+        return $this;
     }
 
     /**

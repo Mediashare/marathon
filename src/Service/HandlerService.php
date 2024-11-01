@@ -21,9 +21,10 @@ class HandlerService {
         private readonly CommitService $commitService,
         private readonly SerializerService $serializerService,
     ) {
-        $this->getConfigService()->setTaskService($taskService);
-        $this->getConfigService()->setFilesystem(new Filesystem());
-        $this->getConfigService()->setSerializerService($serializerService);
+        $this->getConfigService()
+            ->setTaskService($taskService)
+            ->setFilesystem(new Filesystem())
+            ->setSerializerService($serializerService);
     }
 
     /**
