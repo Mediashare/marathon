@@ -1,11 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-if (strpos(__FILE__, 'phar:') === 0) {
-    require_once 'phar://' . __FILE__ . '/vendor/autoload_runtime.php';
-} else {
-    require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
-}
+require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
 
 use Mediashare\Marathon\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;

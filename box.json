@@ -8,7 +8,7 @@
         "config",
         "src"
     ],
-    "directories-bin": [],
+    "directories-bin": ["bin"],
     "files": [
         "composer.json",
         ".env"
@@ -20,12 +20,11 @@
             "in": "vendor"
         },
         {
-            "name": ["*.yaml", "*.yml"],
+            "name": ["*.yaml", "*.yml", "*.php"],
             "exclude": ["test"],
             "in": "config"
         }
     ],
-    "finder-bin": [],
     "banner": "*** Marathon (Version 0.1.8) ***",
     "stub": true,
     "dump-autoload": false,
