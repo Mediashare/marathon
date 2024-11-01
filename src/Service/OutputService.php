@@ -18,7 +18,30 @@ class OutputService {
     public function __construct(
         private TimestampService $timestampService,
     ) {
-        $this->output = new ConsoleOutput();
+        // $this->output = new ConsoleOutput();
+
+        $this->cliMarkdown = new CliMarkdown();
+        $this->cliMarkdown->setTheme([
+            'inlineCode' => 'cyan-bg',
+        ]);
+
+        $this->transliterator = EmojiTransliterator::create('text-emoji');
+    }
+
+    private InputInterface $input;
+    private OutputInterface $output;
+    private SymfonyStyle|null $symfonyStyle = null;
+
+    private CliMarkdown $cliMarkdown;
+    private EmojiTransliterator $transliterator;
+
+    private Config $config;
+    private TaskCollection|Task $task;
+    private int|null $maxWidthOfColumn = null;
+
+    public function setIO(InputInterface $input, OutputInterface $output): self {
+        $this->input = $input;
+        $this->output = $output;
 
         $white = new OutputFormatterStyle('white');
         $this->output->getFormatter()->setStyle('white', $white);
@@ -96,33 +119,17 @@ class OutputService {
         $bold = new OutputFormatterStyle('default', options: ['bold']);
         $this->output->getFormatter()->setStyle('bold', $bold);
 
-        $this->cliMarkdown = new CliMarkdown();
-        $this->cliMarkdown->setTheme([
-            'inlineCode' => 'cyan-bg',
-        ]);
-
-        $this->transliterator = EmojiTransliterator::create('text-emoji');
-    }
-
-    private InputInterface $input;
-    private OutputInterface $output;
-
-    private CliMarkdown $cliMarkdown;
-
-    private EmojiTransliterator $transliterator;
-
-    private Config $config;
-    private TaskCollection|Task $task;
-    private int|null $maxWidthOfColumn = null;
-
-    private SymfonyStyle|null $symfonyStyle = null;
-
-    public function setInput(InputInterface $input): self {
-        $this->symfonyStyle = new SymfonyStyle($input, $this->output);
-        $this->input = $input;
+        $this->symfonyStyle = new SymfonyStyle($this->input, $this->output);
 
         return $this;
     }
+    
+    // public function setInput(InputInterface $input): self {
+    //     $this->symfonyStyle = new SymfonyStyle($input, $this->output);
+    //     $this->input = $input;
+
+    //     return $this;
+    // }
 
     /**
      * @throws SymfonyStyleNotFoundException

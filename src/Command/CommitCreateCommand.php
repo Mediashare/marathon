@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CommitCreateCommand extends Command {
     protected static $defaultName = 'commit:create';
 
-    protected function configure() {
+    protected function configure(): void {
         $this
             ->addArgument('message', InputArgument::OPTIONAL, 'Define a commit <comment>message</comment>', false)
             ->addOption('editor', 'e', InputOption::VALUE_NONE, 'Open default message <comment>editor</comment>')
@@ -61,7 +61,7 @@ class CommitCreateCommand extends Command {
             $this->outputService
                 ->setConfig($this->handlerService->getConfigService()->getConfig())
                 ->setTask($this->handlerService->getTask())
-                ->setInput($input)
+                ->setIO($input, $output)
                 ->outputRenderTask();
 
             return Command::SUCCESS;

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CommitDeleteCommand extends Command {
     protected static $defaultName = 'commit:delete';
 
-    protected function configure() {
+    protected function configure(): void {
         $this
             ->addArgument('commit-id', InputArgument::REQUIRED, '<comment>Commit ID</comment>')
             ->addOption('task-id', 't', InputOption::VALUE_REQUIRED, 'Task <comment>ID</comment> or <comment>name</comment>', null)
@@ -56,7 +56,7 @@ class CommitDeleteCommand extends Command {
             $this->outputService
                 ->setConfig($this->handlerService->getConfigService()->getConfig())
                 ->setTask($this->handlerService->getTask())
-                ->setInput($input)
+                ->setIO($input, $output)
                 ->outputRenderTask();
 
             return Command::SUCCESS;

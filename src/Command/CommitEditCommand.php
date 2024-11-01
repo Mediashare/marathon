@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CommitEditCommand extends Command {
     protected static $defaultName = 'commit:edit';
 
-    protected function configure() {
+    protected function configure(): void {
         $this
             ->addArgument('commit-id', InputArgument::REQUIRED, '<comment>Commit ID</comment>')
             ->addOption('editor', 'e', InputOption::VALUE_NONE, 'Open default message <comment>editor</comment>')
@@ -63,7 +63,7 @@ class CommitEditCommand extends Command {
             $this->outputService
                 ->setConfig($this->handlerService->getConfigService()->getConfig())
                 ->setTask($this->handlerService->getTask())
-                ->setInput($input)
+                ->setIO($input, $output)
                 ->outputRenderTask();
 
             return Command::SUCCESS;

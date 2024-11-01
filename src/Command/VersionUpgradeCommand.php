@@ -23,7 +23,7 @@ Class VersionUpgradeCommand extends Command {
         parent::__construct();
     }
 
-    protected function configure() {
+    protected function configure(): void {
         $this
             ->addArgument('version', InputArgument::OPTIONAL, 'Marathon <comment>version</comment> to update', 'main')    
         ;

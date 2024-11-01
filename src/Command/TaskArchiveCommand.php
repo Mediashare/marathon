@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class TaskArchiveCommand extends Command {
     protected static $defaultName = 'task:archive';
     
-    protected function configure() {
+    protected function configure(): void {
         $this
             ->addArgument('task-id', InputArgument::REQUIRED, 'Task <comment>ID</comment> or <comment>name</comment>')
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the current step (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
@@ -61,7 +61,7 @@ class TaskArchiveCommand extends Command {
             $this->outputService
                 ->setConfig($this->handlerService->getConfigService()->getConfig())
                 ->setTask($this->handlerService->getTask())
-                ->setInput($input)
+                ->setIO($input, $output)
                 ->outputRenderTask();
 
             // Update config

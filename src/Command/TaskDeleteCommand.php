@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class TaskDeleteCommand extends Command {
     protected static $defaultName = 'task:delete';
     
-    protected function configure() {
+    protected function configure(): void {
         $this
             ->addArgument('task-id', InputArgument::REQUIRED, 'Task <comment>ID</comment> or <comment>name</comment>')
 
@@ -40,19 +40,19 @@ class TaskDeleteCommand extends Command {
     protected function execute(InputInterface $input, OutputInterface $output): int {
         try {
             // Handler
-            $this->handlerService->init(
+            $task = $this->handlerService->init(
                 $input->getOption('config-path'),
                 $input->getOption('config-task-dir'),
                 $input->getOption('config-editor'),
                 $input->getArgument('task-id'),
-            )->taskDelete();
+            )->taskDelete()->getTask();
 
             // Update config
             $this->handlerService->getConfigService()->removeTaskIdConfig();
 
             $this->outputService
-                ->setInput($input)
-                ->writeln("<comment>Task <blue>[".$input->getArgument('task-id')."]</blue> was deleted.</comment>");
+                ->setIO($input, $output)
+                ->writeln("<comment>Task <blue>[".$task->getId().($task->getName() ? ":".$task->getName() : "")."]</blue> was deleted.</comment>");
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {
