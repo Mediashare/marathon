@@ -45,7 +45,9 @@ class TaskDeleteCommand extends Command {
                 $input->getOption('config-task-dir'),
                 $input->getOption('config-editor'),
                 $input->getArgument('task-id'),
-            )->taskDelete()->getTask();
+            )->getTask();
+
+            $this->handlerService->taskDelete();
 
             // Update config
             $this->handlerService->getConfigService()->removeTaskIdConfig();
