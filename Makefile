@@ -22,7 +22,7 @@ warmup: cache-warmup
 ##
 ##Tests
 ##
-test: ## Run PHPUnit tests
+test: install ## Run PHPUnit tests
 	chmod +x bin/phpunit
 	php bin/phpunit
 .PHONY: test
@@ -33,7 +33,7 @@ phpunit: test ## Run PHPUnit tests
 ##
 ##Build
 ##
-compile: install tests install-opti cache warmup ## Build Marathon project
+compile: tests install-opti cache warmup ## Build Marathon project
 	box compile
 build: compile ## Build Marathon project
 
