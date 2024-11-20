@@ -121,7 +121,6 @@
         "ext-tokenizer": "*",
         "ext-xml": "*",
         "ext-xmlwriter": "*",
-        "composer/composer": "^2.1.13",
         "phpunit/phpunit": "^9.5",
         "symfony/phpunit-bridge": "^7.1"
     }
