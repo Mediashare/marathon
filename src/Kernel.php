@@ -17,13 +17,8 @@ class Kernel extends BaseKernel
             ->addTag('console.command_loader');
     }
 
-    public function getCacheDir(): string
+    public function getProjectDir(): string
     {
-        return sys_get_temp_dir().'/cache/'.$this->environment.'/'.$this->getContainerClass();
-    }
-
-    public function getLogDir(): string
-    {
-        return sys_get_temp_dir().'/log/'.$this->environment;
+        return dirname(__DIR__);
     }
 }

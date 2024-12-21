@@ -2,10 +2,9 @@ framework:
     secret: '%env(APP_SECRET)%'
     http_method_override: false
     session: false
-    cache:
-        app: cache.adapter.filesystem
     assets: false
     csrf_protection: false
+    cache: null
     profiler:
         enabled: false
     router:
