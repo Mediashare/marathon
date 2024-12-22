@@ -1,78 +1,23 @@
 #!/usr/bin/env php
 <?php
 
-use Mediashare\Marathon\Service\HandlerService;
-use Mediashare\Marathon\Service\OutputService;
-use Mediashare\Marathon\Service\TimestampService;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpClient\NativeHttpClient;
+require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
 
-require __DIR__ . '/../vendor/autoload.php';
+use Mediashare\Marathon\Kernel;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 
+return function (array $context) {
+    $env = $context['APP_ENV'] ?? 'prod';
+    if (!empty($context['APP_ENV']) && strtolower($env) === 'prod') {
+        error_reporting(E_ALL ^ E_DEPRECATED);
+    }
 
-$dotenv = new \Symfony\Component\Dotenv\Dotenv();
-$dotenv->load(__DIR__.'/../.env');
+    $debug = (bool) $context['APP_DEBUG'] ?? 'prod' !== $env;
 
-if (!empty($_ENV['APP_ENV']) && strtolower($_ENV['APP_ENV']) === 'prod') {
-    error_reporting(E_ALL ^ E_DEPRECATED);
-}
-
-$app = new Symfony\Component\Console\Application(
-        'Marathon',
-        !empty($_ENV['APP_VERSION']) ? $_ENV['APP_VERSION'] : 'test'
-);
-
-function handleService(): HandlerService {
-    return new \Mediashare\Marathon\Service\HandlerService(
-        $configService = new \Mediashare\Marathon\Service\ConfigService(
-            $taskService = new \Mediashare\Marathon\Service\TaskService(
-                $stepService = new \Mediashare\Marathon\Service\StepService(
-                        $timestampService = new \Mediashare\Marathon\Service\TimestampService()
-                ),
-                $timestampService,
-                $serializer = new \Mediashare\Marathon\Service\SerializerService(
-                        $filesystem = new Symfony\Component\Filesystem\Filesystem()
-                ),
-                $filesystem
-            ), $serializer, $filesystem
-        ),
-        $taskService,
-        new \Mediashare\Marathon\Service\CommitService($stepService, new \Mediashare\Marathon\Service\EditorService($configService)),
-        $serializer,
-    );
+    $kernel = new Kernel($env, $debug);
+    $application = new Application($kernel);
+    $application->setName("Marathon");
+    $application->setVersion($_ENV['APP_VERSION'] ?? '');
+    
+    return $application;
 };
-
-function outputService(): OutputService {
-    return new \Mediashare\Marathon\Service\OutputService(new TimestampService());
-}
-
-$commandsLoader = new \Symfony\Component\Console\CommandLoader\FactoryCommandLoader([
-    'task:list' => fn () => new Mediashare\Marathon\Command\TaskListCommand(handleService(), outputService()),
-    'todo' => fn () => new Mediashare\Marathon\Command\TaskListCommand(handleService(), outputService()),
-    'task:start' => fn () => new Mediashare\Marathon\Command\TaskStartCommand(handleService(), outputService()),
-    'start' => fn () => new Mediashare\Marathon\Command\TaskStartCommand(handleService(), outputService()),
-    'run' => fn () => new Mediashare\Marathon\Command\TaskStartCommand(handleService(), outputService()),
-    'task:stop' => fn () => new Mediashare\Marathon\Command\TaskStopCommand(handleService(), outputService()),
-    'stop' => fn () => new Mediashare\Marathon\Command\TaskStopCommand(handleService(), outputService()),
-    'pause' => fn () => new Mediashare\Marathon\Command\TaskStopCommand(handleService(), outputService()),
-    'task:status' => fn () => new Mediashare\Marathon\Command\TaskStatusCommand(handleService(), outputService()),
-    'status' => fn () => new Mediashare\Marathon\Command\TaskStatusCommand(handleService(), outputService()),
-    'task:archive' => fn () => new Mediashare\Marathon\Command\TaskArchiveCommand(handleService(), outputService()),
-    'archive' => fn () => new Mediashare\Marathon\Command\TaskArchiveCommand(handleService(), outputService()),
-    'task:delete' => fn () => new Mediashare\Marathon\Command\TaskDeleteCommand(handleService(), outputService()),
-    'delete' => fn () => new Mediashare\Marathon\Command\TaskDeleteCommand(handleService(), outputService()),
-    'commit:create' => fn () => new Mediashare\Marathon\Command\CommitCreateCommand(handleService(), outputService()),
-    'commit' => fn () => new Mediashare\Marathon\Command\CommitCreateCommand(handleService(), outputService()),
-    'beer' => fn () => new Mediashare\Marathon\Command\CommitCreateCommand(handleService(), outputService()),
-    'commit:edit' => fn () => new Mediashare\Marathon\Command\CommitEditCommand(handleService(), outputService()),
-    'edit' => fn () => new Mediashare\Marathon\Command\CommitEditCommand(handleService(), outputService()),
-    'commit:delete' => fn () => new Mediashare\Marathon\Command\CommitDeleteCommand(handleService(), outputService()),
-    'git:gitignore' => function () {
-            return new Mediashare\Marathon\Command\GitGitignoreCommand();
-        },
-    'version:update' => function () {
-            return new Mediashare\Marathon\Command\VersionUpgradeCommand(new NativeHttpClient());
-        },
-]);
-$app->setCommandLoader($commandsLoader);
-$app->run();

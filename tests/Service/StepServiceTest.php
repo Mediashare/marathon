@@ -3,7 +3,7 @@
 namespace Mediashare\Marathon\Tests\Service;
 
 use Mediashare\Marathon\Entity\Step;
-use Mediashare\Marathon\Exception\StrToTimeDurationException;
+use Mediashare\Marathon\Exception\DurationStrToTimeException;
 use Mediashare\Marathon\Service\StepService;
 use Mediashare\Marathon\Service\TimestampService;
 
@@ -52,7 +52,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateStepWithCustomDuration(): void {
         $startDate = (new \DateTime('-1 day'))->getTimestamp();
@@ -68,7 +68,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateWithCustomDuration(): void {
         $customDuration = '+5 minutes';
@@ -81,7 +81,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateWithCustomDurationComplexe(): void {
         $customDuration = '2days +1hour 5 minutes';
@@ -94,7 +94,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateWithCustomDurationComplexeBeyondMonth(): void {
         $customDuration = '6weeks 1day +1h 5 minutes -10s';
@@ -107,7 +107,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateWithCustomDurationWeeksNormalizer(): void {
         $customDuration = '1w';
@@ -120,7 +120,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateWithCustomDurationDaysNormalizer(): void {
         $customDuration = '1d';
@@ -133,7 +133,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateWithCustomDurationHoursNormalizer(): void {
         $customDuration = '1h';
@@ -146,7 +146,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateWithCustomDurationMinutes(): void {
         $customDuration = '1min';
@@ -159,7 +159,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateWithCustomDurationSeconds(): void {
         $customDuration = '1s';
@@ -172,7 +172,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     /**
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testCreateWithCustomDurationAndStartDate(): void {
         $customDuration = '+2 hours';
@@ -186,7 +186,7 @@ class StepServiceTest extends AbstractServiceTestCase {
     }
 
     public function testStrToTimeException(): void {
-        $this->expectException(StrToTimeDurationException::class);
+        $this->expectException(DurationStrToTimeException::class);
 
         // Pass an invalid duration format to trigger StrToTimeException
         $this->stepService->createWithCustomDuration('invalid_duration_format');

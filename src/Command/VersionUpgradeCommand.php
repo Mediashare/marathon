@@ -1,6 +1,7 @@
 <?php
 namespace Mediashare\Marathon\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -8,19 +9,20 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+#[AsCommand(
+    name: 'version:upgrade',
+    description: '<comment>Update</comment> version of Marathon',
+    aliases: ['update', 'upgrade'],
+)]
 Class VersionUpgradeCommand extends Command {
-    protected static $defaultName = 'version:update';
-
     public function __construct(
         private readonly HttpClientInterface $client,
     ) { 
         parent::__construct();
     }
 
-    protected function configure() {
+    protected function configure(): void {
         $this
-            ->setName('version:update')
-            ->setDescription('<comment>Update</comment> version of Marathon')
             ->addArgument('version', InputArgument::OPTIONAL, 'Marathon <comment>version</comment> to update', 'main')    
         ;
     }

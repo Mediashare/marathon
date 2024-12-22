@@ -2,7 +2,7 @@
 namespace Mediashare\Marathon\Service;
 
 use Mediashare\Marathon\Entity\Step;
-use Mediashare\Marathon\Exception\StrToTimeDurationException;
+use Mediashare\Marathon\Exception\DurationStrToTimeException;
 
 class StepService {
     public function __construct(
@@ -22,7 +22,7 @@ class StepService {
     /**
      * Create step with custom duration
      *
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      * @param int|null $startDate Timestamp of startDate
      * @param string $duration (exemple: '+5minutes', '+2hours', '+1days')
      */
@@ -34,7 +34,7 @@ class StepService {
         $endDate = strtotime($duration, $startDate);
 
         if (!$endDate):
-            throw new StrToTimeDurationException($originalDuration);
+            throw new DurationStrToTimeException($originalDuration);
         endif;
 
         return (new Step())

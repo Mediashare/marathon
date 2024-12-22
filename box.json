@@ -9,8 +9,9 @@
         "vendor"
     ],
     "files": [
+        "composer.json",
         ".env",
-        "composer.json"
+        "config/bundles.php"
     ],
     "finder": [
         {
@@ -19,8 +20,8 @@
             "in": "src"
         }
     ],
-    "banner": "*** Marathon (Version 0.1.7) ***",
+    "banner": "*** Marathon (Version 0.1.8) ***",
     "stub": true,
     "dump-autoload": false,
-    "annotations": false
+    "annotations": true
 }

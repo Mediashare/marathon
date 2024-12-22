@@ -6,7 +6,7 @@ use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
-use Mediashare\Marathon\Exception\StrToTimeDurationException;
+use Mediashare\Marathon\Exception\DurationStrToTimeException;
 use Mediashare\Marathon\Exception\TaskNotFoundException;
 use Mediashare\Marathon\Service\CommitService;
 use Mediashare\Marathon\Service\ConfigService;
@@ -31,7 +31,7 @@ class HandlerServiceTest extends AbstractServiceTestCase {
         $config->method('getTaskDirectory')->willReturn($this->taskDirectory);
 
         $configService = $this->createMock(ConfigService::class);
-        $configService->method('setConfig')->willReturnSelf();
+        $configService->method('initConfig')->willReturnSelf();
         $configService->method('write')->willReturnSelf();
         $configService->method('getConfig')->willReturn($config);
 
@@ -40,7 +40,7 @@ class HandlerServiceTest extends AbstractServiceTestCase {
             $this->taskService = $this->createMock(TaskService::class),
             $this->createMock(CommitService::class),
             $this->createMock(SerializerService::class),
-        ))->writeConfig(
+        ))->init(
             configPath: $this->configPath,
             taskDirectory: $this->taskDirectory,
         );
@@ -52,9 +52,9 @@ class HandlerServiceTest extends AbstractServiceTestCase {
      * @throws \JsonException
      */
     public function testSetAndGetConfig(): void {
-        $this->handlerService->writeConfig(false, false, false, false);
+        $this->handlerService->getConfigService()->initConfig(false, false, false, false);
 
-        $this->assertInstanceOf(Config::class, $this->handlerService->getConfig());
+        $this->assertInstanceOf(Config::class, $this->handlerService->getConfigService()->getConfig());
     }
 
     /**
@@ -64,7 +64,6 @@ class HandlerServiceTest extends AbstractServiceTestCase {
      */
     public function testStartTask(): void {
         $task = new Task();
-        $this->taskService->method('setConfig')->willReturnSelf();
         $this->taskService->method('start')->willReturnSelf();
         $this->taskService->method('update')->willReturnSelf();
         $this->taskService->method('getTask')->willReturn($task);
@@ -83,7 +82,6 @@ class HandlerServiceTest extends AbstractServiceTestCase {
      */
     public function testStopTask(): void {
         $task = (new Task())->setRun(false);
-        $this->taskService->method('setConfig')->willReturnSelf();
         $this->taskService->method('stop')->willReturnSelf();
         $this->taskService->method('getTask')->willReturn($task);
 
@@ -100,7 +98,6 @@ class HandlerServiceTest extends AbstractServiceTestCase {
      */
     public function testArchiveTask(): void {
         $task = (new Task())->setArchived(true);
-        $this->taskService->method('setConfig')->willReturnSelf();
         $this->taskService->method('archive')->willReturnSelf();
         $this->taskService->method('update')->willReturnSelf();
         $this->taskService->method('getTask')->willReturn($task);
@@ -115,12 +112,11 @@ class HandlerServiceTest extends AbstractServiceTestCase {
      * @throws TaskNotFoundException
      * @throws FileNotFoundException
      * @throws JsonDecodeException
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      */
     public function testDeleteTask(): void {
         $task = new Task();
 
-        $this->taskService->method('setConfig')->willReturnSelf();
         $this->taskService->method('start')->willReturnSelf();
         $this->taskService->method('getTask')->willReturn($task);
 

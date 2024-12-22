@@ -3,6 +3,7 @@ namespace Mediashare\Marathon\Command;
 
 use Mediashare\Marathon\Service\HandlerService;
 use Mediashare\Marathon\Service\OutputService;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -10,17 +11,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'task:delete',
+    description: '<comment>Deleting</comment> the task',
+    aliases: ['delete', 'remove'],
+)]
 class TaskDeleteCommand extends Command {
-    protected static $defaultName = 'task:delete';
-    
-    protected function configure() {
+    protected function configure(): void {
         $this
-            ->setName('task:delete')
-            ->setAliases([
-                'delete',
-            ])
-            ->setDescription('<comment>Deleting</comment> the task')
-            ->addArgument('task-id', InputArgument::REQUIRED, '<comment>Task ID</comment>')
+            ->addArgument('task-id', InputArgument::REQUIRED, 'Task <comment>ID</comment> or <comment>name</comment>')
 
             // Config
             ->addOption('config-path', 'c', InputOption::VALUE_REQUIRED, 'Set <comment>/file/path/to/json/config</comment>', false)
@@ -39,26 +38,28 @@ class TaskDeleteCommand extends Command {
     protected function execute(InputInterface $input, OutputInterface $output): int {
         try {
             // Handler
-            $this->handlerService->writeConfig(
+            $task = $this->handlerService->init(
                 $input->getOption('config-path'),
                 $input->getOption('config-task-dir'),
                 $input->getOption('config-editor'),
                 $input->getArgument('task-id'),
-            )->taskDelete();
+            )->getTask();
+
+            $this->handlerService->taskDelete();
 
             // Update config
-            $this->handlerService->updateTaskIdInConfig();
+            $this->handlerService->getConfigService()->removeTaskIdConfig();
 
             $this->outputService
-                ->setInput($input)
-                ->writeln("<comment>Task <blue>[".$input->getArgument('task-id')."]</blue> was deleted.</comment>");
+                ->setIO($input, $output)
+                ->writeln("<comment>Task <blue>[".$task->getId().($task->getName() ? ":".$task->getName() : "")."]</blue> was deleted.</comment>");
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {
             $helper = new DescriptorHelper();
             $helper->describe($output, $this);
 
-            if ($this->handlerService->configService->isDebug()):
+            if ($this->handlerService->getConfigService()->isDebug()):
                 $output->writeln("");
                 $output->writeln($exception->getTraceAsString());
             endif;

@@ -6,12 +6,12 @@ use Mediashare\Marathon\Entity\Config;
 use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
-use Mediashare\Marathon\Exception\StrToTimeDurationException;
+use Mediashare\Marathon\Exception\DurationStrToTimeException;
+use Mediashare\Marathon\Exception\RemainingStrToTimeException;
 use Mediashare\Marathon\Exception\TaskNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 
 class TaskService {
-    private Config $config;
     private Task|null $task = null;
 
     public function __construct(
@@ -19,16 +19,21 @@ class TaskService {
         private readonly TimestampService $timestampService,
         private readonly SerializerService $serializerService,
         private readonly Filesystem $filesystem,
+        private readonly ConfigService $configService,
     ) {}
 
+    public function getConfigService(): ConfigService|null {
+        return $this->configService;
+    }
+
     public function setConfig(Config $config): self {
-        $this->config = $config;
+        $this->getConfigService()->setConfig($config);
 
         return $this;
     }
 
     public function getConfig(): Config {
-        return $this->config;
+        return $this->getConfigService()->getConfig();
     }
 
     /**
@@ -37,7 +42,7 @@ class TaskService {
      */
     public function getTasks(): TaskCollection {
         $taskCollection = new TaskCollection();
-        foreach (glob($this->config->getTaskDirectory() . DIRECTORY_SEPARATOR . '*.json') as $filepath):
+        foreach (glob($this->getConfig()->getTaskDirectory() . DIRECTORY_SEPARATOR . '*.json') as $filepath):
             $taskCollection->add($this->serializerService->read($filepath, Task::class));
         endforeach;
 
@@ -59,11 +64,24 @@ class TaskService {
             return $this
                 ->setTask($this->serializerService->read($filepath, Task::class))
                 ->getTask();
+        elseif (($name = $this->getConfig()->getTaskId()) && $task = $this->findTaskByName($name)):
+            $this->setConfig($this->getConfig()->setTaskId($task->getId()));
+            return $task;
         elseif ($createItIfNotExist):
             return $this->create()->getTask();
-        else:
-            throw new TaskNotFoundException($this->getConfig()->getTaskId());
         endif;
+
+        throw new TaskNotFoundException($this->getConfig()->getTaskId());
+    }
+
+    private function findTaskByName(string $name): Task|null {
+        if (($tasks = $this->getTasks()->findByName($name))->count() === 1):
+            return $tasks->first();
+        elseif ($tasks->count() > 1):
+            throw new \Exception("Multiple tasks found with the same name"); 
+        endif;
+
+        return null;
     }
 
     public function setTask(Task|null $task = null): self {
@@ -83,10 +101,6 @@ class TaskService {
 
         $this->setConfig($this->getConfig()->setTaskId($task->getId()));
 
-        if ($task->isRun()):
-            $task->addStep($this->stepService->create());
-        endif;
-
         $this->serializerService->writeTask($this->getTaskFilepath(), $task);
 
         return $this->setTask($task);
@@ -95,7 +109,7 @@ class TaskService {
     /**
      * @throws FileNotFoundException
      * @throws JsonDecodeException
-     * @throws StrToTimeDurationException
+     * @throws DurationStrToTimeException
      * @throws TaskNotFoundException
      */
     public function start(bool|null $createItIfNotExist = true): self {
@@ -123,7 +137,7 @@ class TaskService {
         $task = $this
             ->getTask($createItIfNotExist)
             ->setRun(false);
-
+        
         if (($lastStep = $task->getSteps()?->last()) && $lastStep->getSeconds() === null):
             $task
                 ->getSteps()
@@ -162,6 +176,10 @@ class TaskService {
         return $this->getConfig()->getTaskDirectory().DIRECTORY_SEPARATOR.$this->getConfig()->getTaskId().'.json';
     }
 
+    /**
+     * @throws DurationStrToTimeException
+     * @throws RemainingStrToTimeException
+     */
     public function update(
         string|false $name = false,
         string|false $duration = false,
@@ -189,6 +207,9 @@ class TaskService {
         if ($remaining !== false):
             $remaining = $this->timestampService->convert($remaining);
             $timestamp = strtotime($remaining, $now = (new \DateTime())->getTimestamp());
+            if (!$timestamp):
+                throw new RemainingStrToTimeException($remaining);
+            endif;
             $seconds = $timestamp - $now;
             $task->setRemaining($seconds);
         endif;

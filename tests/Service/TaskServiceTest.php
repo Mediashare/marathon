@@ -7,6 +7,7 @@ use Mediashare\Marathon\Entity\Task;
 use Mediashare\Marathon\Exception\FileNotFoundException;
 use Mediashare\Marathon\Exception\JsonDecodeException;
 use Mediashare\Marathon\Exception\TaskNotFoundException;
+use Mediashare\Marathon\Service\ConfigService;
 use Mediashare\Marathon\Service\SerializerService;
 use Mediashare\Marathon\Service\StepService;
 use Mediashare\Marathon\Service\TaskService;
@@ -14,7 +15,7 @@ use Mediashare\Marathon\Service\TimestampService;
 use Symfony\Component\Filesystem\Filesystem;
 
 class TaskServiceTest extends AbstractServiceTestCase {
-    private TaskService $taskService;
+    private TaskService|null $taskService = null;
 
     public function setUp(): void {
         parent::setUp();
@@ -24,6 +25,11 @@ class TaskServiceTest extends AbstractServiceTestCase {
             $timestampService,
             new SerializerService($filesystem = new Filesystem()),
             $filesystem,
+            new ConfigService(
+                $this->taskService,
+                new SerializerService($filesystem),
+                $filesystem,
+            )
         );
     }
 

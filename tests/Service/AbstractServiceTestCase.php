@@ -4,7 +4,7 @@ namespace Mediashare\Marathon\Tests\Service;
 
 use PHPUnit\Framework\TestCase;
 
-class AbstractServiceTestCase extends TestCase {
+abstract class AbstractServiceTestCase extends TestCase {
     public string $marathonDirectory;
     public string $configPath;
     public string $taskDirectory;

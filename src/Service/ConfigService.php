@@ -10,19 +10,31 @@ use Mediashare\Marathon\Entity\Config;
 
 class ConfigService {
     private Config|null $config = null;
+    private TaskService $taskService;
+    private SerializerService $serializerService;
+    private Filesystem $filesystem;
 
-    public function __construct(
-        private readonly TaskService $taskService,
-        private readonly SerializerService $serializerService,
-        private readonly Filesystem $filesystem,
-    ) { }
+    public function setTaskService(TaskService $taskService): self {
+        $this->taskService = $taskService;
+        return $this;
+    }
+
+    public function setSerializerService(SerializerService $serializerService): self {
+        $this->serializerService = $serializerService;
+        return $this;
+    }
+
+    public function setFilesystem(Filesystem $filesystem): self {
+        $this->filesystem = $filesystem;
+        return $this;
+    }
 
     /**
      * @throws FileNotFoundException
      * @throws JsonDecodeException
      * @throws \JsonException
      */
-    public function setConfig(
+    public function initConfig(
         string|false $configPath = false,
         string|false $taskDirectory = false,
         string|false $editor = false,
@@ -32,7 +44,7 @@ class ConfigService {
             $this->writeLastConfigPathIntoMainConfig($configPath);
         endif;
 
-        $this->config = new Config(
+        $this->setConfig(new Config(
             $configPath = $configPath ?: $this->getLastConfigPath(),
             $taskDirectory ?: $this->getLastTaskDirectory(),
             $editor ?: $this->getLastEditor(),
@@ -43,7 +55,13 @@ class ConfigService {
                     ?: $this->getLastTaskIdByDirectory(configPath: $configPath, taskDirectory: $taskDirectory)
                 )
             ,
-        );
+        ));
+
+        return $this;
+    }
+
+    public function setConfig(Config $config): self {
+        $this->config = $config;
 
         return $this;
     }
@@ -196,5 +214,12 @@ class ConfigService {
             ->setConfigPath($configPath)
         ;
         $this->write(Config::CONFIG_PATH);
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function removeTaskIdConfig(): self {
+        return $this->setConfig($this->getConfig()->setTaskId(null))->write();
     }
 }

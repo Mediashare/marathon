@@ -11,26 +11,29 @@ use Mediashare\Marathon\Service\TimestampService;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ConfigServiceTest extends AbstractServiceTestCase {
-    private ConfigService $configService;
+    private ConfigService|null $configService = null;
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->configService = new ConfigService(
-            new TaskService(
-                new StepService($timestampService = new TimestampService()),
-                $timestampService,
-                $serializer = new SerializerService($filesystem = new Filesystem()),
-                $filesystem,
-            ), $serializer, $filesystem,
-        );
+        $this->configService = new ConfigService();
+        $this->configService
+            ->setTaskService(
+                new TaskService(
+                    new StepService($timestampService = new TimestampService()),
+                    $timestampService,
+                    $serializer = new SerializerService($filesystem = new Filesystem()),
+                    $filesystem,
+                    $this->configService,
+                )
+            )->setSerializerService($serializer)->setFilesystem($filesystem);
     }
 
     /**
      * @throws \JsonException
      */
     public function testWrite(): void {
-        $config = $this->configService->setConfig(
+        $config = $this->configService->initConfig(
             configPath: $this->configPath,
             taskDirectory: $this->taskDirectory,
             taskId: $taskId = 'taskId',
