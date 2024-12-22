@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 #[AsCommand(
     name: 'task:list',
@@ -43,7 +42,6 @@ class TaskListCommand extends Command {
     public function __construct(
         private readonly HandlerService $handlerService,
         private readonly OutputService $outputService,
-        private readonly KernelInterface $kernel,
     ) {
         parent::__construct();
     }
@@ -75,8 +73,6 @@ class TaskListCommand extends Command {
                 ->setTask($this->handlerService->getTasks())
                 ->setIO($input, $output)
                 ->outputRenderTasks();
-
-                dd($this->kernel->getCacheDir());
 
             return Command::SUCCESS;
         } catch (\Exception $exception) {

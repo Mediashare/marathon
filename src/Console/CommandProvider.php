@@ -21,7 +21,7 @@ final class CommandProvider implements CommandLoaderInterface
         'git:gitignore' => ['class' => GitGitignoreCommand::class, 'dependencies' => []],
         'task:archive' => ['class' => TaskArchiveCommand::class],
         'task:delete' => ['class' => TaskDeleteCommand::class],
-        'task:list' => ['class' => TaskListCommand::class, 'dependencies' => ['handlerService', 'outputService', 'kernel']],
+        'task:list' => ['class' => TaskListCommand::class, 'dependencies' => ['handlerService', 'outputService']],
         'task:start' => ['class' => TaskStartCommand::class],
         'task:status' => ['class' => TaskStatusCommand::class],
         'task:stop' => ['class' => TaskStopCommand::class],
