@@ -16,8 +16,6 @@ use Symfony\Component\Console\Output\OutputInterface;
     description: '<comment>Deleting</comment> the commit from task',
 )]
 class CommitDeleteCommand extends Command {
-    protected static $defaultName = 'commit:delete';
-
     protected function configure(): void {
         $this
             ->addArgument('commit-id', InputArgument::REQUIRED, '<comment>Commit ID</comment>')

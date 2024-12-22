@@ -33,7 +33,7 @@ phpunit: test ## Run PHPUnit tests
 ##
 ##Build
 ##
-compile: tests install-opti cache ## Build Marathon project
+compile: tests install-opti cache warmup ## Build Marathon project
 	box compile
 build: compile ## Build Marathon project
 

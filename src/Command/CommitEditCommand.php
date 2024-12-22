@@ -17,8 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
     aliases: ['edit'],
 )]
 class CommitEditCommand extends Command {
-    protected static $defaultName = 'commit:edit';
-
     protected function configure(): void {
         $this
             ->addArgument('commit-id', InputArgument::REQUIRED, '<comment>Commit ID</comment>')

@@ -13,8 +13,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
     aliases: ['gitignore', 'git'],
 )]
 class GitGitignoreCommand extends Command {
-    protected static $defaultName = 'git:gitignore';
-
     protected function execute(InputInterface $input, OutputInterface $output): int {
         if (file_exists($filepath = './.gitignore')):
             $currentContent = file_get_contents($filepath);

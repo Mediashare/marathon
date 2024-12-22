@@ -17,8 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
     aliases: ['status', 'statut'],
 )]
 class TaskStatusCommand extends Command {
-    protected static $defaultName = 'task:status';
-    
     protected function configure(): void {
         $this
             ->addArgument('task-id', InputArgument::OPTIONAL, 'Task <comment>ID</comment> or <comment>name</comment>', null)

@@ -17,8 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
     aliases: ['delete', 'remove'],
 )]
 class TaskDeleteCommand extends Command {
-    protected static $defaultName = 'task:delete';
-    
     protected function configure(): void {
         $this
             ->addArgument('task-id', InputArgument::REQUIRED, 'Task <comment>ID</comment> or <comment>name</comment>')

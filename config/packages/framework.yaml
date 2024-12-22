@@ -4,9 +4,9 @@ framework:
     session: false
     assets: false
     csrf_protection: false
-    cache: null
     profiler:
         enabled: false
+        collect: false
     router:
         enabled: false
     annotations:
@@ -15,6 +15,7 @@ framework:
         enabled: true
     translator:
         enabled: false
+        cache_dir: null
     mailer:
         enabled: false
     rate_limiter:

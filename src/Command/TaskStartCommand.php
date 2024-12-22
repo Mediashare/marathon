@@ -16,9 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     description: '<comment>Starting</comment> step of task',
     aliases: ['start', 'task:run', 'run', 'task'],
 )]
-class TaskStartCommand extends Command {
-    protected static $defaultName = 'task:start';
-    
+class TaskStartCommand extends Command {    
     protected function configure(): void {
         $this
             ->addArgument('task-id', InputArgument::OPTIONAL, 'Task <comment>ID</comment> or <comment>name</comment>', null)

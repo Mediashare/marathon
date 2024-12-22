@@ -17,8 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
     aliases: ['commit', 'beer'],
 )]
 class CommitCreateCommand extends Command {
-    protected static $defaultName = 'commit:create';
-
     protected function configure(): void {
         $this
             ->addArgument('message', InputArgument::OPTIONAL, 'Define a commit <comment>message</comment>', false)

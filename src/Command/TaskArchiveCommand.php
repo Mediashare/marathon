@@ -16,9 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     description: '<comment>Archive</comment> the task',
     aliases: ['archive', 'end', 'finish'],
 )]
-class TaskArchiveCommand extends Command {
-    protected static $defaultName = 'task:archive';
-    
+class TaskArchiveCommand extends Command {    
     protected function configure(): void {
         $this
             ->addArgument('task-id', InputArgument::REQUIRED, 'Task <comment>ID</comment> or <comment>name</comment>')

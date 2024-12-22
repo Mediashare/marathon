@@ -15,8 +15,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
     aliases: ['update', 'upgrade'],
 )]
 Class VersionUpgradeCommand extends Command {
-    protected static $defaultName = 'version:update';
-
     public function __construct(
         private readonly HttpClientInterface $client,
     ) { 

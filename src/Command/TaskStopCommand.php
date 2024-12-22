@@ -17,8 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
     aliases: ['stop', 'pause'],
 )]
 class TaskStopCommand extends Command {
-    protected static $defaultName = 'task:stop';
-    
     protected function configure(): void {
         $this
             ->addArgument('task-id', InputArgument::OPTIONAL, 'Task <comment>ID</comment> or <comment>name</comment>', null)

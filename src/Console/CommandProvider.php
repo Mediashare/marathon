@@ -9,7 +9,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
 final class CommandProvider implements CommandLoaderInterface
 {
-    private const DEFAULT_DEPENDENCIES = ['handleService', 'outputService'];
+    private const DEFAULT_DEPENDENCIES = ['handlerService', 'outputService'];
     
     /**
      * @var array<string, array{class: class-string<Command>, dependencies?: array<string>}>
@@ -21,7 +21,7 @@ final class CommandProvider implements CommandLoaderInterface
         'git:gitignore' => ['class' => GitGitignoreCommand::class, 'dependencies' => []],
         'task:archive' => ['class' => TaskArchiveCommand::class],
         'task:delete' => ['class' => TaskDeleteCommand::class],
-        'task:list' => ['class' => TaskListCommand::class],
+        'task:list' => ['class' => TaskListCommand::class, 'dependencies' => ['handlerService', 'outputService', 'kernel']],
         'task:start' => ['class' => TaskStartCommand::class],
         'task:status' => ['class' => TaskStatusCommand::class],
         'task:stop' => ['class' => TaskStopCommand::class],
@@ -72,7 +72,7 @@ final class CommandProvider implements CommandLoaderInterface
     private function resolveDependencies(array $config): array
     {
         $dependencyNames = $config['dependencies'] ?? self::DEFAULT_DEPENDENCIES;
-        
+        dd($dependencyNames);
         return array_map(
             fn(string $serviceName): object => $this->serviceLocator->get($serviceName),
             $dependencyNames

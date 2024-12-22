@@ -21,4 +21,14 @@ class Kernel extends BaseKernel
     {
         return dirname(__DIR__);
     }
+
+    public function getCacheDir(): string
+    {
+        return sys_get_temp_dir() . '/marathon_cache';
+    }
+
+    public function getLogDir(): string
+    {
+        return sys_get_temp_dir() . '/marathon.log';
+    }
 }
