@@ -41,18 +41,17 @@
         "ext-xmlwriter": "*",
         "phppkg/cli-markdown": "^2.0",
         "ramsey/collection": "^2.0",
-        "symfony/cache": "*",
-        "symfony/console": "^7.1",
-        "symfony/dotenv": "^7.1",
-        "symfony/emoji": "^7.1",
+        "symfony/console": "^7.2",
+        "symfony/dotenv": "^7.2",
+        "symfony/emoji": "^7.2",
         "symfony/flex": "*",
-        "symfony/framework-bundle": "^7.1",
-        "symfony/http-client": "^7.1",
-        "symfony/property-access": "^7.1",
-        "symfony/property-info": "^7.1",
+        "symfony/framework-bundle": "^7.2",
+        "symfony/http-client": "^7.2",
+        "symfony/property-access": "^7.2",
+        "symfony/property-info": "^7.2",
         "symfony/runtime": "*",
-        "symfony/serializer": "^7.1",
-        "symfony/yaml": "^7.1"
+        "symfony/serializer": "^7.2",
+        "symfony/yaml": "^7.2"
     },
     "bin": ["marathon"],
     "config": {
@@ -87,16 +86,6 @@
         "symfony/polyfill-php56": "*"
     },
     "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        },
-        "post-install-cmd": [
-            "@auto-scripts"
-        ],
-        "post-update-cmd": [
-            "@auto-scripts"
-        ],
         "console-package": "php bin/marathon"
     },
     "conflict": {
@@ -105,7 +94,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "^7.1",
+            "require": "^7.2",
             "console": "bin/console"
         },
         "marathon": {
@@ -122,6 +111,6 @@
         "ext-xml": "*",
         "ext-xmlwriter": "*",
         "phpunit/phpunit": "^9.5",
-        "symfony/phpunit-bridge": "^7.1"
+        "symfony/phpunit-bridge": "^7.2"
     }
 }
