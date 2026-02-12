@@ -18,6 +18,6 @@ return function (array $context) {
     $application = new Application($kernel);
     $application->setName("Marathon");
     $application->setVersion($_ENV['APP_VERSION'] ?? '');
-    
+
     return $application;
 };

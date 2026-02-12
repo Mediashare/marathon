@@ -20,7 +20,7 @@
             "in": "src"
         }
     ],
-    "banner": "*** Marathon (Version 0.1.8) ***",
+    "banner": "*** Marathon (Version 0.1.9) ***",
     "stub": true,
     "dump-autoload": false,
     "annotations": true
