@@ -3,9 +3,11 @@
 ##
 install-opti: ## Composer install optimized
 	composer install --no-scripts --no-autoloader --no-dev
+	composer bin box require humbug/box
 	composer dump-autoload --classmap-authoritative --no-dev --optimize
 install: ## Composer install
 	composer install --no-scripts --no-autoloader
+	composer bin box require humbug/box
 	composer dump-autoload --classmap-authoritative --optimize
 
 ##
@@ -34,14 +36,14 @@ phpunit: test ## Run PHPUnit tests
 ##Build
 ##
 compile: tests install-opti cache warmup ## Build Marathon project
-	box compile
+	./vendor-bin/box/vendor/humbug/box/bin/box compile
 build: compile ## Build Marathon project
 
 build-prod: tests install-opti cache ## Build Marathon project
-	box compile
+	./vendor-bin/box/vendor/humbug/box/bin/box compile
 
 build-without-tests: install-opti cache ## Build Marathon project without running tests
-	box compile
+	./vendor-bin/box/vendor/humbug/box/bin/box compile
 build-without-test: build-without-tests ## Build Marathon project without running tests
 compile-without-tests: build-without-tests ## Build Marathon project without running tests
 compile-without-test: build-without-tests ## Build Marathon project without running tests

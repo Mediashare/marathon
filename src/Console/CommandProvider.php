@@ -72,7 +72,7 @@ final class CommandProvider implements CommandLoaderInterface
 
         /** @var class-string<Command> $className */
         $className = $config['class'];
-        
+
         return new $className(...$dependencies);
     }
 
