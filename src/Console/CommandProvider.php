@@ -2,6 +2,17 @@
 
 namespace Mediashare\Marathon\Console;
 
+use Mediashare\Marathon\Command\CommitCreateCommand;
+use Mediashare\Marathon\Command\CommitDeleteCommand;
+use Mediashare\Marathon\Command\CommitEditCommand;
+use Mediashare\Marathon\Command\GitGitignoreCommand;
+use Mediashare\Marathon\Command\TaskArchiveCommand;
+use Mediashare\Marathon\Command\TaskDeleteCommand;
+use Mediashare\Marathon\Command\TaskListCommand;
+use Mediashare\Marathon\Command\TaskStartCommand;
+use Mediashare\Marathon\Command\TaskStatusCommand;
+use Mediashare\Marathon\Command\TaskStopCommand;
+use Mediashare\Marathon\Command\VersionUpgradeCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
@@ -72,7 +83,7 @@ final class CommandProvider implements CommandLoaderInterface
     private function resolveDependencies(array $config): array
     {
         $dependencyNames = $config['dependencies'] ?? self::DEFAULT_DEPENDENCIES;
-        dd($dependencyNames);
+
         return array_map(
             fn(string $serviceName): object => $this->serviceLocator->get($serviceName),
             $dependencyNames
