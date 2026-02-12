@@ -20,7 +20,7 @@ class CommitCreateCommand extends Command {
     protected function configure(): void {
         $this
             ->addArgument('message', InputArgument::OPTIONAL, 'Define a commit <comment>message</comment>', false)
-            ->addOption('editor', 'e', InputOption::VALUE_NONE, 'Open default message <comment>editor</comment>')
+            ->addOption('draft', 'D', InputOption::VALUE_NONE, 'Open default message into <comment>editor</comment>')
             ->addOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Set the <comment>duration</comment> of the new commit (ex: "<comment>10min</comment>", "<comment>1d</comment>", "<comment>1 day 10 minutes</comment>", "<comment>1h</comment>", "<comment>2 hours</comment>", "<comment>-1hour</comment>")', false)
             ->addOption('task-id', 't', InputOption::VALUE_REQUIRED, 'Task <comment>ID</comment> or <comment>name</comment>', null)
 
